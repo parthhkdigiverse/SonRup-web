@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Sonrup™ - Premium Family Wellness Support</title>
+    <meta name="description" content="Get in touch with our family wellness support team. Lic No: GA/646-A. Marketed By Sonrup, Surat, Gujarat. Sugar-free Ayurvedic and daily multivitamin support.">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        .contact-layout {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 50px;
+            margin-top: 40px;
+        }
+
+        .contact-card-box {
+            background-color: var(--bg-dark-card);
+            border: 1px solid var(--border-dark);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        .contact-form-group {
+            margin-bottom: 20px;
+        }
+
+        .contact-form-group label {
+            display: block;
+            color: #FFFFFF;
+            font-size: 13.5px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .contact-input {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background-color: rgba(255, 255, 255, 0.02);
+            color: #FFFFFF;
+            font-size: 14px;
+            font-family: var(--font-body);
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+
+        .contact-input:focus {
+            border-color: var(--color-gold);
+            background-color: rgba(255, 255, 255, 0.04);
+        }
+
+        textarea.contact-input {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .contact-info-list {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .contact-info-item {
+            display: flex;
+            gap: 15px;
+        }
+
+        .contact-icon-wrapper {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background-color: rgba(201, 162, 39, 0.05);
+            border: 1px solid rgba(201, 162, 39, 0.15);
+            color: var(--color-gold);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .contact-text-wrapper h3 {
+            font-size: 16px;
+            color: #FFFFFF;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .contact-text-wrapper p {
+            font-size: 13.5px;
+            color: var(--text-on-dark-muted);
+            line-height: 1.6;
+        }
+
+        @media (max-width: 992px) {
+            .contact-layout {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+        }
+    </style>
+</head>
+<body class="shop-catalog-body">
+
+    <!-- Sticky Header -->
+    <header class="site-header scrolled" id="main-header">
+        <div class="header-container">
+            <a href="index.html" class="brand-logo" id="logo-link">
+                <!-- SVG Bear Logo (Sonrup Logo) -->
+                <svg width="40" height="40" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="50" cy="50" r="45" stroke="#C9A227" stroke-width="2" />
+                    <path d="M35 38C35 32 45 28 50 35C55 28 65 32 65 38C65 52 50 68 50 68C50 68 35 52 35 38Z" fill="#C9A227" />
+                    <circle cx="43" cy="40" r="3" fill="#121212" />
+                    <circle cx="57" cy="40" r="3" fill="#121212" />
+                    <path d="M47 48C47 48 48 50 50 50C52 50 53 48 53 48" stroke="#121212" stroke-width="2" stroke-linecap="round" />
+                    <path d="M50 25C47 25 45 23 45 21C45 19 47 18 50 18C53 18 55 19 55 21C55 23 53 25 50 25Z" fill="#D9B24C" />
+                </svg>
+                <span class="brand-name">s<span>o</span>nrup</span>
+            </a>
+            
+            <nav class="nav-links" id="nav-navigation">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="shop.html" class="nav-link">Shop</a>
+                <a href="about.html" class="nav-link">Our Story</a>
+                <a href="faq.html" class="nav-link">FAQs</a>
+                <a href="blog.html" class="nav-link">Blog</a>
+                <a href="contact.html" class="nav-link active">Contact</a>
+            </nav>
+
+            <div class="header-actions" id="header-auth-actions">
+                <button class="cart-trigger" id="cart-button" aria-label="View Cart">
+                    <i data-lucide="shopping-cart"></i>
+                    <span class="cart-badge" id="cart-count">0</span>
+                </button>
+                <a href="login.html" class="btn-secondary btn-sm" id="header-login-btn">Login</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container" style="padding-top: 130px; padding-bottom: 80px;">
+        <!-- Breadcrumb -->
+        <nav class="breadcrumb" style="font-size: 12px; margin-bottom: 30px; color: var(--text-on-dark-muted);">
+            <a href="index.html" style="color: var(--color-gold);">Home</a> / 
+            <span>Contact Us</span>
+        </nav>
+
+        <!-- Contact Header -->
+        <div class="section-header" style="margin-bottom: 40px; text-align: left;">
+            <span class="sub-heading">GET IN TOUCH</span>
+            <h1 style="font-size: 36px; color: #FFFFFF; font-family: var(--font-heading); margin-top: 10px;">Contact Our Team</h1>
+            <p class="section-desc" style="margin-left: 0; max-width: 600px;">Have questions about shipping, dosage, or wholesale orders? Drop us a message, and our customer wellness team will reply within 24 hours.</p>
+        </div>
+
+        <!-- Contact Layout -->
+        <div class="contact-layout">
+            <!-- Left Side: Form -->
+            <div class="contact-card-box">
+                <form id="contact-form">
+                    <div class="contact-form-group">
+                        <label for="contact-name">Full Name</label>
+                        <input type="text" id="contact-name" class="contact-input" placeholder="Enter your name" required>
+                    </div>
+                    <div class="contact-form-group">
+                        <label for="contact-email">Email Address</label>
+                        <input type="email" id="contact-email" class="contact-input" placeholder="name@domain.com" required>
+                    </div>
+                    <div class="contact-form-group">
+                        <label for="contact-subject">Subject</label>
+                        <input type="text" id="contact-subject" class="contact-input" placeholder="How can we help?" required>
+                    </div>
+                    <div class="contact-form-group">
+                        <label for="contact-message">Message</label>
+                        <textarea id="contact-message" class="contact-input" placeholder="Type your query in detail..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn-primary btn-block" style="justify-content: center; margin-top: 25px;">Send Message</button>
+                </form>
+            </div>
+
+            <!-- Right Side: Details -->
+            <div style="display: flex; flex-direction: column; justify-content: space-between; padding: 10px 0;">
+                <div class="contact-info-list">
+                    <!-- Office -->
+                    <div class="contact-info-item">
+                        <div class="contact-icon-wrapper">
+                            <i data-lucide="map-pin"></i>
+                        </div>
+                        <div class="contact-text-wrapper">
+                            <h3>Marketed Headquarters</h3>
+                            <p>SONRUP<br>A 584 Sitaram Society, Punagam Road,<br>Surat - 395010, Gujarat, India</p>
+                        </div>
+                    </div>
+
+                    <!-- Manufacturing -->
+                    <div class="contact-info-item">
+                        <div class="contact-icon-wrapper">
+                            <i data-lucide="factory"></i>
+                        </div>
+                        <div class="contact-text-wrapper">
+                            <h3>Manufacturing Lab</h3>
+                            <p>KELLEN HEALTHCARE<br>GMP & ISO Certified Facility</p>
+                        </div>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="contact-info-item">
+                        <div class="contact-icon-wrapper">
+                            <i data-lucide="mail"></i>
+                        </div>
+                        <div class="contact-text-wrapper">
+                            <h3>Direct Email Support</h3>
+                            <p>info@sonrup.com<br>sales@sonrup.com</p>
+                        </div>
+                    </div>
+
+                    <!-- Phone -->
+                    <div class="contact-info-item">
+                        <div class="contact-icon-wrapper">
+                            <i data-lucide="phone"></i>
+                        </div>
+                        <div class="contact-text-wrapper">
+                            <h3>Customer Care Helpline</h3>
+                            <p>+91 76001 75193<br>Mon - Sat, 10:00 AM - 6:00 PM IST</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Shopping Cart Drawer (Sidebar) -->
+    <div class="cart-drawer" id="cart-drawer" aria-hidden="true">
+        <div class="cart-overlay"></div>
+        <div class="cart-wrapper">
+            <div class="cart-header">
+                <h2>Your Shopping Cart</h2>
+                <button class="close-cart" id="close-cart-btn" aria-label="Close cart">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            
+            <div class="cart-body">
+                <div class="cart-empty-message" id="cart-empty-msg">
+                    <i data-lucide="shopping-bag" class="empty-bag-icon"></i>
+                    <p>Your cart is empty</p>
+                    <a href="#products-section" class="btn-primary btn-sm close-cart-btn-nav" style="margin-top: 15px;">Shop Our Gummies</a>
+                </div>
+                <div class="cart-items-container" id="cart-items-list">
+                    <!-- Dynamic Cart Items go here -->
+                </div>
+            </div>
+            
+            <div class="cart-footer" id="cart-footer-panel">
+                <div class="cart-summary-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-weight: 600; font-size: 16px;">
+                    <span>Subtotal</span>
+                    <span class="cart-subtotal-price" id="cart-subtotal" style="color: var(--color-gold); font-family: var(--font-heading);">₹0.00</span>
+                </div>
+                <p class="shipping-note" style="font-size: 11px; color: var(--text-on-dark-muted); margin-bottom: 16px; display: flex; align-items: center; gap: 6px;"><i data-lucide="truck" style="width: 14px; height: 14px; color: var(--color-gold);"></i> Free Express Shipping applied</p>
+                <button class="btn-primary btn-block" id="cart-checkout-btn">Proceed to Checkout</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="container footer-grid">
+            <div class="footer-brand-col">
+                <a href="index.html" class="brand-logo footer-logo">
+                    <svg width="35" height="35" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="50" cy="50" r="45" stroke="#C9A227" stroke-width="2" />
+                        <path d="M35 38C35 32 45 28 50 35C55 28 65 32 65 38C65 52 50 68 50 68C50 68 35 52 35 38Z" fill="#C9A227" />
+                    </svg>
+                    <span class="brand-name">sonrup</span>
+                </a>
+                <p class="footer-desc">Premium natural wellness solutions. Empowering health, strength, and happiness across generations.</p>
+                <div class="social-links">
+                    <a href="#" aria-label="Facebook"><i data-lucide="facebook"></i></a>
+                    <a href="#" aria-label="Instagram"><i data-lucide="instagram"></i></a>
+                    <a href="#" aria-label="Twitter"><i data-lucide="twitter"></i></a>
+                </div>
+            </div>
+
+            <div class="footer-links-col">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="shop.html">Our Gummies</a></li>
+                    <li><a href="blog.html">Wellness Blog</a></li>
+                    <li><a href="contact.html">Contact Us</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-legal-col">
+                <h3>Regulatory Info</h3>
+                <p><strong>Lic No:</strong> GA/646-A</p>
+                <p><strong>FSSAI:</strong> 10726997000544</p>
+                <p class="disclaimer">Disclaimer: These products are nutraceuticals and not intended to diagnose, treat, cure, or prevent any disease.</p>
+            </div>
+
+            <div class="footer-contact-col">
+                <h3>Marketed & Manufactured</h3>
+                <p><strong>Marketed By:</strong> SONRUP<br>A 584 Sitaram Society, Punagam Road, Surat-395010</p>
+                <p><strong>Manufactured By:</strong> KELLEN HEALTHCARE</p>
+                <p class="contact-methods">
+                    <span><i data-lucide="mail"></i> info@sonrup.com</span>
+                    <span><i data-lucide="phone"></i> +91 76001 75193</span>
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Toast Notification -->
+    <div class="toast-notification" id="toast-message">
+        <i data-lucide="check-circle" class="toast-icon"></i>
+        <div class="toast-content">
+            <h4 id="toast-title">Success</h4>
+            <p id="toast-body">Message</p>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

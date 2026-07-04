@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sonrup™ - Your Profile & Order History</title>
+    <meta name="description" content="Manage your Sonrup account details and track your family wellness combo subscriptions.">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="profile-page">
+
+    <!-- Sticky Header -->
+    <header class="site-header scrolled" id="main-header">
+        <div class="header-container">
+            <a href="index.html" class="brand-logo" id="logo-link">
+                <svg width="40" height="40" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="50" cy="50" r="45" stroke="#C9A227" stroke-width="2" />
+                    <path d="M35 38C35 32 45 28 50 35C55 28 65 32 65 38C65 52 50 68 50 68C50 68 35 52 35 38Z" fill="#C9A227" />
+                    <circle cx="43" cy="40" r="3" fill="#121212" />
+                    <circle cx="57" cy="40" r="3" fill="#121212" />
+                </svg>
+                <span class="brand-name">s<span>o</span>nrup</span>
+            </a>
+            <nav class="nav-links" id="nav-navigation">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="shop.html" class="nav-link">Shop</a>
+                <a href="about.html" class="nav-link">Our Story</a>
+                <a href="faq.html" class="nav-link">FAQs</a>
+                <a href="blog.html" class="nav-link">Blog</a>
+                <a href="contact.html" class="nav-link">Contact</a>
+            </nav>
+
+            <div class="header-actions" id="header-auth-actions">
+                <button class="cart-trigger" id="cart-button" aria-label="View Cart">
+                    <i data-lucide="shopping-cart"></i>
+                    <span class="cart-badge" id="cart-count">0</span>
+                </button>
+                <a href="profile.html" class="nav-profile-btn" id="header-profile-icon" aria-label="Profile" style="display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid var(--color-gold); background: rgba(201, 162, 39, 0.1); color: var(--color-gold); cursor: pointer;">
+                    <i data-lucide="user" style="width: 16px; height: 16px;"></i>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container" style="padding-top: 130px; padding-bottom: 60px;">
+        <!-- Welcome banner -->
+        <div style="background: linear-gradient(135deg, rgba(201, 162, 39, 0.08) 0%, rgba(18, 18, 18, 0.5) 100%); border: 1px solid var(--border-dark); border-radius: 16px; padding: 40px; margin-bottom: 40px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
+            <div>
+                <h1 style="font-size: 32px; color: #FFFFFF; font-family: var(--font-heading); margin-bottom: 8px;">Hello, <span id="profile-welcome-name">Valued Customer</span></h1>
+                <p style="color: var(--text-on-dark-muted); font-size: 14px;">Welcome to your Sonrup wellness dashboard. View orders and update addresses.</p>
+            </div>
+            <button id="logout-btn" class="btn-secondary btn-sm" style="color: #FF5A5A; border-color: rgba(255, 90, 90, 0.2);"><i data-lucide="log-out" style="width: 14px; height: 14px; margin-right: 6px;"></i>Log Out</button>
+        </div>
+
+        <div class="profile-layout" style="display: grid; grid-template-columns: 1fr 2fr; gap: 40px; align-items: start;">
+            <!-- Left Side: Profile Details -->
+            <div style="background-color: var(--bg-dark-card); border: 1px solid var(--border-dark); border-radius: 16px; padding: 30px;">
+                <h2 style="font-size: 18px; color: #FFFFFF; margin-bottom: 20px; font-family: var(--font-heading); display: flex; align-items: center; gap: 10px;"><i data-lucide="user-check" class="text-gold"></i> Personal Information</h2>
+                <div style="display: flex; flex-direction: column; gap: 16px; font-size: 13.5px;">
+                    <div>
+                        <span style="display: block; font-size: 11px; text-transform: uppercase; color: var(--text-on-dark-muted); margin-bottom: 4px;">Full Name</span>
+                        <strong id="profile-detail-name" style="color: #FFFFFF;">John Doe</strong>
+                    </div>
+                    <div>
+                        <span style="display: block; font-size: 11px; text-transform: uppercase; color: var(--text-on-dark-muted); margin-bottom: 4px;">Email Address</span>
+                        <strong id="profile-detail-email" style="color: #FFFFFF;">john@example.com</strong>
+                    </div>
+                    <div>
+                        <span style="display: block; font-size: 11px; text-transform: uppercase; color: var(--text-on-dark-muted); margin-bottom: 4px;">Phone Number</span>
+                        <strong id="profile-detail-phone" style="color: #FFFFFF;">9876543210</strong>
+                    </div>
+                    <div>
+                        <span style="display: block; font-size: 11px; text-transform: uppercase; color: var(--text-on-dark-muted); margin-bottom: 4px;">Default Shipping Address</span>
+                        <strong id="profile-detail-address" style="color: #FFFFFF;">Flat 12, Sitaram Society, Surat - 395010</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side: Order History -->
+            <div style="background-color: var(--bg-dark-card); border: 1px solid var(--border-dark); border-radius: 16px; padding: 30px;">
+                <h2 style="font-size: 18px; color: #FFFFFF; margin-bottom: 20px; font-family: var(--font-heading); display: flex; align-items: center; gap: 10px;"><i data-lucide="shopping-bag" class="text-gold"></i> Order History</h2>
+                
+                <div id="profile-orders-list" style="display: flex; flex-direction: column; gap: 20px;">
+                    <!-- Dynamic Orders go here -->
+                    <div style="text-align: center; padding: 40px 20px; color: var(--text-on-dark-muted);" id="no-orders-msg">
+                        <i data-lucide="package-open" style="width: 48px; height: 48px; stroke-width: 1.5; color: var(--color-gold); margin-bottom: 12px; display: inline-block;"></i>
+                        <p style="font-size: 14.5px;">No orders placed yet.</p>
+                        <a href="index.html#products-section" class="btn-primary btn-sm" style="margin-top: 15px; display: inline-flex;">Shop Wellness Gummies</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="container footer-grid">
+            <div class="footer-brand-col">
+                <a href="index.html" class="brand-logo footer-logo">
+                    <svg width="35" height="35" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="50" cy="50" r="45" stroke="#C9A227" stroke-width="2" />
+                        <path d="M35 38C35 32 45 28 50 35C55 28 65 32 65 38C65 52 50 68 50 68C50 68 35 52 35 38Z" fill="#C9A227" />
+                    </svg>
+                    <span class="brand-name">sonrup</span>
+                </a>
+                <p class="footer-desc">Premium natural wellness solutions. Empowering health, strength, and happiness across generations.</p>
+                <div class="social-links">
+                    <a href="#" aria-label="Facebook"><i data-lucide="facebook"></i></a>
+                    <a href="#" aria-label="Instagram"><i data-lucide="instagram"></i></a>
+                    <a href="#" aria-label="Twitter"><i data-lucide="twitter"></i></a>
+                </div>
+            </div>
+
+            <div class="footer-links-col">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="shop.html">Our Gummies</a></li>
+                    <li><a href="blog.html">Wellness Blog</a></li>
+                    <li><a href="contact.html">Contact Us</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-legal-col">
+                <h3>Regulatory Info</h3>
+                <p><strong>Lic No:</strong> GA/646-A</p>
+                <p><strong>FSSAI:</strong> 10726997000544</p>
+                <p class="disclaimer">Disclaimer: These products are nutraceuticals and not intended to diagnose, treat, cure, or prevent any disease.</p>
+            </div>
+
+            <div class="footer-contact-col">
+                <h3>Marketed & Manufactured</h3>
+                <p><strong>Marketed By:</strong> SONRUP<br>A 584 Sitaram Society, Punagam Road, Surat-395010</p>
+                <p><strong>Manufactured By:</strong> KELLEN HEALTHCARE</p>
+                <p class="contact-methods">
+                    <span><i data-lucide="mail"></i> info@sonrup.com</span>
+                    <span><i data-lucide="phone"></i> +91 76001 75193</span>
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Shopping Cart Drawer -->
+    <div class="cart-drawer" id="cart-drawer" aria-hidden="true">
+        <div class="cart-overlay"></div>
+        <div class="cart-wrapper">
+            <div class="cart-header">
+                <h2>Your Shopping Cart</h2>
+                <button class="close-cart" id="close-cart-btn" aria-label="Close cart"><i data-lucide="x"></i></button>
+            </div>
+            <div class="cart-body">
+                <div class="cart-empty-message" id="cart-empty-msg">
+                    <i data-lucide="shopping-bag" class="empty-bag-icon"></i>
+                    <p>Your cart is empty</p>
+                </div>
+                <div class="cart-items-container" id="cart-items-list"></div>
+            </div>
+            <div class="cart-footer" id="cart-footer-panel">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                    <span>Subtotal</span>
+                    <span id="cart-subtotal">₹0.00</span>
+                </div>
+                <a href="checkout.html" class="btn-primary btn-block" style="text-align: center; text-decoration: none; display: flex; align-items: center; justify-content: center;">Proceed to Checkout</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Toast Notification -->
+    <div class="toast-notification" id="toast-message">
+        <i data-lucide="check-circle" class="toast-icon"></i>
+        <div class="toast-content">
+            <h4 id="toast-title">Success</h4>
+            <p id="toast-body">Message</p>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

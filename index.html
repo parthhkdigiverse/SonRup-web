@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sonrup™ Family Wellness Combo - Natural Wellness Gummies</title>
+    <meta name="description" content="Get the ultimate 3-in-1 family supplement bundle. Includes Himalayan Shilajit, Biotin + Multivitamin, and Kid's Multivitamin gummies. Sugar-free and natural.">
+    <!-- Google Fonts: Cinzel (premium serif) & Inter (clean sans-serif) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+    <!-- Sticky Header -->
+    <header class="site-header" id="main-header">
+        <div class="header-container">
+            <a href="#" class="brand-logo" id="logo-link">
+                <!-- SVG Bear Logo (Sonrup Logo) -->
+                <svg width="40" height="40" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="50" cy="50" r="45" stroke="#C9A227" stroke-width="2" />
+                    <!-- Stylized Bear mark -->
+                    <path d="M35 38C35 32 45 28 50 35C55 28 65 32 65 38C65 52 50 68 50 68C50 68 35 52 35 38Z" fill="#C9A227" />
+                    <circle cx="43" cy="40" r="3" fill="#121212" />
+                    <circle cx="57" cy="40" r="3" fill="#121212" />
+                    <path d="M47 48C47 48 48 50 50 50C52 50 53 48 53 48" stroke="#121212" stroke-width="2" stroke-linecap="round" />
+                    <path d="M50 25C47 25 45 23 45 21C45 19 47 18 50 18C53 18 55 19 55 21C55 23 53 25 50 25Z" fill="#D9B24C" />
+                </svg>
+                <span class="brand-name">s<span>o</span>nrup</span>
+            </a>
+            <nav class="nav-links" id="nav-navigation">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="shop.html" class="nav-link">Shop</a>
+                <a href="about.html" class="nav-link">Our Story</a>
+                <a href="faq.html" class="nav-link">FAQs</a>
+                <a href="blog.html" class="nav-link">Blog</a>
+                <a href="contact.html" class="nav-link">Contact</a>
+            </nav>
+
+            <div class="header-actions" id="header-auth-actions">
+                <button class="cart-trigger" id="cart-button" aria-label="View Cart">
+                    <i data-lucide="shopping-cart"></i>
+                    <span class="cart-badge" id="cart-count">0</span>
+                </button>
+                <a href="login.html" class="btn-secondary btn-sm" id="header-login-btn">Login</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="hero-section" id="combo-section">
+            <div class="hero-bg-overlay"></div>
+            <div class="hero-container">
+                <div class="hero-content">
+                    <div class="promo-badge">
+                        <i data-lucide="sparkles" class="text-gold"></i>
+                        <span>PREMIUM NATURAL WELLNESS</span>
+                    </div>
+                    <h1 class="hero-title">Premium Gummies for<br><span class="text-gold">Active Health & Beauty.</span></h1>
+                    <p class="hero-subtitle">Sugar-free, clinical-grade formulations crafted to fuel adult performance, daily glow, and kids' active growth. Experience modern Ayurveda and advanced science combined.</p>
+                    
+                    <div class="hero-actions" style="margin-top: 30px;">
+                        <a href="shop.html" class="btn-primary btn-lg" id="hero-cta-btn" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 10px;">
+                            <span>Explore Collection</span>
+                            <i data-lucide="arrow-right"></i>
+                        </a>
+                        <div class="hero-trust">
+                            <span><i data-lucide="shield-check" class="text-gold"></i> 100% Sugar-Free & Safe</span>
+                            <span><i data-lucide="truck"></i> Free Shipping India-Wide</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hero-image-wrapper">
+                    <div class="glowing-bg"></div>
+                    <img src="https://res.cloudinary.com/dr3vva4uq/image/upload/v1783158335/hero-combo.jpg" alt="Sonrup Family Wellness Combo Bottles" class="hero-combo-image" id="hero-image">
+                    <!-- Float badges -->
+                    <div class="float-badge shilajit-badge">
+                        <span class="dot gold-dot"></span> Adult Performance
+                    </div>
+                    <div class="float-badge biotin-badge">
+                        <span class="dot orange-dot"></span> Beauty & Energy
+                    </div>
+                    <div class="float-badge kids-badge">
+                        <span class="dot blue-dot"></span> Kids' Immunity
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Trust Strip -->
+        <section class="trust-strip" id="trust-strip">
+            <div class="trust-container">
+                <div class="trust-item">
+                    <div class="trust-icon"><i data-lucide="ban"></i></div>
+                    <div class="trust-text">
+                        <h4>Sugar Free</h4>
+                        <p>No Added Sugar</p>
+                    </div>
+                </div>
+                <div class="trust-item">
+                    <div class="trust-icon"><i data-lucide="droplet-off"></i></div>
+                    <div class="trust-text">
+                        <h4>No Artificial Color</h4>
+                        <p>100% Safe Formulas</p>
+                    </div>
+                </div>
+                <div class="trust-item">
+                    <div class="trust-icon"><i data-lucide="apple"></i></div>
+                    <div class="trust-text">
+                        <h4>Natural Fruit Flavor</h4>
+                        <p>Imli, Citrus & Mixed Fruit</p>
+                    </div>
+                </div>
+                <div class="trust-item">
+                    <div class="trust-icon"><span class="badge-text">FSSAI</span></div>
+                    <div class="trust-text">
+                        <h4>FSSAI Licensed</h4>
+                        <p>Regulated Quality</p>
+                    </div>
+                </div>
+                <div class="trust-item">
+                    <div class="trust-icon"><i data-lucide="calendar"></i></div>
+                    <div class="trust-text">
+                        <h4>36-Month Shelf Life</h4>
+                        <p>Long-Lasting Freshness</p>
+                    </div>
+                </div>
+                <div class="trust-item">
+                    <div class="trust-icon"><i data-lucide="map-pin"></i></div>
+                    <div class="trust-text">
+                        <h4>Made in India</h4>
+                        <p>Kellen Healthcare</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+
+
+
+        <!-- Ingredient / Label Transparency Panel -->
+        <section class="ingredients-section" id="ingredients-section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="sub-heading">TRANSPARENCY</span>
+                    <h2>Amount Per Gummy & Label Details</h2>
+                    <p class="section-desc">We believe in complete ingredient transparency. Here is the exact nutritional profile printed on our labels, tested for quality and purity.</p>
+                </div>
+
+                <div class="tab-system">
+                    <div class="tab-nav">
+                        <button class="tab-btn active" data-tab="shilajit-tab">Himalayan Shilajit</button>
+                        <button class="tab-btn" data-tab="biotin-tab">Biotin + Multivitamin</button>
+                        <button class="tab-btn" data-tab="kids-tab">Kid's Multivitamin</button>
+                    </div>
+
+                    <div class="tab-content active" id="shilajit-tab">
+                        <div class="label-table-wrapper">
+                            <table class="label-table">
+                                <thead>
+                                    <tr>
+                                        <th>Component</th>
+                                        <th>Key Features / Source</th>
+                                        <th>Unit Amount Per Gummy</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>Gummy Shilajit Resin</strong></td>
+                                        <td>75% Fulvic Acid Strength</td>
+                                        <td>200 mg</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Ashwagandha</strong></td>
+                                        <td>Withania somnifera</td>
+                                        <td>25 mg</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Flavour</strong></td>
+                                        <td>Imli (Tamarind)</td>
+                                        <td>Natural Blend</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Sugar</strong></td>
+                                        <td>Sugar-Free</td>
+                                        <td>0g</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div class="table-footnote">
+                                <p><i data-lucide="info"></i> Suggested Usage: Take 1 Gummy daily or as directed by a healthcare professional. Best consumed after a meal.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="biotin-tab">
+                        <div class="label-table-wrapper">
+                            <table class="label-table">
+                                <thead>
+                                    <tr>
+                                        <th>Component</th>
+                                        <th>Nutrient Name</th>
+                                        <th>Unit Amount Per Gummy</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>Vitamin C</strong></td>
+                                        <td>Ascorbic Acid</td>
+                                        <td>30 mcg</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Vitamin B6</strong></td>
+                                        <td>Pyridoxine Hcl</td>
+                                        <td>0.25 Mg</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Biotin</strong></td>
+                                        <td>Vitamin H / Hair Vitality</td>
+                                        <td>30 Mcg</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Vitamin E</strong></td>
+                                        <td>Dl-A-Tocopheryl Acetate</td>
+                                        <td>5 Mg</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Vitamin A</strong></td>
+                                        <td>Retinol Acetate</td>
+                                        <td>500 Mcg</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Vitamin B12</strong></td>
+                                        <td>Cyanocobalamin</td>
+                                        <td>1.1 Mcg</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Folic Acid</strong></td>
+                                        <td>Vitamin B9 / Folate</td>
+                                        <td>169 Mcg</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Vitamin K2-7</strong></td>
+                                        <td>Menaquinone</td>
+                                        <td>22.7 Mcg</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Zinc Citrate</strong></td>
+                                        <td>Immune Mineral</td>
+                                        <td>3 Mg</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Iodine</strong></td>
+                                        <td>Potassium Iodide</td>
+                                        <td>35 Mcg</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div class="table-footnote">
+                                <p><i data-lucide="info"></i> Suggested Usage: 1 Gummy daily for adults. Chew thoroughly before swallowing.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="kids-tab">
+                        <div class="label-table-wrapper">
+                            <table class="label-table">
+                                <thead>
+                                    <tr>
+                                        <th>Component</th>
+                                        <th>Nutrient Name</th>
+                                        <th>Unit Amount Per Gummy</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>Vitamin A</strong></td>
+                                        <td>Retinol Acetate</td>
+                                        <td>500 Iu</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Vitamin C</strong></td>
+                                        <td>Ascorbic Acid</td>
+                                        <td>5 mg</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Vitamin D</strong></td>
+                                        <td>Cholecalciferol</td>
+                                        <td>200 Iu</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Vitamin E</strong></td>
+                                        <td>Dl-A-Tocopherol</td>
+                                        <td>0.5 Iu</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Vitamin B6</strong></td>
+                                        <td>Pyridoxine Hcl</td>
+                                        <td>0.6 Mg</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Folic Acid</strong></td>
+                                        <td>Vitamin B9</td>
+                                        <td>70 Mcg</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Vitamin B12</strong></td>
+                                        <td>Cyanocobalamin</td>
+                                        <td>3 Mcg</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Biotin</strong></td>
+                                        <td>Vitamin H</td>
+                                        <td>30 Mcg</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Pantothenic Acid</strong></td>
+                                        <td>Vitamin B5</td>
+                                        <td>0.6 Mg</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Iodine</strong></td>
+                                        <td>Potassium Iodide</td>
+                                        <td>21 Mcg</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Zinc</strong></td>
+                                        <td>Zinc Citrate</td>
+                                        <td>1.35 Mg</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Choline</strong></td>
+                                        <td>Brain Development Support</td>
+                                        <td>20 Mcg</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Inositol</strong></td>
+                                        <td>Cellular Signal Transduction</td>
+                                        <td>20 Mcg</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Iron</strong></td>
+                                        <td>Ferrous Fumarate</td>
+                                        <td>1 Mcg</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div class="table-footnote">
+                                <p><i data-lucide="info"></i> Suggested Usage: 1 Gummy daily for children above 4 years of age under adult supervision.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- "Why the Combo" Value Section -->
+        <section class="why-section" id="why-section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="sub-heading">THE ADVANTAGE</span>
+                    <h2>Why The Family Wellness Combo?</h2>
+                    <p class="section-desc">Why buy multiple packs from different brands when you can cover the daily nutrient requirements of the entire household with one premium bundle?</p>
+                </div>
+
+                <div class="why-grid">
+                    <div class="why-card">
+                        <div class="why-icon-container"><i data-lucide="zap"></i></div>
+                        <h3>Energy & Performance</h3>
+                        <p>Himalayan Shilajit (75% Fulvic Acid) combined with Ashwagandha helps increase stamina, strength, and daily energy levels for active adults.</p>
+                    </div>
+                    <div class="why-card">
+                        <div class="why-icon-container"><i data-lucide="sparkles"></i></div>
+                        <h3>Glowing Beauty & Health</h3>
+                        <p>Essential Biotin and Folic Acid ensure healthy skin, strong nails, and glowing hair, while 10 vitamins regulate cellular health.</p>
+                    </div>
+                    <div class="why-card">
+                        <div class="why-icon-container"><i data-lucide="shield-alert"></i></div>
+                        <h3>Shielded Kids' Immunity</h3>
+                        <p>Loaded with Vitamin C, D, Zinc, and Iron, our kids' formula boosts immunity, builds strong bones, and supports memory growth.</p>
+                    </div>
+                    <div class="why-card">
+                        <div class="why-icon-container"><i data-lucide="smile"></i></div>
+                        <h3>Delicious & Sugar Free</h3>
+                        <p>Enjoyable fruit flavors without the guilt. Formulated entirely sugar-free, making it the perfect daily chewable supplement.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Usage / Who it's for -->
+        <section class="usage-section" id="usage-section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="sub-heading">GUIDANCE</span>
+                    <h2>How & Who It's For</h2>
+                    <p class="section-desc">Simple guidelines for the daily routine of each family member.</p>
+                </div>
+
+                <div class="usage-grid">
+                    <div class="usage-column col-him">
+                        <div class="usage-header">
+                            <span class="avatar-icon"><i data-lucide="user"></i></span>
+                            <h3>Him</h3>
+                            <span class="target-desc">Father / Adult Male</span>
+                        </div>
+                        <div class="usage-body">
+                            <h4>Himalayan Shilajit Gummies</h4>
+                            <p>Take 1 Gummy daily after breakfast or dinner.</p>
+                            <h4>Biotin + Multivitamin</h4>
+                            <p>Take 1 Gummy daily for overall vitality and daily energy support.</p>
+                        </div>
+                    </div>
+
+                    <div class="usage-column col-her">
+                        <div class="usage-header">
+                            <span class="avatar-icon"><i data-lucide="user-plus"></i></span>
+                            <h3>Her</h3>
+                            <span class="target-desc">Mother / Adult Female</span>
+                        </div>
+                        <div class="usage-body">
+                            <h4>Biotin + Multivitamin</h4>
+                            <p>Take 1 Gummy daily in the morning to support hair, skin, nails, and energy.</p>
+                            <h4>Himalayan Shilajit</h4>
+                            <p>Take 1 Gummy daily for strength and stamina, if active or exercising.</p>
+                        </div>
+                    </div>
+
+                    <div class="usage-column col-kids">
+                        <div class="usage-header">
+                            <span class="avatar-icon"><i data-lucide="users"></i></span>
+                            <h3>Kids</h3>
+                            <span class="target-desc">Children (Ages 4+)</span>
+                        </div>
+                        <div class="usage-body">
+                            <h4>Kid's Multivitamin</h4>
+                            <p>Chew 1 Gummy daily after school or lunch under parental supervision.</p>
+                            <p class="kids-warning">Not suitable for kids under 4 years of age.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Reviews Section -->
+        <section class="reviews-section" id="reviews-section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="sub-heading">TESTIMONIALS</span>
+                    <h2>Trusted by Families</h2>
+                    <p class="section-desc">Hear what real parents, professionals, and wellness enthusiasts say about Sonrup.</p>
+                </div>
+
+                <div class="reviews-rating-summary">
+                    <div class="rating-large">4.8</div>
+                    <div class="rating-stars">
+                        <i data-lucide="star" class="fill-gold"></i>
+                        <i data-lucide="star" class="fill-gold"></i>
+                        <i data-lucide="star" class="fill-gold"></i>
+                        <i data-lucide="star" class="fill-gold"></i>
+                        <i data-lucide="star" class="fill-gold"></i>
+                    </div>
+                    <p>Based on 450+ verified reviews</p>
+                </div>
+
+                <div class="reviews-carousel-wrapper">
+                    <button class="carousel-control prev" id="review-prev-btn" aria-label="Previous Review">
+                        <i data-lucide="chevron-left"></i>
+                    </button>
+                    
+                    <div class="reviews-carousel-container">
+                        <div class="reviews-carousel-track" id="reviews-carousel-track">
+                            <div class="review-card">
+                                <div class="review-meta">
+                                    <div class="stars">
+                                        <i data-lucide="star"></i>
+                                        <i data-lucide="star"></i>
+                                        <i data-lucide="star"></i>
+                                        <i data-lucide="star"></i>
+                                        <i data-lucide="star"></i>
+                                    </div>
+                                    <span class="review-date">June 2026</span>
+                                </div>
+                                <h4>Perfect combo for the whole house!</h4>
+                                <p>"My husband takes the Shilajit gummies for energy during workouts, I chew the Biotin ones for hair strength, and my 6-year-old loves the mix fruit flavor. Excellent value and zero sugar!"</p>
+                                <div class="review-author">
+                                    <div class="author-avatar">PS</div>
+                                    <div class="author-info">
+                                        <strong>Priya S.</strong>
+                                        <span class="verified-buyer"><i data-lucide="check-circle"></i> Verified Buyer</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="review-card">
+                                <div class="review-meta">
+                                    <div class="stars">
+                                        <i data-lucide="star"></i>
+                                        <i data-lucide="star"></i>
+                                        <i data-lucide="star"></i>
+                                        <i data-lucide="star"></i>
+                                        <i data-lucide="star"></i>
+                                    </div>
+                                    <span class="review-date">May 2026</span>
+                                </div>
+                                <h4>Excellent Quality & Taste</h4>
+                                <p>"Very impressed by the lack of added sugar. The Shilajit tamarind flavor is delicious and does not have the bitter taste of traditional resin. Highly recommend the family bundle."</p>
+                                <div class="review-author">
+                                    <div class="author-avatar">RK</div>
+                                    <div class="author-info">
+                                        <strong>Rajesh K.</strong>
+                                        <span class="verified-buyer"><i data-lucide="check-circle"></i> Verified Buyer</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="review-card">
+                                <div class="review-meta">
+                                    <div class="stars">
+                                        <i data-lucide="star"></i>
+                                        <i data-lucide="star"></i>
+                                        <i data-lucide="star"></i>
+                                        <i data-lucide="star"></i>
+                                        <i data-lucide="star"></i>
+                                    </div>
+                                    <span class="review-date">May 2026</span>
+                                </div>
+                                <h4>Great kid's vitamin list</h4>
+                                <p>"We checked the ingredients list of the Kid's multivitamin with our pediatrician, and she was very impressed by the addition of Choline and Iron in proper gummy ratios. Will buy again!"</p>
+                                <div class="review-author">
+                                    <div class="author-avatar">AM</div>
+                                    <div class="author-info">
+                                        <strong>Ananya M.</strong>
+                                        <span class="verified-buyer"><i data-lucide="check-circle"></i> Verified Buyer</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="review-card">
+                                <div class="review-meta">
+                                    <div class="stars">
+                                        <i data-lucide="star"></i>
+                                        <i data-lucide="star"></i>
+                                        <i data-lucide="star"></i>
+                                        <i data-lucide="star"></i>
+                                        <i data-lucide="star"></i>
+                                    </div>
+                                    <span class="review-date">April 2026</span>
+                                </div>
+                                <h4>Stamina and focus increased</h4>
+                                <p>"Have been using the Shilajit gummies for over a month now. There's a noticeable increase in muscle recovery and afternoon energy levels. Tamarind taste is spot on!"</p>
+                                <div class="review-author">
+                                    <div class="author-avatar">VS</div>
+                                    <div class="author-info">
+                                        <strong>Vikram S.</strong>
+                                        <span class="verified-buyer"><i data-lucide="check-circle"></i> Verified Buyer</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="review-card">
+                                <div class="review-meta">
+                                    <div class="stars">
+                                        <i data-lucide="star"></i>
+                                        <i data-lucide="star"></i>
+                                        <i data-lucide="star"></i>
+                                        <i data-lucide="star"></i>
+                                        <i data-lucide="star"></i>
+                                    </div>
+                                    <span class="review-date">March 2026</span>
+                                </div>
+                                <h4>Biotin gummies work wonders</h4>
+                                <p>"I was skeptical about hair vitamins, but these Biotin ones actually made my nails stronger and significantly reduced hair fall. Plus, they are delicious and sugar-free."</p>
+                                <div class="review-author">
+                                    <div class="author-avatar">SP</div>
+                                    <div class="author-info">
+                                        <strong>Sneha P.</strong>
+                                        <span class="verified-buyer"><i data-lucide="check-circle"></i> Verified Buyer</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="review-card">
+                                <div class="review-meta">
+                                    <div class="stars">
+                                        <i data-lucide="star"></i>
+                                        <i data-lucide="star"></i>
+                                        <i data-lucide="star"></i>
+                                        <i data-lucide="star"></i>
+                                        <i data-lucide="star"></i>
+                                    </div>
+                                    <span class="review-date">Feb 2026</span>
+                                </div>
+                                <h4>Pediatrician Approved!</h4>
+                                <p>"Finding a good sugar-free multivitamin for my kids was so hard. They look forward to their daily mixed fruit gummy, and I'm happy knowing they get quality iron and zinc."</p>
+                                <div class="review-author">
+                                    <div class="author-avatar">DR</div>
+                                    <div class="author-info">
+                                        <strong>Dr. Rohan V.</strong>
+                                        <span class="verified-buyer"><i data-lucide="check-circle"></i> Verified Buyer</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="carousel-control next" id="review-next-btn" aria-label="Next Review">
+                        <i data-lucide="chevron-right"></i>
+                    </button>
+                </div>
+                
+                <div class="carousel-dots" id="carousel-dots">
+                    <span class="dot active" data-index="0"></span>
+                    <span class="dot" data-index="1"></span>
+                    <span class="dot" data-index="2"></span>
+                    <span class="dot" data-index="3"></span>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ Section -->
+        <section class="faq-section" id="faq-section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="sub-heading">ANSWERS</span>
+                    <h2>Frequently Asked Questions</h2>
+                    <p class="section-desc">Got questions about dosage, safety, or suitability? We've got you covered.</p>
+                </div>
+
+                <div class="faq-accordion-container">
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            <span>What is the recommended age suitability for the kids' gummies?</span>
+                            <i data-lucide="chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Our Kid's Multivitamin and Immunity Booster gummies are specifically formulated for kids aged 4 and above. We recommend 1 gummy daily under parental supervision. For children under 4, please consult your family pediatrician.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            <span>Are these gummies completely sugar-free?</span>
+                            <i data-lucide="chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Yes! All three gummies in the Sonrup Family Wellness Combo are completely sugar-free and contain no added sugars. They are sweetened with premium natural substitutes, making them delicious without raising blood sugar levels.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            <span>What is the shelf life of these products?</span>
+                            <i data-lucide="chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Each bottle has a shelf life of 36 months from the date of manufacture. Please store them in a cool, dry place away from direct sunlight, and keep the cap tightly sealed to maintain freshness.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            <span>How does the return policy work?</span>
+                            <i data-lucide="chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <p>We stand behind the quality of our products. If you are not satisfied with your purchase, you can contact our customer support team within 30 days of delivery for a full replacement or refund. No questions asked.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            <span>Can both men and women take the Shilajit and Biotin gummies?</span>
+                            <i data-lucide="chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Absolutely. Both products are unisex. Shilajit gummies help improve stamina and strength for anyone, while Biotin + Multivitamin gummies support skin, hair, and nail health for all adults.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="container footer-grid">
+            <div class="footer-brand-col">
+                <a href="#" class="brand-logo footer-logo">
+                    <svg width="35" height="35" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="50" cy="50" r="45" stroke="#C9A227" stroke-width="2" />
+                        <path d="M35 38C35 32 45 28 50 35C55 28 65 32 65 38C65 52 50 68 50 68C50 68 35 52 35 38Z" fill="#C9A227" />
+                        <circle cx="43" cy="40" r="3" fill="#121212" />
+                        <circle cx="57" cy="40" r="3" fill="#121212" />
+                    </svg>
+                    <span class="brand-name">sonrup</span>
+                </a>
+                <p class="footer-desc">Premium natural wellness solutions. Empowering health, strength, and happiness across generations.</p>
+                <div class="social-links">
+                    <a href="#" aria-label="Facebook"><i data-lucide="facebook"></i></a>
+                    <a href="#" aria-label="Instagram"><i data-lucide="instagram"></i></a>
+                    <a href="#" aria-label="Twitter"><i data-lucide="twitter"></i></a>
+                </div>
+            </div>
+
+            <div class="footer-links-col">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="shop.html">Our Gummies</a></li>
+                    <li><a href="about.html">Our Story</a></li>
+                    <li><a href="faq.html">Dietary FAQs</a></li>
+                    <li><a href="blog.html">Wellness Blog</a></li>
+                    <li><a href="contact.html">Contact Us</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-legal-col">
+                <h3>Regulatory Info</h3>
+                <p><strong>Lic No:</strong> GA/646-A</p>
+                <p><strong>FSSAI:</strong> 10726997000544</p>
+                <p class="disclaimer">Disclaimer: These products are nutraceuticals and not intended to diagnose, treat, cure, or prevent any disease.</p>
+            </div>
+
+            <div class="footer-contact-col">
+                <h3>Marketed & Manufactured</h3>
+                <p><strong>Marketed By:</strong> SONRUP<br>A 584 Sitaram Society, Punagam Road, Surat-395010</p>
+                <p><strong>Manufactured By:</strong> KELLEN HEALTHCARE</p>
+                <p class="contact-methods">
+                    <span><i data-lucide="mail"></i> info@sonrup.com</span>
+                    <span><i data-lucide="phone"></i> +91 76001 75193</span>
+                </p>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <div class="container footer-bottom-flex">
+                <p>&copy; 2026 Sonrup. All rights reserved. Made with ❤️ in India.</p>
+                <div class="footer-payment-icons">
+                    <i data-lucide="credit-card"></i> UPI, Netbanking, Cards Accepted
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Sticky Bottom Bar (Mobile) -->
+    <div class="sticky-bottom-bar" id="mobile-sticky-bar">
+        <div class="bottom-bar-content">
+            <div class="bar-price-info">
+                <span class="bar-label">Sonrup Combo Pack</span>
+                <div class="bar-price-row">
+                    <span class="bar-price">₹1,799</span>
+                    <span class="bar-old-price">₹2,997</span>
+                </div>
+            </div>
+            <button class="btn-primary add-to-cart-combo btn-sm" id="sticky-bar-cta">Add Combo</button>
+        </div>
+    </div>
+
+    <!-- Shopping Cart Drawer (Sidebar) -->
+    <div class="cart-drawer" id="cart-drawer" aria-hidden="true">
+        <div class="cart-overlay"></div>
+        <div class="cart-wrapper">
+            <div class="cart-header">
+                <h2>Your Shopping Cart</h2>
+                <button class="close-cart" id="close-cart-btn" aria-label="Close cart">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            
+            <div class="cart-body">
+                <div class="cart-empty-message" id="cart-empty-msg">
+                    <i data-lucide="shopping-bag" class="empty-bag-icon"></i>
+                    <p>Your cart is empty</p>
+                    <a href="#products-section" class="btn-primary btn-sm close-cart-btn-nav" style="margin-top: 15px;">Shop Our Gummies</a>
+                </div>
+                <div class="cart-items-container" id="cart-items-list">
+                    <!-- Dynamic Cart Items go here -->
+                </div>
+            </div>
+            
+            <div class="cart-footer" id="cart-footer-panel">
+                <div class="cart-summary-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-weight: 600; font-size: 16px;">
+                    <span>Subtotal</span>
+                    <span class="cart-subtotal-price" id="cart-subtotal" style="color: var(--color-gold); font-family: var(--font-heading);">₹0.00</span>
+                </div>
+                <p class="shipping-note" style="font-size: 11px; color: var(--text-on-dark-muted); margin-bottom: 16px; display: flex; align-items: center; gap: 6px;"><i data-lucide="truck" style="width: 14px; height: 14px; color: var(--color-gold);"></i> Free Express Shipping applied</p>
+                <button class="btn-primary btn-block" id="cart-checkout-btn">Proceed to Checkout</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- E-Commerce Checkout / Order Modal -->
+    <div class="checkout-modal" id="checkout-modal" aria-hidden="true">
+        <div class="modal-overlay"></div>
+        <div class="modal-wrapper">
+            <button class="close-modal" id="close-modal-btn" aria-label="Close modal">
+                <i data-lucide="x"></i>
+            </button>
+            <div class="modal-body">
+                <h2>Secure Checkout</h2>
+                <p class="modal-intro">Complete your purchase of the Sonrup™ Family Wellness Combo Pack.</p>
+                
+                <div class="order-summary-box">
+                    <h3>Order Summary</h3>
+                    <div id="checkout-items-list" style="display: flex; flex-direction: column; gap: 8px;">
+                        <!-- Dynamic items will go here -->
+                    </div>
+                    <div class="summary-item shipping" style="display: flex; justify-content: space-between; font-size: 13.5px; margin-top: 8px;">
+                        <span>Shipping & Handling</span>
+                        <span class="free-text" style="color: var(--color-gold); font-weight: 600;">FREE</span>
+                    </div>
+                    <hr style="border: none; border-top: 1px solid rgba(255, 255, 255, 0.05); margin: 12px 0;">
+                    <div class="summary-item total" style="display: flex; justify-content: space-between; font-weight: 600;">
+                        <span>Grand Total</span>
+                        <span class="total-price" style="font-family: var(--font-heading); font-size: 18px; color: var(--color-gold);">₹1,799.00</span>
+                    </div>
+                    <div id="upgrade-combo-box" class="upgrade-box" style="display: none; margin-top: 15px; padding: 12px; border-radius: 8px; background: rgba(201, 162, 39, 0.1); border: 1px dashed var(--color-gold); text-align: center;">
+                        <p style="font-size: 12px; color: #FFFFFF; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; gap: 6px;"><i data-lucide="sparkles" class="text-gold" style="width: 14px; height: 14px;"></i> Upgrade to 3-in-1 Combo for only <strong>₹1,799</strong>!</p>
+                        <button type="button" id="upgrade-combo-btn" class="btn-primary btn-sm" style="font-size: 11px; padding: 6px 12px; border-radius: 6px; width: 100%; justify-content: center;">Upgrade & Save 40%</button>
+                    </div>
+                </div>
+
+                <form class="checkout-form" id="checkout-form">
+                    <div class="form-section">
+                        <h3>1. Shipping Details</h3>
+                        <div class="form-group-row">
+                            <div class="form-group">
+                                <label for="first-name">Full Name</label>
+                                <input type="text" id="first-name" placeholder="John Doe" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="address">Delivery Address</label>
+                            <input type="text" id="address" placeholder="Flat, Street, Area" required>
+                        </div>
+                        <div class="form-group-row">
+                            <div class="form-group">
+                                <label for="city">City</label>
+                                <input type="text" id="city" placeholder="Surat" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="pincode">Pincode</label>
+                                <input type="text" id="pincode" placeholder="395010" pattern="[0-9]{6}" required>
+                            </div>
+                        </div>
+                        <div class="form-group-row">
+                            <div class="form-group">
+                                <label for="email">Email</label>
+                                <input type="email" id="email" placeholder="john@example.com" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="phone">Phone Number</label>
+                                <input type="tel" id="phone" placeholder="9876543210" pattern="[0-9]{10}" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>2. Payment Method</h3>
+                        <div class="payment-options">
+                            <label class="payment-option-card active">
+                                <input type="radio" name="payment-method" value="cod" checked>
+                                <span class="custom-radio"></span>
+                                <div class="payment-info">
+                                    <span class="payment-title">Cash on Delivery (COD)</span>
+                                    <span class="payment-sub">Pay in cash when delivery partner arrives</span>
+                                </div>
+                            </label>
+                            <label class="payment-option-card">
+                                <input type="radio" name="payment-method" value="upi">
+                                <span class="custom-radio"></span>
+                                <div class="payment-info">
+                                    <span class="payment-title">Instant UPI Pay</span>
+                                    <span class="payment-sub">GPay, PhonePe, Paytm (Simulated)</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-primary btn-block" id="place-order-btn">
+                        <span>Place Order — ₹1,799.00</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Info Detail Modal -->
+    <div class="product-info-modal" id="product-info-modal" aria-hidden="true" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 2050; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease;">
+        <div class="modal-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.75); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);"></div>
+        <div class="modal-wrapper" id="product-modal-wrapper" style="position: relative; background-color: var(--bg-dark-card); width: 90%; max-width: 800px; max-height: 90vh; border-radius: 16px; border: 1px solid var(--border-dark); box-shadow: var(--shadow-premium); overflow-y: auto; z-index: 2060; padding: 36px; transform: scale(0.9); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); display: grid; grid-template-columns: 1fr 1.2fr; gap: 30px;">
+            <button class="close-modal" id="close-product-modal-btn" aria-label="Close modal" style="position: absolute; top: 20px; right: 20px; width: 32px; height: 32px; border-radius: 50%; background: rgba(255, 255, 255, 0.03); display: flex; align-items: center; justify-content: center; color: var(--text-on-dark-muted);">
+                <i data-lucide="x"></i>
+            </button>
+            
+            <!-- Left Column: Gallery -->
+            <div class="modal-gallery-container" style="display: flex; flex-direction: column; gap: 16px;">
+                <div class="main-display-image-holder" style="background-color: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 20px; display: flex; justify-content: center; align-items: center; height: 260px;">
+                    <img id="modal-main-img" src="" alt="Product Main Image" style="max-height: 100%; object-fit: contain; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.4));">
+                </div>
+                <div class="modal-thumbnails-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
+                    <div class="thumb-card active" style="border: 1px solid var(--color-gold); border-radius: 6px; padding: 6px; cursor: pointer; background-color: rgba(255, 255, 255, 0.01); aspect-ratio: 1; display: flex; align-items: center; justify-content: center;"><img class="thumb-img" id="thumb-img-0" src="" style="max-height: 100%; object-fit: contain;"></div>
+                    <div class="thumb-card" style="border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 6px; padding: 6px; cursor: pointer; background-color: rgba(255, 255, 255, 0.01); aspect-ratio: 1; display: flex; align-items: center; justify-content: center;"><img class="thumb-img" id="thumb-img-1" src="" style="max-height: 100%; object-fit: contain;"></div>
+                    <div class="thumb-card" style="border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 6px; padding: 6px; cursor: pointer; background-color: rgba(255, 255, 255, 0.01); aspect-ratio: 1; display: flex; align-items: center; justify-content: center;"><img class="thumb-img" id="thumb-img-2" src="" style="max-height: 100%; object-fit: contain;"></div>
+                    <div class="thumb-card" style="border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 6px; padding: 6px; cursor: pointer; background-color: rgba(255, 255, 255, 0.01); aspect-ratio: 1; display: flex; align-items: center; justify-content: center;"><img class="thumb-img" id="thumb-img-3" src="" style="max-height: 100%; object-fit: contain;"></div>
+                </div>
+            </div>
+            
+            <!-- Right Column: Details -->
+            <div class="modal-info-details" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div style="position: relative;">
+                    <span id="modal-tag" class="product-tag" style="position: static; display: inline-block; margin-bottom: 12px;">Tag</span>
+                    <h2 id="modal-title" style="font-size: 24px; color: #FFFFFF; margin-bottom: 8px; font-family: var(--font-heading);">Product Title</h2>
+                    <p id="modal-flavor" class="flavor-info" style="margin-bottom: 16px;"><i data-lucide="leaf"></i> Flavor details</p>
+                    <p id="modal-desc" style="font-size: 13.5px; color: var(--text-on-dark-muted); margin-bottom: 20px;">Product detailed summary description goes here.</p>
+                    
+                    <h4 style="font-size: 13px; text-transform: uppercase; color: #FFFFFF; margin-bottom: 10px; font-family: var(--font-body); font-weight: 600;">Key Benefits:</h4>
+                    <ul id="modal-benefits" class="benefit-bullets" style="margin-bottom: 24px; gap: 8px;">
+                        <!-- Dynamic list -->
+                    </ul>
+                </div>
+                
+                <div style="border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 20px; display: flex; align-items: center; justify-content: space-between;">
+                    <div style="display: flex; flex-direction: column;">
+                        <span style="font-size: 11px; text-transform: uppercase; color: var(--text-on-dark-muted);">Price (60 Gummies)</span>
+                        <span id="modal-price" style="font-size: 26px; font-family: var(--font-heading); color: #FFFFFF; font-weight: 700;">₹999</span>
+                    </div>
+                    <button class="btn-primary" id="modal-add-to-cart-btn" style="padding: 14px 28px;">Add To Cart</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Toast Notification -->
+    <div class="toast-notification" id="toast-message">
+        <i data-lucide="check-circle" class="toast-icon"></i>
+        <div class="toast-content">
+            <h4 id="toast-title">Added to Cart</h4>
+            <p id="toast-body">Sonrup Family Wellness Combo has been added to your cart.</p>
+        </div>
+    </div>
+
+    <!-- App Script -->
+    <script src="app.js"></script>
+</body>
+</html>

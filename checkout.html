@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sonrup™ - Secure Checkout</title>
+    <meta name="description" content="Securely complete your Sonrup family wellness purchase. Enter shipping and payment details.">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="checkout-page-body">
+
+    <!-- Sticky Header -->
+    <header class="site-header scrolled" id="main-header">
+        <div class="header-container">
+            <a href="index.html" class="brand-logo" id="logo-link">
+                <svg width="40" height="40" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="50" cy="50" r="45" stroke="#C9A227" stroke-width="2" />
+                    <path d="M35 38C35 32 45 28 50 35C55 28 65 32 65 38C65 52 50 68 50 68C50 68 35 52 35 38Z" fill="#C9A227" />
+                    <circle cx="43" cy="40" r="3" fill="#121212" />
+                    <circle cx="57" cy="40" r="3" fill="#121212" />
+                </svg>
+                <span class="brand-name">s<span>o</span>nrup</span>
+            </a>
+            <nav class="nav-links" id="nav-navigation">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="shop.html" class="nav-link">Shop</a>
+                <a href="about.html" class="nav-link">Our Story</a>
+                <a href="faq.html" class="nav-link">FAQs</a>
+                <a href="blog.html" class="nav-link">Blog</a>
+                <a href="contact.html" class="nav-link">Contact</a>
+            </nav>
+
+            <div class="header-actions" id="header-auth-actions">
+                <button class="cart-trigger" id="cart-button" aria-label="View Cart">
+                    <i data-lucide="shopping-cart"></i>
+                    <span class="cart-badge" id="cart-count">0</span>
+                </button>
+                <a href="login.html" class="btn-secondary btn-sm" id="header-login-btn">Login</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container" style="padding-top: 130px; padding-bottom: 60px;">
+        <h1 style="font-size: 32px; color: #FFFFFF; font-family: var(--font-heading); margin-bottom: 30px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 15px;">Secure Checkout</h1>
+        
+        <div class="checkout-layout-grid" style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 40px; align-items: start;">
+            <!-- Left Column: Forms -->
+            <div style="background-color: var(--bg-dark-card); border: 1px solid var(--border-dark); border-radius: 16px; padding: 40px;">
+                <form class="checkout-form" id="checkout-page-form" style="display: flex; flex-direction: column; gap: 30px;">
+                    <!-- Shipping Address section -->
+                    <div class="form-section">
+                        <h2 style="font-size: 18px; color: #FFFFFF; margin-bottom: 20px; font-family: var(--font-heading); font-weight: 600;">1. Shipping Details</h2>
+                        <div class="form-group" style="margin-bottom: 16px;">
+                            <label for="checkout-name" style="display: block; font-size: 11px; font-weight: 500; color: #FFFFFF; margin-bottom: 6px; text-transform: uppercase;">Full Name</label>
+                            <input type="text" id="checkout-name" placeholder="John Doe" required style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); background-color: rgba(255,255,255,0.02); color: #FFFFFF; box-sizing: border-box;">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 16px;">
+                            <label for="checkout-address" style="display: block; font-size: 11px; font-weight: 500; color: #FFFFFF; margin-bottom: 6px; text-transform: uppercase;">Delivery Address</label>
+                            <input type="text" id="checkout-address" placeholder="Flat / Apartment No, Street name" required style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); background-color: rgba(255,255,255,0.02); color: #FFFFFF; box-sizing: border-box;">
+                        </div>
+                        <div class="form-group-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+                            <div class="form-group">
+                                <label for="checkout-city" style="display: block; font-size: 11px; font-weight: 500; color: #FFFFFF; margin-bottom: 6px; text-transform: uppercase;">City</label>
+                                <input type="text" id="checkout-city" placeholder="Surat" required style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); background-color: rgba(255,255,255,0.02); color: #FFFFFF; box-sizing: border-box;">
+                            </div>
+                            <div class="form-group">
+                                <label for="checkout-pincode" style="display: block; font-size: 11px; font-weight: 500; color: #FFFFFF; margin-bottom: 6px; text-transform: uppercase;">Pincode</label>
+                                <input type="text" id="checkout-pincode" placeholder="395010" pattern="[0-9]{6}" required style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); background-color: rgba(255,255,255,0.02); color: #FFFFFF; box-sizing: border-box;">
+                            </div>
+                        </div>
+                        <div class="form-group-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                            <div class="form-group">
+                                <label for="checkout-email" style="display: block; font-size: 11px; font-weight: 500; color: #FFFFFF; margin-bottom: 6px; text-transform: uppercase;">Email Address</label>
+                                <input type="email" id="checkout-email" placeholder="john@example.com" required style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); background-color: rgba(255,255,255,0.02); color: #FFFFFF; box-sizing: border-box;">
+                            </div>
+                            <div class="form-group">
+                                <label for="checkout-phone" style="display: block; font-size: 11px; font-weight: 500; color: #FFFFFF; margin-bottom: 6px; text-transform: uppercase;">Phone Number</label>
+                                <input type="tel" id="checkout-phone" placeholder="9876543210" pattern="[0-9]{10}" required style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); background-color: rgba(255,255,255,0.02); color: #FFFFFF; box-sizing: border-box;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment Method section -->
+                    <div class="form-section">
+                        <h2 style="font-size: 18px; color: #FFFFFF; margin-bottom: 20px; font-family: var(--font-heading); font-weight: 600;">2. Payment Method</h2>
+                        <div class="payment-options" style="display: flex; flex-direction: column; gap: 12px;">
+                            <label class="payment-option-card active" style="display: flex; align-items: center; gap: 15px; background: rgba(255, 255, 255, 0.01); border: 1px solid var(--border-dark); border-radius: 8px; padding: 16px; cursor: pointer; transition: all 0.3s ease;">
+                                <input type="radio" name="payment-method" value="cod" checked style="accent-color: var(--color-gold);">
+                                <div class="payment-info">
+                                    <span class="payment-title" style="display: block; font-weight: 600; color: #FFFFFF; font-size: 14.5px;">Cash on Delivery (COD)</span>
+                                    <span class="payment-sub" style="display: block; font-size: 12px; color: var(--text-on-dark-muted); margin-top: 2px;">Pay in cash when delivery partner arrives</span>
+                                </div>
+                            </label>
+                            <label class="payment-option-card" style="display: flex; align-items: center; gap: 15px; background: rgba(255, 255, 255, 0.01); border: 1px solid var(--border-dark); border-radius: 8px; padding: 16px; cursor: pointer; transition: all 0.3s ease;">
+                                <input type="radio" name="payment-method" value="upi" style="accent-color: var(--color-gold);">
+                                <div class="payment-info">
+                                    <span class="payment-title" style="display: block; font-weight: 600; color: #FFFFFF; font-size: 14.5px;">Instant UPI Pay</span>
+                                    <span class="payment-sub" style="display: block; font-size: 12px; color: var(--text-on-dark-muted); margin-top: 2px;">GPay, PhonePe, Paytm (Simulated)</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-primary btn-block" id="place-order-page-btn" style="padding: 16px; justify-content: center; font-size: 16px; font-weight: 600; width: 100%;">
+                        <span>Place Order</span>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Right Column: Summary -->
+            <div style="background-color: var(--bg-dark-card); border: 1px solid var(--border-dark); border-radius: 16px; padding: 30px; position: sticky; top: 100px;">
+                <h2 style="font-size: 18px; color: #FFFFFF; margin-bottom: 20px; font-family: var(--font-heading); font-weight: 600;">Order Summary</h2>
+                
+                <div id="checkout-page-summary-list" style="display: flex; flex-direction: column; gap: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 15px;">
+                    <!-- Dynamic Cart Items go here -->
+                </div>
+
+                <div style="display: flex; justify-content: space-between; font-size: 13.5px; margin-top: 15px; color: var(--text-on-dark-muted);">
+                    <span>Shipping & Handling</span>
+                    <span style="color: var(--color-gold); font-weight: 600;">FREE</span>
+                </div>
+                
+                <div style="display: flex; justify-content: space-between; font-size: 13.5px; margin-top: 8px; color: var(--text-on-dark-muted);">
+                    <span>GST (Included)</span>
+                    <span>₹0.00</span>
+                </div>
+
+                <hr style="border: none; border-top: 1px solid rgba(255, 255, 255, 0.05); margin: 15px 0;">
+
+                <div style="display: flex; justify-content: space-between; font-weight: 600; align-items: center; font-size: 16px;">
+                    <span>Grand Total</span>
+                    <span id="checkout-page-grand-total" style="font-family: var(--font-heading); font-size: 22px; color: var(--color-gold);">₹0</span>
+                </div>
+
+                <!-- Combo Upgrade Upsell Banner -->
+                <div id="checkout-page-upgrade-box" class="upgrade-box" style="display: none; margin-top: 20px; padding: 15px; border-radius: 8px; background: rgba(201, 162, 39, 0.1); border: 1px dashed var(--color-gold); text-align: center;">
+                    <p style="font-size: 12px; color: #FFFFFF; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 6px;"><i data-lucide="sparkles" class="text-gold" style="width: 14px; height: 14px;"></i> Upgrade to 3-in-1 Combo for only <strong>₹1,799</strong>!</p>
+                    <button type="button" id="checkout-page-upgrade-btn" class="btn-primary btn-sm" style="font-size: 11px; padding: 8px 12px; border-radius: 6px; width: 100%; justify-content: center;">Upgrade & Save 40%</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="container footer-grid">
+            <div class="footer-brand-col">
+                <a href="index.html" class="brand-logo footer-logo">
+                    <svg width="35" height="35" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="50" cy="50" r="45" stroke="#C9A227" stroke-width="2" />
+                        <path d="M35 38C35 32 45 28 50 35C55 28 65 32 65 38C65 52 50 68 50 68C50 68 35 52 35 38Z" fill="#C9A227" />
+                    </svg>
+                    <span class="brand-name">sonrup</span>
+                </a>
+                <p class="footer-desc">Premium natural wellness solutions. Empowering health, strength, and happiness across generations.</p>
+                <div class="social-links">
+                    <a href="#" aria-label="Facebook"><i data-lucide="facebook"></i></a>
+                    <a href="#" aria-label="Instagram"><i data-lucide="instagram"></i></a>
+                    <a href="#" aria-label="Twitter"><i data-lucide="twitter"></i></a>
+                </div>
+            </div>
+
+            <div class="footer-links-col">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="shop.html">Our Gummies</a></li>
+                    <li><a href="blog.html">Wellness Blog</a></li>
+                    <li><a href="contact.html">Contact Us</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-legal-col">
+                <h3>Regulatory Info</h3>
+                <p><strong>Lic No:</strong> GA/646-A</p>
+                <p><strong>FSSAI:</strong> 10726997000544</p>
+                <p class="disclaimer">Disclaimer: These products are nutraceuticals and not intended to diagnose, treat, cure, or prevent any disease.</p>
+            </div>
+
+            <div class="footer-contact-col">
+                <h3>Marketed & Manufactured</h3>
+                <p><strong>Marketed By:</strong> SONRUP<br>A 584 Sitaram Society, Punagam Road, Surat-395010</p>
+                <p><strong>Manufactured By:</strong> KELLEN HEALTHCARE</p>
+                <p class="contact-methods">
+                    <span><i data-lucide="mail"></i> info@sonrup.com</span>
+                    <span><i data-lucide="phone"></i> +91 76001 75193</span>
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Success Toast Notification -->
+    <div class="toast-notification" id="toast-message">
+        <i data-lucide="check-circle" class="toast-icon"></i>
+        <div class="toast-content">
+            <h4 id="toast-title">Success</h4>
+            <p id="toast-body">Message</p>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

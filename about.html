@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Sonrup™ - Pure Himalayan Wellness Story</title>
+    <meta name="description" content="Discover the story behind Sonrup. Sourcing 100% pure Himalayan Shilajit, sugar-free daily vitamins, and state-of-the-art GMP-certified manufacturing.">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        .about-hero {
+            position: relative;
+            padding: 100px 0;
+            background: linear-gradient(180deg, rgba(18,18,18,0.2) 0%, rgba(15,15,16,1) 100%), url('https://res.cloudinary.com/dr3vva4uq/image/upload/v1783158379/wellness-login-hero.jpg');
+            background-size: cover;
+            background-position: center;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.02);
+        }
+
+        .about-hero::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 15, 16, 0.7);
+            z-index: 1;
+        }
+
+        .about-hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .story-section {
+            display: grid;
+            grid-template-columns: 1fr 1.1fr;
+            gap: 60px;
+            align-items: center;
+            padding: 80px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+        }
+
+        .story-section.reverse {
+            grid-template-columns: 1.1fr 1fr;
+        }
+
+        .story-img-container {
+            background-color: var(--bg-dark-card);
+            border: 1px solid var(--border-dark);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: var(--shadow-premium);
+            overflow: hidden;
+        }
+
+        .story-img-container img {
+            border-radius: 12px;
+            width: 100%;
+            object-fit: cover;
+            aspect-ratio: 4/3;
+        }
+
+        .story-text h2 {
+            font-size: 28px;
+            color: #FFFFFF;
+            margin-top: 10px;
+            margin-bottom: 20px;
+            font-family: var(--font-heading);
+        }
+
+        .story-text p {
+            font-size: 15px;
+            color: var(--text-on-dark-muted);
+            line-height: 1.7;
+            margin-bottom: 20px;
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .stat-card {
+            background-color: var(--bg-dark-card);
+            border: 1px solid rgba(255,255,255,0.03);
+            border-radius: 16px;
+            padding: 30px 20px;
+        }
+
+        .stat-number {
+            font-family: var(--font-heading);
+            font-size: 36px;
+            color: var(--color-gold);
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-on-dark-muted);
+        }
+
+        @media (max-width: 768px) {
+            .story-section, .story-section.reverse {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+            .story-section.reverse .story-img-container {
+                order: 2;
+            }
+            .stat-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body class="shop-catalog-body">
+
+    <!-- Sticky Header -->
+    <header class="site-header scrolled" id="main-header">
+        <div class="header-container">
+            <a href="index.html" class="brand-logo" id="logo-link">
+                <!-- SVG Bear Logo (Sonrup Logo) -->
+                <svg width="40" height="40" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="50" cy="50" r="45" stroke="#C9A227" stroke-width="2" />
+                    <path d="M35 38C35 32 45 28 50 35C55 28 65 32 65 38C65 52 50 68 50 68C50 68 35 52 35 38Z" fill="#C9A227" />
+                    <circle cx="43" cy="40" r="3" fill="#121212" />
+                    <circle cx="57" cy="40" r="3" fill="#121212" />
+                    <path d="M47 48C47 48 48 50 50 50C52 50 53 48 53 48" stroke="#121212" stroke-width="2" stroke-linecap="round" />
+                    <path d="M50 25C47 25 45 23 45 21C45 19 47 18 50 18C53 18 55 19 55 21C55 23 53 25 50 25Z" fill="#D9B24C" />
+                </svg>
+                <span class="brand-name">s<span>o</span>nrup</span>
+            </a>
+            
+            <nav class="nav-links" id="nav-navigation">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="shop.html" class="nav-link">Shop</a>
+                <a href="about.html" class="nav-link active">Our Story</a>
+                <a href="faq.html" class="nav-link">FAQs</a>
+                <a href="blog.html" class="nav-link">Blog</a>
+                <a href="contact.html" class="nav-link">Contact</a>
+            </nav>
+
+            <div class="header-actions" id="header-auth-actions">
+                <button class="cart-trigger" id="cart-button" aria-label="View Cart">
+                    <i data-lucide="shopping-cart"></i>
+                    <span class="cart-badge" id="cart-count">0</span>
+                </button>
+                <a href="login.html" class="btn-secondary btn-sm" id="header-login-btn">Login</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <div class="about-hero">
+        <div class="about-hero-content container">
+            <span class="sub-heading" style="color: var(--color-gold);">OUR STORY</span>
+            <h1 style="font-size: 46px; color: #FFFFFF; font-family: var(--font-heading); margin-top: 15px; margin-bottom: 20px; line-height: 1.2;">Himalayan Purity,<br>Modern Scientific Wellness</h1>
+            <p style="font-size: 16px; color: rgba(255,255,255,0.8); line-height: 1.6; max-width: 650px; margin: 0 auto;">At Sonrup™, we bridge the wisdom of traditional Ayurveda with clean, modern dietary science to empower the health of your entire household.</p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container" style="padding-top: 40px; padding-bottom: 80px;">
+        
+        <!-- Sourcing Story -->
+        <div class="story-section">
+            <div class="story-img-container">
+                <img src="https://res.cloudinary.com/dr3vva4uq/image/upload/v1783158366/shilajit-detail1.jpg" alt="Pure Himalayan Sourcing">
+            </div>
+            <div class="story-text">
+                <span class="sub-heading" style="color: var(--color-gold);">01. PURE SOURCE</span>
+                <h2>Harvested From the Peaks</h2>
+                <p>Our flagship ingredient, pure Shilajit resin, is wild-harvested at elevations above 16,000 feet in the pristine Himalayan ranges. Formed over centuries, this dense Ayurvedic restorative is packed with over 84 ionic minerals.</p>
+                <p>We purify this raw resin under strict laboratory standards to achieve an industry-leading 75% Fulvic Acid concentration, ensuring maximum bioavailability and strength in every single bite.</p>
+            </div>
+        </div>
+
+        <!-- Sugar-Free Science -->
+        <div class="story-section reverse">
+            <div class="story-text">
+                <span class="sub-heading" style="color: var(--color-gold);">02. THE SCIENCE</span>
+                <h2>100% Sugar-Free Nutrition</h2>
+                <p>Most wellness gummies on the market are packed with processed sugars, glucose syrups, and gelatin—turning vital supplements into unhealthy candy. At Sonrup, we knew there was a better way.</p>
+                <p>Our research team formulated a completely sugar-free gummie base that retains premium textures and natural, kid-approved fruit flavours (like Tamarind and Orange Citrus) without compromising your metabolic health.</p>
+            </div>
+            <div class="story-img-container">
+                <img src="https://res.cloudinary.com/dr3vva4uq/image/upload/v1783158321/biotin-detail1.jpg" alt="Sugar-free gummy formulations">
+            </div>
+        </div>
+
+        <!-- Manufacturing Excellence -->
+        <div class="story-section">
+            <div class="story-img-container">
+                <img src="https://res.cloudinary.com/dr3vva4uq/image/upload/v1783158343/kids-detail1.jpg" alt="GMP Certified Manufacturing Lab">
+            </div>
+            <div class="story-text">
+                <span class="sub-heading" style="color: var(--color-gold);">03. TRUST & HYGIENE</span>
+                <h2>GMP & ISO Certified Labs</h2>
+                <p>Quality and safety are the core pillars of Sonrup. Every bottle is manufactured at our state-of-the-art facility operated by Kellen Healthcare. Our plant operates under strict GMP (Good Manufacturing Practices) and ISO-9001 quality guidelines.</p>
+                <p>From heavy-metal clearance tests to batch consistency, we guarantee a safe, pure, and premium supplement that you can trust for your children, parents, and yourself.</p>
+            </div>
+        </div>
+
+        <!-- Stat Highlights -->
+        <div class="stat-grid">
+            <div class="stat-card">
+                <div class="stat-number">16k+ Ft</div>
+                <div class="stat-label">Himalayan Sourcing</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">100%</div>
+                <div class="stat-label">Sugar-Free Formula</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">GMP</div>
+                <div class="stat-label">Certified Facility</div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="container footer-grid">
+            <div class="footer-brand-col">
+                <a href="index.html" class="brand-logo footer-logo">
+                    <svg width="35" height="35" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="50" cy="50" r="45" stroke="#C9A227" stroke-width="2" />
+                        <path d="M35 38C35 32 45 28 50 35C55 28 65 32 65 38C65 52 50 68 50 68C50 68 35 52 35 38Z" fill="#C9A227" />
+                    </svg>
+                    <span class="brand-name">sonrup</span>
+                </a>
+                <p class="footer-desc">Premium natural wellness solutions. Empowering health, strength, and happiness across generations.</p>
+                <div class="social-links">
+                    <a href="#" aria-label="Facebook"><i data-lucide="facebook"></i></a>
+                    <a href="#" aria-label="Instagram"><i data-lucide="instagram"></i></a>
+                    <a href="#" aria-label="Twitter"><i data-lucide="twitter"></i></a>
+                </div>
+            </div>
+
+            <div class="footer-links-col">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="shop.html">Our Gummies</a></li>
+                    <li><a href="blog.html">Wellness Blog</a></li>
+                    <li><a href="contact.html">Contact Us</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-legal-col">
+                <h3>Regulatory Info</h3>
+                <p><strong>Lic No:</strong> GA/646-A</p>
+                <p><strong>FSSAI:</strong> 10726997000544</p>
+                <p class="disclaimer">Disclaimer: These products are nutraceuticals and not intended to diagnose, treat, cure, or prevent any disease.</p>
+            </div>
+
+            <div class="footer-contact-col">
+                <h3>Marketed & Manufactured</h3>
+                <p><strong>Marketed By:</strong> SONRUP<br>A 584 Sitaram Society, Punagam Road, Surat-395010</p>
+                <p><strong>Manufactured By:</strong> KELLEN HEALTHCARE</p>
+                <p class="contact-methods">
+                    <span><i data-lucide="mail"></i> info@sonrup.com</span>
+                    <span><i data-lucide="phone"></i> +91 76001 75193</span>
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Shopping Cart Drawer (Sidebar) -->
+    <div class="cart-drawer" id="cart-drawer" aria-hidden="true">
+        <div class="cart-overlay"></div>
+        <div class="cart-wrapper">
+            <div class="cart-header">
+                <h2>Your Shopping Cart</h2>
+                <button class="close-cart" id="close-cart-btn" aria-label="Close cart">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            
+            <div class="cart-body">
+                <div class="cart-empty-message" id="cart-empty-msg">
+                    <i data-lucide="shopping-bag" class="empty-bag-icon"></i>
+                    <p>Your cart is empty</p>
+                </div>
+                <div class="cart-items-container" id="cart-items-list"></div>
+            </div>
+            
+            <div class="cart-footer" id="cart-footer-panel">
+                <div class="cart-summary-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-weight: 600; font-size: 16px;">
+                    <span>Subtotal</span>
+                    <span class="cart-subtotal-price" id="cart-subtotal" style="color: var(--color-gold); font-family: var(--font-heading);">₹0.00</span>
+                </div>
+                <button class="btn-primary btn-block" id="cart-checkout-btn">Proceed to Checkout</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Toast Notification -->
+    <div class="toast-notification" id="toast-message">
+        <i data-lucide="check-circle" class="toast-icon"></i>
+        <div class="toast-content">
+            <h4 id="toast-title">Success</h4>
+            <p id="toast-body">Added to Cart</p>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
