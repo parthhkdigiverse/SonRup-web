@@ -12,6 +12,45 @@ async function loadAppConfig() {
             if (!res.ok) res = await fetch("config.json");
         }
         APP_CONFIG = await res.json();
+
+        // Fetch live MongoDB settings from backend server directly
+        if (APP_CONFIG.backend_port && window.location.port != APP_CONFIG.backend_port) {
+            try {
+                const liveRes = await fetch(`${window.location.protocol}//${window.location.hostname}:${APP_CONFIG.backend_port}/api/config`);
+                if (liveRes.ok) {
+                    const liveConfig = await liveRes.json();
+                    APP_CONFIG = { ...APP_CONFIG, ...liveConfig };
+                }
+            } catch (e) { /* use cached config */ }
+        }
+
+        // Inject Dynamic Announcement Top Bar if configured
+        if (APP_CONFIG.announcement_banner_enabled && APP_CONFIG.announcement_banner_text) {
+            let banner = document.getElementById("sonrup-announcement-bar");
+            if (!banner) {
+                banner = document.createElement("div");
+                banner.id = "sonrup-announcement-bar";
+                banner.style.background = "linear-gradient(90deg, #181818, #C9A227 50%, #181818)";
+                banner.style.color = "#000";
+                banner.style.fontWeight = "800";
+                banner.style.fontSize = "13px";
+                banner.style.padding = "10px 16px";
+                banner.style.textAlign = "center";
+                banner.style.letterSpacing = "0.5px";
+                banner.style.position = "relative";
+                banner.style.zIndex = "1001";
+                banner.style.width = "100%";
+                banner.style.boxShadow = "0 2px 15px rgba(201,162,39,0.3)";
+
+                const siteHeader = document.querySelector(".site-header") || document.querySelector("header");
+                if (siteHeader && siteHeader.parentNode) {
+                    siteHeader.parentNode.insertBefore(banner, siteHeader);
+                } else {
+                    document.body.prepend(banner);
+                }
+            }
+            banner.textContent = APP_CONFIG.announcement_banner_text;
+        }
     } catch (err) {
         console.warn("Could not load app config, using defaults.", err);
         APP_CONFIG = { backend_port: 8010 };
@@ -812,16 +851,20 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         if (isLoggedIn()) {
             const userObj = JSON.parse(localStorage.getItem("sonrup_user") || '{}');
+            const adminBadgeHtml = userObj.is_admin ? `
+                <a href="admin" class="nav-admin-btn" style="background: linear-gradient(135deg, #C9A227, #E5C365); color: #000; font-size: 11px; font-weight: 800; padding: 6px 12px; border-radius: 99px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; box-shadow: 0 2px 10px rgba(201, 162, 39, 0.4); text-transform: uppercase;">⚡ Admin Portal</a>
+            ` : '';
             authActionsContainer.innerHTML = `
                 ${headerButtonsHtml}
-                <a href="profile.html" class="nav-profile-btn" id="header-profile-icon" title="View Profile: ${userObj.name || ''}" style="display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid var(--color-gold); background: rgba(201, 162, 39, 0.1); color: var(--color-gold); cursor: pointer; text-decoration: none;">
+                ${adminBadgeHtml}
+                <a href="profile" class="nav-profile-btn" id="header-profile-icon" title="View Profile: ${userObj.name || ''}" style="display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid var(--color-gold); background: rgba(201, 162, 39, 0.1); color: var(--color-gold); cursor: pointer; text-decoration: none;">
                     <i data-lucide="user" style="width: 16px; height: 16px;"></i>
                 </a>
             `;
         } else {
             authActionsContainer.innerHTML = `
                 ${headerButtonsHtml}
-                <a href="login.html" class="btn-secondary btn-sm" id="header-login-btn">Login</a>
+                <a href="login" class="btn-secondary btn-sm" id="header-login-btn">Login</a>
             `;
         }
 
@@ -838,6 +881,22 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // Run dynamic header update on page load
     updateHeaderAuthUI();
+
+    // Password Visibility Toggles (Eye Button)
+    const setupPasswordToggle = (btnId, inputId) => {
+        const btn = document.getElementById(btnId);
+        const input = document.getElementById(inputId);
+        if (btn && input) {
+            btn.addEventListener("click", () => {
+                const isPass = input.getAttribute("type") === "password";
+                input.setAttribute("type", isPass ? "text" : "password");
+                btn.innerHTML = `<i data-lucide="${isPass ? 'eye-off' : 'eye'}" width="18" height="18"></i>`;
+                if (window.lucide) window.lucide.createIcons();
+            });
+        }
+    };
+    setupPasswordToggle("toggle-login-password", "login-password");
+    setupPasswordToggle("toggle-signup-password", "signup-password");
 
     // Login Form Handler
     const loginForm = document.getElementById("login-form");
@@ -862,8 +921,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                 const data = await res.json();
                 setAuth(data.access_token, data.user);
-                const dest = (typeof cart !== "undefined" && cart.length > 0) ? "checkout.html" : "profile.html";
-                showToast("Login Successful", cart.length > 0 ? "Redirecting to complete your checkout..." : "Redirecting to your wellness profile...");
+                const dest = data.user.is_admin ? "admin" : ((typeof cart !== "undefined" && cart.length > 0) ? "checkout" : "profile");
+                showToast("Login Successful", data.user.is_admin ? "Welcome back, Administrator! Launching Admin Portal..." : (cart.length > 0 ? "Redirecting to complete your checkout..." : "Redirecting to your wellness profile..."));
                 setTimeout(() => {
                     window.location.href = dest;
                 }, 1000);

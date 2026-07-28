@@ -31,6 +31,50 @@ def run_frontend_thread(port: int):
     os.chdir(frontend_dir)
 
     class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
+        def do_GET(self):
+            url_path = self.path.split('?')[0].split('#')[0]
+            query_and_hash = self.path[len(url_path):]
+
+            # Redirect explicit .html requests to clean extensionless URLs (e.g. /shop.html -> /shop)
+            if url_path.endswith('.html'):
+                clean_name = url_path[:-5]
+                if clean_name == '/index':
+                    clean_name = '/'
+                new_location = f"{clean_name}{query_and_hash}" if clean_name else f"/{query_and_hash}"
+                self.send_response(301)
+                self.send_header('Location', new_location)
+                self.end_headers()
+                return
+
+            # Resolve clean URLs to .html files on disk internally
+            if url_path != '/' and not url_path.endswith('/') and '.' not in url_path.split('/')[-1]:
+                potential_name = f"{url_path.lstrip('/')}.html"
+                if (frontend_dir / potential_name).is_file():
+                    self.path = f"/{potential_name}{query_and_hash}"
+
+            super().do_GET()
+
+        def do_HEAD(self):
+            url_path = self.path.split('?')[0].split('#')[0]
+            query_and_hash = self.path[len(url_path):]
+
+            if url_path.endswith('.html'):
+                clean_name = url_path[:-5]
+                if clean_name == '/index':
+                    clean_name = '/'
+                new_location = f"{clean_name}{query_and_hash}" if clean_name else f"/{query_and_hash}"
+                self.send_response(301)
+                self.send_header('Location', new_location)
+                self.end_headers()
+                return
+
+            if url_path != '/' and not url_path.endswith('/') and '.' not in url_path.split('/')[-1]:
+                potential_name = f"{url_path.lstrip('/')}.html"
+                if (frontend_dir / potential_name).is_file():
+                    self.path = f"/{potential_name}{query_and_hash}"
+
+            super().do_HEAD()
+
         def end_headers(self):
             # Disable caching for seamless local development
             self.send_header("Cache-Control", "no-cache, no-store, must-revalidate")
@@ -42,12 +86,28 @@ def run_frontend_thread(port: int):
             # Format static server log messages cleanly
             sys.stdout.write(f"🌐 [Frontend UI] {self.address_string()} - - [{self.log_date_time_string()}] {format % args}\n")
 
-    with socketserver.TCPServer(("", port), CustomHTTPRequestHandler) as httpd:
-        print(f"🌐 [Frontend UI] Serving interface at: http://localhost:{port}")
-        try:
+    class ReusableTCPServer(socketserver.TCPServer):
+        allow_reuse_address = True
+
+    try:
+        with ReusableTCPServer(("", port), CustomHTTPRequestHandler) as httpd:
+            print(f"🌐 [Frontend UI] Serving interface at: http://localhost:{port}")
             httpd.serve_forever()
-        except Exception:
-            pass
+    except Exception as e:
+        print(f"\n❌ [Frontend UI] Could not bind to port {port}: {e}")
+        print(f"💡 Try running: lsof -ti :{port} | xargs kill -9\n")
+
+
+def check_port_availability(port: int, name: str):
+    """Check if a designated server port is occupied and raise an informative error without killing existing processes."""
+    import socket
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.settimeout(0.5)
+        if s.connect_ex(("localhost", port)) == 0 or s.connect_ex(("127.0.0.1", port)) == 0:
+            print(f"\n❌ [Error] Port {port} ({name}) is currently in use by another running application.")
+            print(f"💡 To check what is running on port {port}, run: lsof -i :{port}")
+            print(f"💡 To manually stop the process if desired, run: lsof -ti :{port} | xargs kill -9\n")
+            sys.exit(1)
 
 
 if __name__ == "__main__":
@@ -63,6 +123,10 @@ if __name__ == "__main__":
     print(f"🔗 Frontend UI Server Port : {frontend_port}  (http://localhost:{frontend_port})")
     print(f"📦 Python Runtime          : {sys.executable}")
     print("=" * 66)
+
+    # Check that development ports are free before attempting to launch servers
+    check_port_availability(frontend_port, "Frontend UI")
+    check_port_availability(backend_port, "Backend API")
 
     backend_proc = None
 

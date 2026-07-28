@@ -1,7 +1,13 @@
-"""Product schemas for response validation."""
-
 from pydantic import BaseModel
 from typing import List, Optional
+
+
+class ProductVariant(BaseModel):
+    """Schema for product size, pack, or flavor variants."""
+    name: str
+    price: int
+    sku: Optional[str] = ""
+    in_stock: bool = True
 
 
 class ProductOut(BaseModel):
@@ -17,3 +23,4 @@ class ProductOut(BaseModel):
     images: List[str]
     tag_class: str
     product_type: str  # "single" or "combo"
+    variants: Optional[List[ProductVariant]] = []

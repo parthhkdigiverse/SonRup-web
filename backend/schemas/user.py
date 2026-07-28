@@ -28,6 +28,7 @@ class UserProfile(BaseModel):
     phone: str
     address: str
     pincode: str
+    is_admin: bool = False
 
 
 class TokenResponse(BaseModel):

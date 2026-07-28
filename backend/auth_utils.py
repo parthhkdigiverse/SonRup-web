@@ -85,3 +85,15 @@ async def get_current_user(
     # Convert ObjectId to string for serialization
     user["_id"] = str(user["_id"])
     return user
+
+
+async def get_current_admin_user(
+    current_user: dict = Depends(get_current_user),
+) -> dict:
+    """Dependency: assert that the currently authenticated user has administrative rights."""
+    if not current_user.get("is_admin", False):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Administrator privileges required to perform this action.",
+        )
+    return current_user

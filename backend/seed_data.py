@@ -182,3 +182,50 @@ async def seed_products(db):
 
     result = await db.products.insert_many(SEED_PRODUCTS)
     print(f"🌱 Seeded {len(result.inserted_ids)} products into the database.")
+
+
+async def seed_admin(db):
+    """Seed default Admin user account if not already present."""
+    from config import ADMIN_EMAIL, ADMIN_PASSWORD
+    from auth_utils import hash_password
+
+    admin = await db.users.find_one({"email": ADMIN_EMAIL})
+    if not admin:
+        admin_doc = {
+            "name": "SonRup Administrator",
+            "email": ADMIN_EMAIL,
+            "phone": "+91 76001 75193",
+            "address": "SonRup Headquarters, Surat",
+            "pincode": "395010",
+            "hashed_password": hash_password(ADMIN_PASSWORD),
+            "is_admin": True,
+            "created_at": datetime.now(timezone.utc),
+        }
+        await db.users.insert_one(admin_doc)
+        print(f"🛡️ Seeded default Admin user: {ADMIN_EMAIL}")
+    elif not admin.get("is_admin"):
+        await db.users.update_one({"_id": admin["_id"]}, {"$set": {"is_admin": True}})
+        print(f"🛡️ Upgraded existing account {ADMIN_EMAIL} to Administrator privileges.")
+
+
+async def seed_settings(db):
+    """Seed initial website settings document if collection is empty."""
+    from config import FRONTEND_CONFIG
+
+    settings = await db.settings.find_one({"_id": "global_settings"})
+    if not settings:
+        default_doc = {
+            "_id": "global_settings",
+            "site_name": FRONTEND_CONFIG.get("site_name", "Sonrup"),
+            "support_email": FRONTEND_CONFIG.get("support_email", "info@sonrup.com"),
+            "support_phone": FRONTEND_CONFIG.get("support_phone", "+91 76001 75193"),
+            "support_address": FRONTEND_CONFIG.get("support_address", "A 584 Sitaram Society, Punagam Road, Surat-395010"),
+            "fssai_number": FRONTEND_CONFIG.get("fssai_number", "10726997000544"),
+            "license_number": FRONTEND_CONFIG.get("license_number", "GA/646-A"),
+            "announcement_banner_enabled": True,
+            "announcement_banner_text": "🌟 Free Express Shipping on All Wellness Orders Above ₹999 across India! 🚀",
+            "updated_at": datetime.now(timezone.utc),
+        }
+        await db.settings.insert_one(default_doc)
+        print("⚙️ Seeded default website settings into MongoDB.")
+

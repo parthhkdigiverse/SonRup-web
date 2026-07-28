@@ -35,6 +35,10 @@ JWT_ALGORITHM: str = get_env_var("JWT_ALGORITHM", "HS256")
 TOKEN_EXPIRE_MINUTES: int = int(get_env_var("TOKEN_EXPIRE_MINUTES", "10080"))
 DEBUG: bool = get_env_var("DEBUG", "false").lower() == "true"
 
+# ─── Default Admin Account Credentials ───
+ADMIN_EMAIL: str = get_env_var("ADMIN_EMAIL", "admin@sonrup.com")
+ADMIN_PASSWORD: str = get_env_var("ADMIN_PASSWORD", "AdminSonRup2026!")
+
 # ─── Public frontend config (safe to expose via /api/config or config.json) ───
 FRONTEND_CONFIG: dict = {
     "backend_port": BACKEND_PORT,

@@ -27,6 +27,7 @@ def _user_to_profile(user: dict) -> UserProfile:
         phone=user["phone"],
         address=user["address"],
         pincode=user["pincode"],
+        is_admin=bool(user.get("is_admin", False)),
     )
 
 
@@ -51,6 +52,7 @@ async def signup(data: UserSignup):
         "address": data.address,
         "pincode": data.pincode,
         "hashed_password": hash_password(data.password),
+        "is_admin": False,
         "created_at": datetime.now(timezone.utc),
     }
 
