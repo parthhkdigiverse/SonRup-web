@@ -1236,6 +1236,8 @@ button {
     display: grid;
     grid-template-columns: 1.2fr 0.8fr 1fr 1fr;
     gap: 40px;
+    padding-top: 48px !important;
+    padding-bottom: 24px !important;
 }
 
 .footer-logo {
@@ -1342,17 +1344,20 @@ button {
 }
 
 .footer-bottom {
-    border-top: 1px solid rgba(255, 255, 255, 0.02);
-    padding: 24px 0;
-    font-size: 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 0 !important;
+    font-size: 13px;
 }
 
+.footer-bottom .container,
 .footer-bottom-flex {
     display: flex;
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
     gap: 16px;
+    padding-top: 18px !important;
+    padding-bottom: 18px !important;
 }
 
 .footer-payment-icons {

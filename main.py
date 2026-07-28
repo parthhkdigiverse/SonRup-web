@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 SonRup Full-Stack Launcher — Self-contained script that starts both backend API and frontend servers simultaneously.
-Automatically detects and utilizes the local Python virtual environment.
+Automatically detects and utilizes the local Python virtual environment (.venv).
 Usage: python3 main.py
 """
 
@@ -10,7 +10,8 @@ import sys
 import time
 import http.server
 import socketserver
-import multiprocessing
+import threading
+import subprocess
 from pathlib import Path
 
 root_dir = Path(__file__).resolve().parent
@@ -21,25 +22,11 @@ if venv_python.is_file() and os.path.realpath(sys.executable) != os.path.realpat
     os.execv(str(venv_python), [str(venv_python)] + sys.argv)
 
 from dotenv import load_dotenv
-
 load_dotenv(dotenv_path=root_dir / ".env")
 
 
-def run_backend(host: str, port: int, debug: bool):
-    """Worker process to run the FastAPI backend via Uvicorn."""
-    import uvicorn
-
-    backend_dir = root_dir / "backend"
-    os.chdir(backend_dir)
-    sys.path.insert(0, str(backend_dir))
-
-    print(f"🚀 [Backend API] Starting on http://localhost:{port}")
-    print(f"📖 [OpenAPI Docs] Interactive documentation: http://localhost:{port}/api/docs")
-    uvicorn.run("main:app", host=host, port=port, reload=debug)
-
-
-def run_frontend(port: int):
-    """Worker process to serve the static frontend UI files."""
+def run_frontend_thread(port: int):
+    """Background daemon thread to serve the static frontend UI files."""
     frontend_dir = root_dir / "frontend"
     os.chdir(frontend_dir)
 
@@ -59,15 +46,12 @@ def run_frontend(port: int):
         print(f"🌐 [Frontend UI] Serving interface at: http://localhost:{port}")
         try:
             httpd.serve_forever()
-        except KeyboardInterrupt:
+        except Exception:
             pass
 
 
 if __name__ == "__main__":
-    # Windows/macOS multiprocessing freeze_support
-    multiprocessing.freeze_support()
-
-    backend_port = int(os.getenv("BACKEND_PORT", os.getenv("PORT", "8010")))
+    backend_port = int(os.getenv("BACKEND_PORT", os.getenv("PORT", "8030")))
     frontend_port = int(os.getenv("FRONTEND_PORT", "3000"))
     host = os.getenv("HOST", "0.0.0.0")
     debug = os.getenv("DEBUG", "false").lower() == "true"
@@ -80,45 +64,46 @@ if __name__ == "__main__":
     print(f"📦 Python Runtime          : {sys.executable}")
     print("=" * 66)
 
-    processes = []
+    backend_proc = None
 
     try:
-        # Launch backend worker process
-        backend_proc = multiprocessing.Process(
-            target=run_backend, args=(host, backend_port, debug), name="Backend-Server"
-        )
-        backend_proc.start()
-        processes.append(("Backend API", backend_proc))
+        # Launch frontend UI server in a background daemon thread
+        print("\n[1/2] Launching Frontend static UI server...")
+        ui_thread = threading.Thread(target=run_frontend_thread, args=(frontend_port,), daemon=True)
+        ui_thread.start()
 
-        # Brief delay to allow initial backend startup logs before UI server output
-        time.sleep(1.5)
+        # Brief pause for UI startup logs before booting Uvicorn subprocess
+        time.sleep(0.5)
 
-        # Launch frontend worker process
-        frontend_proc = multiprocessing.Process(
-            target=run_frontend, args=(frontend_port,), name="Frontend-Server"
-        )
-        frontend_proc.start()
-        processes.append(("Frontend UI", frontend_proc))
+        # Launch backend FastAPI server as a system subprocess (prevents Uvicorn reloader Errno 9 bad fd bugs)
+        print("[2/2] Launching Backend API server via Uvicorn...")
+        backend_dir = root_dir / "backend"
+        cmd = [sys.executable, "-m", "uvicorn", "main:app", "--host", host, "--port", str(backend_port)]
+        if debug:
+            cmd.append("--reload")
+
+        backend_proc = subprocess.Popen(cmd, cwd=str(backend_dir))
 
         print(f"\n✅ Both servers are LIVE! Open your browser at: http://localhost:{frontend_port}")
         print("💡 Press Ctrl+C at any time to shut down both servers.\n")
 
-        # Monitor child worker health
+        # Monitor backend process health
         while True:
-            for name, proc in processes:
-                if not proc.is_alive():
-                    print(f"\n⚠️ {name} server exited unexpectedly (exit code: {proc.exitcode}).")
-                    raise KeyboardInterrupt
+            ret = backend_proc.poll()
+            if ret is not None:
+                print(f"\n⚠️ Backend API server exited unexpectedly (exit code: {ret}).")
+                break
             time.sleep(0.5)
 
     except (KeyboardInterrupt, SystemExit):
         print("\n\n🛑 Shutting down SonRup application servers...")
-        for name, proc in processes:
-            if proc.is_alive():
-                print(f"   Terminating {name} server (PID {proc.pid})...")
-                proc.terminate()
-                proc.join(timeout=3)
-                if proc.is_alive():
-                    proc.kill()
+    finally:
+        if backend_proc and backend_proc.poll() is None:
+            print(f"   Terminating Backend API server (PID {backend_proc.pid})...")
+            backend_proc.terminate()
+            try:
+                backend_proc.wait(timeout=3)
+            except subprocess.TimeoutExpired:
+                backend_proc.kill()
         print("✅ All servers cleanly stopped. Goodbye!")
         sys.exit(0)
