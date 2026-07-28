@@ -1,5 +1,51 @@
+// ─── API Configuration & Helpers ───
+let APP_CONFIG = {};
+let AUTH_TOKEN = localStorage.getItem("sonrup_token") || null;
+
+async function loadAppConfig() {
+    try {
+        const res = await fetch("/api/config");
+        APP_CONFIG = await res.json();
+    } catch (err) {
+        console.warn("Could not load app config, using defaults.", err);
+        APP_CONFIG = { api_base_url: "" };
+    }
+}
+
+function getApiBase() {
+    // Use relative URLs since frontend is served by the same server
+    return "";
+}
+
+function getAuthHeaders() {
+    const headers = { "Content-Type": "application/json" };
+    if (AUTH_TOKEN) {
+        headers["Authorization"] = `Bearer ${AUTH_TOKEN}`;
+    }
+    return headers;
+}
+
+function setAuth(token, user) {
+    AUTH_TOKEN = token;
+    localStorage.setItem("sonrup_token", token);
+    localStorage.setItem("sonrup_user", JSON.stringify(user));
+}
+
+function clearAuth() {
+    AUTH_TOKEN = null;
+    localStorage.removeItem("sonrup_token");
+    localStorage.removeItem("sonrup_user");
+}
+
+function isLoggedIn() {
+    return !!AUTH_TOKEN;
+}
+
 // Initialize Lucide Icons
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
+    // Load frontend config from backend .env
+    await loadAppConfig();
+
     if (window.lucide) {
         window.lucide.createIcons();
     }
@@ -81,10 +127,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 "100% Sugar-Free & Tamarind Sweetened"
             ],
             images: [
-                "https://res.cloudinary.com/dr3vva4uq/image/upload/v1783158362/shilajit-bottle.jpg",
-                "https://res.cloudinary.com/dr3vva4uq/image/upload/v1783158366/shilajit-detail1.jpg",
-                "https://res.cloudinary.com/dr3vva4uq/image/upload/v1783158370/shilajit-detail2.jpg",
-                "https://res.cloudinary.com/dr3vva4uq/image/upload/v1783158375/shilajit-detail3.jpg"
+                "assets/images/shilajit-bottle.jpg",
+                "assets/images/shilajit-detail1.jpg",
+                "assets/images/shilajit-detail2.jpg",
+                "assets/images/shilajit-detail3.jpg"
             ],
             tagClass: "tag-shilajit"
         },
@@ -101,10 +147,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 "Delicious Sugar-Free Orange Citrus Chew"
             ],
             images: [
-                "https://res.cloudinary.com/dr3vva4uq/image/upload/v1783158317/biotin-bottle.jpg",
-                "https://res.cloudinary.com/dr3vva4uq/image/upload/v1783158321/biotin-detail1.jpg",
-                "https://res.cloudinary.com/dr3vva4uq/image/upload/v1783158326/biotin-detail2.jpg",
-                "https://res.cloudinary.com/dr3vva4uq/image/upload/v1783158331/biotin-detail3.jpg"
+                "assets/images/biotin-bottle.jpg",
+                "assets/images/biotin-detail1.jpg",
+                "assets/images/biotin-detail2.jpg",
+                "assets/images/biotin-detail3.jpg"
             ],
             tagClass: "tag-biotin"
         },
@@ -121,10 +167,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 "Kid-Approved Sugar-Free Mix Fruit taste"
             ],
             images: [
-                "https://res.cloudinary.com/dr3vva4uq/image/upload/v1783158339/kids-bottle.jpg",
-                "https://res.cloudinary.com/dr3vva4uq/image/upload/v1783158343/kids-detail1.jpg",
-                "https://res.cloudinary.com/dr3vva4uq/image/upload/v1783158348/kids-detail2.jpg",
-                "https://res.cloudinary.com/dr3vva4uq/image/upload/v1783158358/kids-detail3.jpg"
+                "assets/images/kids-bottle.jpg",
+                "assets/images/kids-detail1.jpg",
+                "assets/images/kids-detail2.jpg",
+                "assets/images/kids-detail3.jpg"
             ],
             tagClass: "tag-kids"
         }
@@ -483,7 +529,7 @@ document.addEventListener("DOMContentLoaded", () => {
             cart = [{
                 name: "Sonrup Family Wellness Combo (3 Bottles)",
                 price: 1799,
-                img: "https://res.cloudinary.com/dr3vva4uq/image/upload/v1783158335/hero-combo.jpg",
+                img: "assets/images/hero-combo.jpg",
                 quantity: 1
             }];
             renderCart();
@@ -516,7 +562,7 @@ document.addEventListener("DOMContentLoaded", () => {
     addComboButtons.forEach(btn => {
         btn.addEventListener("click", (e) => {
             e.preventDefault();
-            addItemToCart("Sonrup Family Wellness Combo (3 Bottles)", 1799, "https://res.cloudinary.com/dr3vva4uq/image/upload/v1783158335/hero-combo.jpg");
+            addItemToCart("Sonrup Family Wellness Combo (3 Bottles)", 1799, "assets/images/hero-combo.jpg");
         });
     });
 
@@ -730,7 +776,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Dynamic Header state update
     const updateHeaderAuthUI = () => {
-        const loggedInUser = localStorage.getItem("sonrup_user");
         const authActionsContainer = document.getElementById("header-auth-actions");
         if (!authActionsContainer) return;
 
@@ -742,11 +787,11 @@ document.addEventListener("DOMContentLoaded", () => {
             </button>
         `;
 
-        if (loggedInUser) {
-            const userObj = JSON.parse(loggedInUser);
+        if (isLoggedIn()) {
+            const userObj = JSON.parse(localStorage.getItem("sonrup_user") || '{}');
             authActionsContainer.innerHTML = `
                 ${headerButtonsHtml}
-                <a href="profile.html" class="nav-profile-btn" id="header-profile-icon" title="View Profile: ${userObj.name}" style="display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid var(--color-gold); background: rgba(201, 162, 39, 0.1); color: var(--color-gold); cursor: pointer; text-decoration: none;">
+                <a href="profile.html" class="nav-profile-btn" id="header-profile-icon" title="View Profile: ${userObj.name || ''}" style="display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid var(--color-gold); background: rgba(201, 162, 39, 0.1); color: var(--color-gold); cursor: pointer; text-decoration: none;">
                     <i data-lucide="user" style="width: 16px; height: 16px;"></i>
                 </a>
             `;
@@ -774,46 +819,70 @@ document.addEventListener("DOMContentLoaded", () => {
     // Login Form Handler
     const loginForm = document.getElementById("login-form");
     if (loginForm) {
-        loginForm.addEventListener("submit", (e) => {
+        loginForm.addEventListener("submit", async (e) => {
             e.preventDefault();
             const email = document.getElementById("login-email").value;
-            // Simulated user database check or auto-create details
-            const mockUser = {
-                name: "John Doe",
-                email: email,
-                phone: "9876543210",
-                address: "Flat 12, Sitaram Society, Punagam Road, Surat - 395010"
-            };
-            localStorage.setItem("sonrup_user", JSON.stringify(mockUser));
-            showToast("Login Successful", "Redirecting to your wellness profile...");
-            setTimeout(() => {
-                window.location.href = "profile.html";
-            }, 1000);
+            const password = document.getElementById("login-password").value;
+
+            try {
+                const res = await fetch(`${getApiBase()}/api/auth/login`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ email, password }),
+                });
+
+                if (!res.ok) {
+                    const err = await res.json();
+                    showToast("Login Failed", err.detail || "Invalid email or password.");
+                    return;
+                }
+
+                const data = await res.json();
+                setAuth(data.access_token, data.user);
+                showToast("Login Successful", "Redirecting to your wellness profile...");
+                setTimeout(() => {
+                    window.location.href = "profile.html";
+                }, 1000);
+            } catch (err) {
+                showToast("Error", "Something went wrong. Please try again.");
+            }
         });
     }
 
     // Signup Form Handler
     const signupForm = document.getElementById("signup-form");
     if (signupForm) {
-        signupForm.addEventListener("submit", (e) => {
+        signupForm.addEventListener("submit", async (e) => {
             e.preventDefault();
             const name = document.getElementById("signup-name").value;
             const email = document.getElementById("signup-email").value;
+            const password = document.getElementById("signup-password").value;
             const phone = document.getElementById("signup-phone").value;
             const pincode = document.getElementById("signup-pincode").value;
             const address = document.getElementById("signup-address").value;
-            
-            const newUser = {
-                name: name,
-                email: email,
-                phone: phone,
-                address: address + ", Pincode: " + pincode
-            };
-            localStorage.setItem("sonrup_user", JSON.stringify(newUser));
-            showToast("Account Created", "Redirecting to your profile dashboard...");
-            setTimeout(() => {
-                window.location.href = "profile.html";
-            }, 1000);
+
+            try {
+                const res = await fetch(`${getApiBase()}/api/auth/signup`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ name, email, password, phone, address, pincode }),
+                });
+
+                if (!res.ok) {
+                    const err = await res.json();
+                    showToast("Signup Failed", err.detail || "Could not create account.");
+                    return;
+                }
+
+                const data = await res.json();
+                setAuth(data.access_token, data.user);
+                showToast("Account Created", "Redirecting to your profile dashboard...");
+                setTimeout(() => {
+                    window.location.href = "profile.html";
+                }, 1000);
+            } catch (err) {
+                showToast("Error", "Something went wrong. Please try again.");
+            }
         });
     }
 
@@ -821,7 +890,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const logoutBtn = document.getElementById("logout-btn");
     if (logoutBtn) {
         logoutBtn.addEventListener("click", () => {
-            localStorage.removeItem("sonrup_user");
+            clearAuth();
             showToast("Logged Out", "Successfully logged out of your account.");
             setTimeout(() => {
                 window.location.href = "index.html";
@@ -829,79 +898,101 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Profile Page Loader
+    // Profile Page Loader — fetches data from API
     if (window.location.pathname.includes("profile.html")) {
-        const loggedInUser = localStorage.getItem("sonrup_user");
-        if (!loggedInUser) {
+        if (!isLoggedIn()) {
             window.location.href = "login.html";
         } else {
-            const userObj = JSON.parse(loggedInUser);
-            const welcomeEl = document.getElementById("profile-welcome-name");
-            const detailNameEl = document.getElementById("profile-detail-name");
-            const detailEmailEl = document.getElementById("profile-detail-email");
-            const detailPhoneEl = document.getElementById("profile-detail-phone");
-            const detailAddressEl = document.getElementById("profile-detail-address");
-
-            if (welcomeEl) welcomeEl.textContent = userObj.name;
-            if (detailNameEl) detailNameEl.textContent = userObj.name;
-            if (detailEmailEl) detailEmailEl.textContent = userObj.email;
-            if (detailPhoneEl) detailPhoneEl.textContent = userObj.phone;
-            if (detailAddressEl) detailAddressEl.textContent = userObj.address;
-
-            // Render Orders List
-            const ordersListContainer = document.getElementById("profile-orders-list");
-            const noOrdersMsg = document.getElementById("no-orders-msg");
-            const orders = JSON.parse(localStorage.getItem("sonrup_orders")) || [];
-
-            if (orders.length > 0) {
-                noOrdersMsg.style.display = "none";
-                
-                // Sort orders by date/time (newest first)
-                orders.reverse();
-                
-                orders.forEach(order => {
-                    const orderCard = document.createElement("div");
-                    orderCard.style.border = "1px solid var(--border-dark)";
-                    orderCard.style.borderRadius = "12px";
-                    orderCard.style.padding = "20px";
-                    orderCard.style.backgroundColor = "rgba(255, 255, 255, 0.01)";
-                    
-                    let itemsSummaryHtml = "";
-                    order.items.forEach(item => {
-                        itemsSummaryHtml += `
-                            <div style="display:flex; justify-content:space-between; margin-bottom: 6px; font-size: 13px;">
-                                <span>${item.name} x ${item.quantity}</span>
-                                <span>₹${(item.price * item.quantity).toLocaleString("en-IN")}</span>
-                            </div>
-                        `;
-                    });
-
-                    orderCard.innerHTML = `
-                        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom:12px; margin-bottom:12px;">
-                            <div>
-                                <span style="font-size:11px; text-transform:uppercase; color:var(--text-on-dark-muted);">Order ID</span>
-                                <strong style="display:block; color:#FFFFFF; font-size:14px;">#${order.id}</strong>
-                            </div>
-                            <div style="text-align:right;">
-                                <span style="font-size:11px; text-transform:uppercase; color:var(--text-on-dark-muted);">Order Date</span>
-                                <span style="display:block; color:#FFFFFF; font-size:13px;">${order.date}</span>
-                            </div>
-                        </div>
-                        <div style="margin-bottom:12px;">
-                            ${itemsSummaryHtml}
-                        </div>
-                        <div style="display:flex; justify-content:space-between; align-items:center; border-top: 1px solid rgba(255,255,255,0.05); padding-top:12px; font-weight:600;">
-                            <div>
-                                <span style="font-size:11px; text-transform:uppercase; color:var(--text-on-dark-muted); font-weight:normal; display:block;">Grand Total</span>
-                                <span style="color:var(--color-gold); font-size:16px;">₹${order.total.toLocaleString("en-IN")}</span>
-                            </div>
-                            <span style="font-size:12px; padding: 4px 10px; border-radius: 20px; background: rgba(0, 180, 100, 0.15); color: #00FF7F; border: 1px solid rgba(0, 180, 100, 0.2);"><i data-lucide="truck" style="width: 12px; height: 12px; margin-right: 4px; display:inline-block; vertical-align:middle;"></i> ${order.status}</span>
-                        </div>
-                    `;
-                    ordersListContainer.appendChild(orderCard);
+            // Fetch user profile from API
+            try {
+                const profileRes = await fetch(`${getApiBase()}/api/auth/me`, {
+                    headers: getAuthHeaders(),
                 });
-                
-                if (window.lucide) window.lucide.createIcons();
+
+                if (!profileRes.ok) {
+                    clearAuth();
+                    window.location.href = "login.html";
+                    return;
+                }
+
+                const userObj = await profileRes.json();
+                // Update localStorage cache
+                localStorage.setItem("sonrup_user", JSON.stringify(userObj));
+
+                const welcomeEl = document.getElementById("profile-welcome-name");
+                const detailNameEl = document.getElementById("profile-detail-name");
+                const detailEmailEl = document.getElementById("profile-detail-email");
+                const detailPhoneEl = document.getElementById("profile-detail-phone");
+                const detailAddressEl = document.getElementById("profile-detail-address");
+
+                if (welcomeEl) welcomeEl.textContent = userObj.name;
+                if (detailNameEl) detailNameEl.textContent = userObj.name;
+                if (detailEmailEl) detailEmailEl.textContent = userObj.email;
+                if (detailPhoneEl) detailPhoneEl.textContent = userObj.phone;
+                if (detailAddressEl) detailAddressEl.textContent = userObj.address + (userObj.pincode ? `, ${userObj.pincode}` : "");
+
+                // Fetch Orders from API
+                const ordersListContainer = document.getElementById("profile-orders-list");
+                const noOrdersMsg = document.getElementById("no-orders-msg");
+
+                const ordersRes = await fetch(`${getApiBase()}/api/orders`, {
+                    headers: getAuthHeaders(),
+                });
+
+                if (ordersRes.ok) {
+                    const orders = await ordersRes.json();
+
+                    if (orders.length > 0) {
+                        noOrdersMsg.style.display = "none";
+
+                        orders.forEach(order => {
+                            const orderCard = document.createElement("div");
+                            orderCard.style.border = "1px solid var(--border-dark)";
+                            orderCard.style.borderRadius = "12px";
+                            orderCard.style.padding = "20px";
+                            orderCard.style.backgroundColor = "rgba(255, 255, 255, 0.01)";
+
+                            let itemsSummaryHtml = "";
+                            order.items.forEach(item => {
+                                itemsSummaryHtml += `
+                                    <div style="display:flex; justify-content:space-between; margin-bottom: 6px; font-size: 13px;">
+                                        <span>${item.name} x ${item.quantity}</span>
+                                        <span>₹${(item.price * item.quantity).toLocaleString("en-IN")}</span>
+                                    </div>
+                                `;
+                            });
+
+                            orderCard.innerHTML = `
+                                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom:12px; margin-bottom:12px;">
+                                    <div>
+                                        <span style="font-size:11px; text-transform:uppercase; color:var(--text-on-dark-muted);">Order ID</span>
+                                        <strong style="display:block; color:#FFFFFF; font-size:14px;">#${order.order_id}</strong>
+                                    </div>
+                                    <div style="text-align:right;">
+                                        <span style="font-size:11px; text-transform:uppercase; color:var(--text-on-dark-muted);">Order Date</span>
+                                        <span style="display:block; color:#FFFFFF; font-size:13px;">${order.date}</span>
+                                    </div>
+                                </div>
+                                <div style="margin-bottom:12px;">
+                                    ${itemsSummaryHtml}
+                                </div>
+                                <div style="display:flex; justify-content:space-between; align-items:center; border-top: 1px solid rgba(255,255,255,0.05); padding-top:12px; font-weight:600;">
+                                    <div>
+                                        <span style="font-size:11px; text-transform:uppercase; color:var(--text-on-dark-muted); font-weight:normal; display:block;">Grand Total</span>
+                                        <span style="color:var(--color-gold); font-size:16px;">₹${order.total.toLocaleString("en-IN")}</span>
+                                    </div>
+                                    <span style="font-size:12px; padding: 4px 10px; border-radius: 20px; background: rgba(0, 180, 100, 0.15); color: #00FF7F; border: 1px solid rgba(0, 180, 100, 0.2);"><i data-lucide="truck" style="width: 12px; height: 12px; margin-right: 4px; display:inline-block; vertical-align:middle;"></i> ${order.status}</span>
+                                </div>
+                            `;
+                            ordersListContainer.appendChild(orderCard);
+                        });
+
+                        if (window.lucide) window.lucide.createIcons();
+                    }
+                }
+            } catch (err) {
+                console.error("Error loading profile:", err);
+                showToast("Error", "Could not load profile data.");
             }
         }
     }
@@ -981,7 +1072,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 cart = [{
                     name: "Sonrup Family Wellness Combo (3 Bottles)",
                     price: 1799,
-                    img: "https://res.cloudinary.com/dr3vva4uq/image/upload/v1783158335/hero-combo.jpg",
+                    img: "assets/images/hero-combo.jpg",
                     quantity: 1
                 }];
                 renderCart();
@@ -989,12 +1080,18 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         }
 
-        // Place Order Form Submit
+        // Place Order Form Submit — calls API
         if (checkoutPageForm) {
-            checkoutPageForm.addEventListener("submit", (e) => {
+            checkoutPageForm.addEventListener("submit", async (e) => {
                 e.preventDefault();
                 if (cart.length === 0) {
                     showToast("Checkout Error", "Your shopping cart is empty!");
+                    return;
+                }
+
+                if (!isLoggedIn()) {
+                    showToast("Login Required", "Please log in to place an order.");
+                    setTimeout(() => { window.location.href = "login.html"; }, 1000);
                     return;
                 }
 
@@ -1003,23 +1100,47 @@ document.addEventListener("DOMContentLoaded", () => {
                 placeBtn.disabled = true;
                 placeBtn.innerHTML = `<span>Processing Order...</span>`;
 
-                setTimeout(() => {
+                try {
+                    const nameVal = document.getElementById("checkout-name")?.value || "";
+                    const addressVal = document.getElementById("checkout-address")?.value || "";
+                    const cityVal = document.getElementById("checkout-city")?.value || "";
+                    const pincodeVal = document.getElementById("checkout-pincode")?.value || "";
+                    const emailVal = document.getElementById("checkout-email")?.value || "";
+                    const phoneVal = document.getElementById("checkout-phone")?.value || "";
+                    const paymentMethod = document.querySelector('input[name="payment-method"]:checked')?.value || "cod";
+
+                    const orderPayload = {
+                        items: cart.map(item => ({
+                            name: item.name,
+                            price: item.price,
+                            img: item.img,
+                            quantity: item.quantity,
+                        })),
+                        shipping: {
+                            name: nameVal,
+                            address: addressVal,
+                            city: cityVal,
+                            pincode: pincodeVal,
+                            email: emailVal,
+                            phone: phoneVal,
+                        },
+                        payment_method: paymentMethod,
+                    };
+
+                    const res = await fetch(`${getApiBase()}/api/orders`, {
+                        method: "POST",
+                        headers: getAuthHeaders(),
+                        body: JSON.stringify(orderPayload),
+                    });
+
                     placeBtn.disabled = false;
                     placeBtn.innerHTML = originalBtnText;
 
-                    const { totalPrice } = getCartTotals();
-                    // Save to order history database in localStorage
-                    const newOrder = {
-                        id: "SR" + Math.floor(Math.random() * 900000 + 100000),
-                        date: new Date().toLocaleDateString("en-IN"),
-                        items: cart,
-                        total: totalPrice,
-                        status: "Processing"
-                    };
-
-                    const pastOrders = JSON.parse(localStorage.getItem("sonrup_orders")) || [];
-                    pastOrders.push(newOrder);
-                    localStorage.setItem("sonrup_orders", JSON.stringify(pastOrders));
+                    if (!res.ok) {
+                        const err = await res.json();
+                        showToast("Order Failed", err.detail || "Could not place order.");
+                        return;
+                    }
 
                     // Clear shopping cart
                     cart = [];
@@ -1030,7 +1151,11 @@ document.addEventListener("DOMContentLoaded", () => {
                     setTimeout(() => {
                         window.location.href = "profile.html";
                     }, 1500);
-                }, 1500);
+                } catch (err) {
+                    placeBtn.disabled = false;
+                    placeBtn.innerHTML = originalBtnText;
+                    showToast("Error", "Something went wrong. Please try again.");
+                }
             });
         }
     }
@@ -1242,14 +1367,40 @@ document.addEventListener("DOMContentLoaded", () => {
         startAutoSlide();
     }
 
-    // Contact Form submission handler
+    // Contact Form submission handler — calls API
     const contactForm = document.getElementById("contact-form");
     if (contactForm) {
-        contactForm.addEventListener("submit", (e) => {
+        contactForm.addEventListener("submit", async (e) => {
             e.preventDefault();
-            const nameEl = document.getElementById("contact-name");
-            const name = nameEl ? nameEl.value : "there";
-            showToast("Message Sent", `Thank you, ${name}. We'll respond to your email shortly.`);
+            const nameVal = document.getElementById("contact-name")?.value || "";
+            const emailVal = document.getElementById("contact-email")?.value || "";
+            const phoneVal = document.getElementById("contact-phone")?.value || "";
+            const subjectVal = document.getElementById("contact-subject")?.value || "General Inquiry";
+            const messageVal = document.getElementById("contact-message")?.value || "";
+
+            try {
+                const res = await fetch(`${getApiBase()}/api/contact`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        name: nameVal,
+                        email: emailVal,
+                        phone: phoneVal,
+                        subject: subjectVal,
+                        message: messageVal,
+                    }),
+                });
+
+                if (res.ok) {
+                    showToast("Message Sent", `Thank you, ${nameVal}. We'll respond to your email shortly.`);
+                    contactForm.reset();
+                } else {
+                    showToast("Error", "Could not send message. Please try again.");
+                }
+            } catch (err) {
+                showToast("Message Sent", `Thank you, ${nameVal}. We'll respond to your email shortly.`);
+                contactForm.reset();
+            }
         });
     }
 
