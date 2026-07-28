@@ -1,18 +1,18 @@
 """
 SonRup FastAPI Application — Main Entry Point.
-All configuration loaded from root .env file.
+All configuration and dynamic ports loaded from root .env file.
 """
 
 from contextlib import asynccontextmanager
 from pathlib import Path
+import json
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, HTMLResponse
-from starlette.routing import Mount
-from starlette.types import ASGIApp
 
-from config import PORT, HOST, DEBUG
+from config import BACKEND_PORT, HOST, DEBUG, FRONTEND_CONFIG
 from database import connect_db, close_db
 from seed_data import seed_products
 
@@ -29,9 +29,18 @@ FRONTEND_DIR = Path(__file__).resolve().parent.parent / "frontend"
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Application lifecycle: connect DB on startup, close on shutdown."""
+    """Application lifecycle: connect DB, seed data, and generate static frontend config on startup."""
     db = await connect_db()
     await seed_products(db)
+    
+    # Dump FRONTEND_CONFIG to frontend/config.json so standalone frontend servers on FRONTEND_PORT can access dynamic ports
+    try:
+        config_path = FRONTEND_DIR / "config.json"
+        config_path.write_text(json.dumps(FRONTEND_CONFIG, indent=2), encoding="utf-8")
+        print(f"📦 Exported dynamic frontend port config to {config_path.name}")
+    except Exception as e:
+        print(f"⚠️ Could not export config.json: {e}")
+
     yield
     await close_db()
 
@@ -53,6 +62,15 @@ api_app.include_router(contact_router)
 # ─── Main application ───
 app = FastAPI(lifespan=lifespan)
 
+# Allow all origins silently without requiring any CORS config or domain lists in .env
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 # Mount the API sub-app at /api — this takes full priority for /api/* paths
 app.mount("/api", api_app)
 
@@ -66,6 +84,6 @@ if __name__ == "__main__":
     uvicorn.run(
         "main:app",
         host=HOST,
-        port=PORT,
+        port=BACKEND_PORT,
         reload=DEBUG,
     )

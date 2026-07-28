@@ -4,17 +4,28 @@ let AUTH_TOKEN = localStorage.getItem("sonrup_token") || null;
 
 async function loadAppConfig() {
     try {
-        const res = await fetch("/api/config");
+        // Try fetching from API directly (when served on backend port)
+        let res = await fetch("/api/config");
+        if (!res.ok) {
+            // When running on dedicated FRONTEND_PORT, load exported local config.json
+            res = await fetch("/config.json");
+            if (!res.ok) res = await fetch("config.json");
+        }
         APP_CONFIG = await res.json();
     } catch (err) {
         console.warn("Could not load app config, using defaults.", err);
-        APP_CONFIG = { api_base_url: "" };
+        APP_CONFIG = { backend_port: 8010 };
     }
 }
 
 function getApiBase() {
-    // Use relative URLs since frontend is served by the same server
-    return "";
+    if (!APP_CONFIG || !APP_CONFIG.backend_port) return "";
+    // If browser port matches backend port, use clean relative URL
+    if (window.location.port == APP_CONFIG.backend_port || (!window.location.port && APP_CONFIG.backend_port == "80")) {
+        return "";
+    }
+    // If served on FRONTEND_PORT, resolve dynamically without fixed domain names
+    return `${window.location.protocol}//${window.location.hostname}:${APP_CONFIG.backend_port}`;
 }
 
 function getAuthHeaders() {

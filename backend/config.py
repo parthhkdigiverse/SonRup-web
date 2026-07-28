@@ -1,6 +1,6 @@
 """
 Configuration module — loads ALL settings from the root .env file.
-Supports dynamic variable interpolation (e.g., ${MONGO_PORT}) without fixed domains or CORS requirements.
+Both backend and frontend ports are fully dynamic and changeable without fixed domains.
 """
 
 from dotenv import load_dotenv
@@ -18,10 +18,13 @@ def get_env_var(key: str, default: str = "") -> str:
     return os.path.expandvars(val)
 
 
-# ─── Backend & Server configuration ───
-HOST: str = get_env_var("HOST", "0.0.0.0")
-PORT: int = int(get_env_var("PORT", "8010"))
+# ─── Dynamic Port Configuration ───
+BACKEND_PORT: int = int(get_env_var("BACKEND_PORT", get_env_var("PORT", "8010")))
+PORT: int = BACKEND_PORT  # Backward compatibility alias
+FRONTEND_PORT: int = int(get_env_var("FRONTEND_PORT", "3000"))
 
+# ─── Server & Database configuration ───
+HOST: str = get_env_var("HOST", "0.0.0.0")
 MONGO_HOST: str = get_env_var("MONGO_HOST", "localhost")
 MONGO_PORT: str = get_env_var("MONGO_PORT", "27017")
 MONGO_URL: str = get_env_var("MONGO_URL", f"mongodb://{MONGO_HOST}:{MONGO_PORT}")
@@ -32,8 +35,10 @@ JWT_ALGORITHM: str = get_env_var("JWT_ALGORITHM", "HS256")
 TOKEN_EXPIRE_MINUTES: int = int(get_env_var("TOKEN_EXPIRE_MINUTES", "10080"))
 DEBUG: bool = get_env_var("DEBUG", "false").lower() == "true"
 
-# ─── Public frontend config (safe to expose via /api/config) ───
+# ─── Public frontend config (safe to expose via /api/config or config.json) ───
 FRONTEND_CONFIG: dict = {
+    "backend_port": BACKEND_PORT,
+    "frontend_port": FRONTEND_PORT,
     "site_name": get_env_var("SITE_NAME", "Sonrup"),
     "support_email": get_env_var("SUPPORT_EMAIL", "info@sonrup.com"),
     "support_phone": get_env_var("SUPPORT_PHONE", "+91 76001 75193"),

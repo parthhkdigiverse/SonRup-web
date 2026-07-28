@@ -25,3 +25,6 @@ package-lock.json
 *.swp
 *.swo
 .DS_Store
+
+# Generated static runtime config
+frontend/config.json
