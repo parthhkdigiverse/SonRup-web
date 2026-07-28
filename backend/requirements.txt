@@ -5,5 +5,5 @@ pymongo
 python-jose[cryptography]
 bcrypt
 python-multipart
-pydantic[email-validator]
+pydantic[email]
 python-dotenv
