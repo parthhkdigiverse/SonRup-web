@@ -592,6 +592,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Add to Cart for Individual Cards
     const addToCartButtons = document.querySelectorAll(".add-to-cart-btn");
     addToCartButtons.forEach(btn => {
+        if (btn.dataset.eventBound === "true") return;
+        btn.dataset.eventBound = "true";
         btn.addEventListener("click", (e) => {
             e.stopPropagation(); // Avoid triggering card click
             const name = btn.getAttribute("data-name");
@@ -687,22 +689,20 @@ document.addEventListener("DOMContentLoaded", async () => {
         const productCards = container.querySelectorAll(".product-card");
         productCards.forEach(card => {
             card.style.cursor = "pointer";
+            if (card.dataset.cardEventBound === "true") return;
+            card.dataset.cardEventBound = "true";
             
-            // Remove existing listener to prevent duplicates by cloning
-            const newCard = card.cloneNode(true);
-            card.parentNode.replaceChild(newCard, card);
-            
-            newCard.addEventListener("click", (e) => {
+            card.addEventListener("click", (e) => {
                 if (e.target.closest(".add-to-cart-btn") || e.target.closest(".buy-now-btn")) {
                     return;
                 }
-                const name = newCard.getAttribute("data-name") || newCard.querySelector("h3")?.textContent || "";
+                const name = card.getAttribute("data-name") || card.querySelector("h3")?.textContent || "";
                 
-                if (newCard.classList.contains("card-shilajit")) {
+                if (card.classList.contains("card-shilajit")) {
                     window.location.href = "shilajit.html";
-                } else if (newCard.classList.contains("card-biotin")) {
+                } else if (card.classList.contains("card-biotin")) {
                     window.location.href = "biotin.html";
-                } else if (newCard.classList.contains("card-kids")) {
+                } else if (card.classList.contains("card-kids")) {
                     window.location.href = "kids.html";
                 } else {
                     if (name.includes("Family")) {
@@ -862,9 +862,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                 const data = await res.json();
                 setAuth(data.access_token, data.user);
-                showToast("Login Successful", "Redirecting to your wellness profile...");
+                const dest = (typeof cart !== "undefined" && cart.length > 0) ? "checkout.html" : "profile.html";
+                showToast("Login Successful", cart.length > 0 ? "Redirecting to complete your checkout..." : "Redirecting to your wellness profile...");
                 setTimeout(() => {
-                    window.location.href = "profile.html";
+                    window.location.href = dest;
                 }, 1000);
             } catch (err) {
                 showToast("Error", "Something went wrong. Please try again.");
@@ -899,9 +900,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                 const data = await res.json();
                 setAuth(data.access_token, data.user);
-                showToast("Account Created", "Redirecting to your profile dashboard...");
+                const dest = (typeof cart !== "undefined" && cart.length > 0) ? "checkout.html" : "profile.html";
+                showToast("Account Created", cart.length > 0 ? "Redirecting to complete your checkout..." : "Redirecting to your profile dashboard...");
                 setTimeout(() => {
-                    window.location.href = "profile.html";
+                    window.location.href = dest;
                 }, 1000);
             } catch (err) {
                 showToast("Error", "Something went wrong. Please try again.");
@@ -1042,14 +1044,9 @@ document.addEventListener("DOMContentLoaded", async () => {
             if (emailField) emailField.value = userObj.email || "";
             if (phoneField) phoneField.value = userObj.phone || "";
             
-            // Extract address and pincode from address string if possible
-            if (userObj.address && addressField && pincodeField) {
-                const parts = userObj.address.split(", Pincode: ");
-                addressField.value = parts[0] || "";
-                if (parts[1]) {
-                    pincodeField.value = parts[1] || "";
-                }
-            }
+            // Explicitly populate user address and pincode fields
+            if (addressField && userObj.address) addressField.value = userObj.address || "";
+            if (pincodeField && userObj.pincode) pincodeField.value = userObj.pincode || "";
         }
 
         const renderCheckoutPageSummary = () => {
@@ -1186,6 +1183,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     // "Buy Now" Button Actions
     const buyNowButtons = document.querySelectorAll(".buy-now-btn");
     buyNowButtons.forEach(btn => {
+        if (btn.dataset.eventBound === "true") return;
+        btn.dataset.eventBound = "true";
         btn.addEventListener("click", (e) => {
             e.stopPropagation();
             const name = btn.getAttribute("data-name");
@@ -1279,28 +1278,28 @@ document.addEventListener("DOMContentLoaded", async () => {
         const bindProductCatalogEvents = () => {
             const addToCartBtns = catalogGrid.querySelectorAll(".add-to-cart-btn");
             addToCartBtns.forEach(btn => {
-                const newBtn = btn.cloneNode(true);
-                btn.parentNode.replaceChild(newBtn, btn);
+                if (btn.dataset.eventBound === "true") return;
+                btn.dataset.eventBound = "true";
                 
-                newBtn.addEventListener("click", (e) => {
+                btn.addEventListener("click", (e) => {
                     e.stopPropagation();
-                    const name = newBtn.getAttribute("data-name");
-                    const price = parseInt(newBtn.getAttribute("data-price"));
-                    const img = newBtn.getAttribute("data-img");
+                    const name = btn.getAttribute("data-name");
+                    const price = parseInt(btn.getAttribute("data-price"));
+                    const img = btn.getAttribute("data-img");
                     addItemToCart(name, price, img);
                 });
             });
 
             const buyNowBtns = catalogGrid.querySelectorAll(".buy-now-btn");
             buyNowBtns.forEach(btn => {
-                const newBtn = btn.cloneNode(true);
-                btn.parentNode.replaceChild(newBtn, btn);
+                if (btn.dataset.eventBound === "true") return;
+                btn.dataset.eventBound = "true";
                 
-                newBtn.addEventListener("click", (e) => {
+                btn.addEventListener("click", (e) => {
                     e.stopPropagation();
-                    const name = newBtn.getAttribute("data-name");
-                    const price = parseInt(newBtn.getAttribute("data-price"));
-                    const img = newBtn.getAttribute("data-img");
+                    const name = btn.getAttribute("data-name");
+                    const price = parseInt(btn.getAttribute("data-price"));
+                    const img = btn.getAttribute("data-img");
 
                     const existingItem = cart.find(item => item.name === name);
                     if (existingItem) {
