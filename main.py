@@ -14,7 +14,7 @@ import multiprocessing
 from pathlib import Path
 
 root_dir = Path(__file__).resolve().parent
-venv_python = root_dir / "venv" / "bin" / "python3"
+venv_python = root_dir / ".venv" / "bin" / "python3"
 
 # Automatically re-run using virtual environment Python if present and not already active
 if venv_python.is_file() and os.path.realpath(sys.executable) != os.path.realpath(str(venv_python)):
