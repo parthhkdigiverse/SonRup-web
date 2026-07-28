@@ -76,3 +76,58 @@ async def list_orders(current_user: dict = Depends(get_current_user)):
         .to_list(100)
     )
     return [_order_to_out(o) for o in orders]
+
+
+from pydantic import BaseModel
+
+class CouponValidateIn(BaseModel):
+    code: str
+    cart_total: int
+
+
+@router.post("/validate-coupon")
+async def validate_coupon(data: CouponValidateIn):
+    """Validate a promo coupon and calculate order discount."""
+    db = get_db()
+    code_clean = data.code.strip().upper()
+    coupon = await db.coupons.find_one({"code": code_clean, "is_active": True})
+
+    if not coupon:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Invalid or expired promo coupon code."
+        )
+
+    min_val = coupon.get("min_order_value", 0)
+    if data.cart_total < min_val:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Minimum order value of ₹{min_val} required for coupon '{code_clean}'."
+        )
+
+    discount_amount = 0
+    if coupon.get("discount_type") == "percentage":
+        discount_amount = int(round(data.cart_total * (coupon.get("discount_value", 0) / 100.0)))
+    else:
+        discount_amount = int(coupon.get("discount_value", 0))
+
+    discount_amount = min(discount_amount, data.cart_total)
+    final_total = data.cart_total - discount_amount
+
+    return {
+        "valid": True,
+        "code": code_clean,
+        "discount_type": coupon.get("discount_type"),
+        "discount_value": coupon.get("discount_value"),
+        "discount_amount": discount_amount,
+        "final_total": final_total,
+        "message": f"🎉 Coupon '{code_clean}' applied successfully!"
+    }
+
+
+@router.get("/public-coupons")
+async def list_public_coupons():
+    """List active promo coupons for checkout display."""
+    db = get_db()
+    coupons = await db.coupons.find({"is_active": True}, {"_id": 0, "code": 1, "discount_type": 1, "discount_value": 1, "min_order_value": 1}).to_list(20)
+    return coupons

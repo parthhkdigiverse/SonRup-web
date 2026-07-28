@@ -14,7 +14,7 @@ from fastapi.responses import FileResponse, HTMLResponse
 
 from config import BACKEND_PORT, HOST, DEBUG, FRONTEND_CONFIG
 from database import connect_db, close_db
-from seed_data import seed_products, seed_admin, seed_settings
+from seed_data import seed_products, seed_admin, seed_settings, seed_coupons
 
 # Import routers
 from routers.config import router as config_router
@@ -35,6 +35,7 @@ async def lifespan(app: FastAPI):
     await seed_products(db)
     await seed_admin(db)
     await seed_settings(db)
+    await seed_coupons(db)
     
     # Dump FRONTEND_CONFIG to frontend/config.json so standalone frontend servers on FRONTEND_PORT can access dynamic ports
     try:

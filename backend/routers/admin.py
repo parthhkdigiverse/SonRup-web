@@ -235,3 +235,71 @@ async def update_user_role(user_id: str, data: UserRoleUpdateIn):
     if result.matched_count == 0:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found.")
     return {"message": f"User {user_id} admin role set to {data.is_admin}."}
+
+
+# ─── 6. Promo Coupons Manager ───
+class CouponIn(BaseModel):
+    code: str
+    discount_type: str  # "percentage" or "fixed"
+    discount_value: float
+    min_order_value: int = 0
+    is_active: bool = True
+
+
+@router.get("/coupons")
+async def list_admin_coupons():
+    """List all promo coupons for admin panel."""
+    db = get_db()
+    coupons = await db.coupons.find().sort("created_at", -1).to_list(100)
+    return [_clean_doc(c) for c in coupons]
+
+
+@router.post("/coupons")
+async def create_admin_coupon(data: CouponIn):
+    """Create a new promo coupon."""
+    db = get_db()
+    code_clean = data.code.strip().upper()
+    existing = await db.coupons.find_one({"code": code_clean})
+    if existing:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Coupon '{code_clean}' already exists.")
+
+    doc = {
+        "code": code_clean,
+        "discount_type": data.discount_type,
+        "discount_value": data.discount_value,
+        "min_order_value": data.min_order_value,
+        "is_active": data.is_active,
+        "usage_count": 0,
+        "created_at": datetime.now(timezone.utc)
+    }
+    res = await db.coupons.insert_one(doc)
+    doc["_id"] = str(res.inserted_id)
+    return _clean_doc(doc)
+
+
+@router.put("/coupons/{code}")
+async def update_admin_coupon(code: str, data: CouponIn):
+    """Update an existing promo coupon."""
+    db = get_db()
+    code_clean = code.strip().upper()
+    update_data = {
+        "discount_type": data.discount_type,
+        "discount_value": data.discount_value,
+        "min_order_value": data.min_order_value,
+        "is_active": data.is_active
+    }
+    res = await db.coupons.update_one({"code": code_clean}, {"$set": update_data})
+    if res.matched_count == 0:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Coupon not found.")
+    updated = await db.coupons.find_one({"code": code_clean})
+    return _clean_doc(updated)
+
+
+@router.delete("/coupons/{code}")
+async def delete_admin_coupon(code: str):
+    """Delete a promo coupon."""
+    db = get_db()
+    res = await db.coupons.delete_one({"code": code.upper()})
+    if res.deleted_count == 0:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Coupon not found.")
+    return {"message": f"Coupon '{code}' deleted."}

@@ -86,7 +86,8 @@ async function initDashboard() {
         loadProducts(),
         loadOrders(),
         loadSettings(),
-        loadUsers()
+        loadUsers(),
+        loadCoupons()
     ]);
     showToast("✅ Admin Dashboard fully synchronized.");
 }
@@ -100,8 +101,12 @@ window.refreshAdminData = initDashboard;
 async function loadStats() {
     try {
         const res = await fetch(`${API_BASE_URL}/admin/stats`, { headers: getHeaders() });
-        if (res.status === 401 || res.status === 403) {
-            showAdminLoginScreen("❌ Session expired or unauthorized. Please authenticate with Admin credentials.");
+        if (res.status === 401 || res.status === 403 || res.status === 404) {
+            localStorage.removeItem("sonrup_token");
+            localStorage.removeItem("access_token");
+            localStorage.removeItem("auth_token");
+            localStorage.removeItem("token");
+            showAdminLoginScreen("🔒 Please log in with your Admin credentials.");
             return false;
         }
         if (!res.ok) throw new Error("Failed to pull platform metrics");
@@ -348,6 +353,100 @@ async function loadUsers() {
     }
 }
 
+
+/**
+ * 6. PROMO COUPONS CONTROLLER
+ */
+let cachedCoupons = [];
+
+async function loadCoupons() {
+    try {
+        const res = await fetch(`${API_BASE_URL}/admin/coupons`, { headers: getHeaders() });
+        const tbody = document.getElementById("coupons-table-body");
+        if (!res.ok) throw new Error("Could not fetch promo coupons");
+
+        cachedCoupons = await res.json();
+        tbody.innerHTML = "";
+
+        if (cachedCoupons.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #94a3b8;">No active promo coupons. Click "Create New Coupon" to publish one.</td></tr>';
+            return;
+        }
+
+        cachedCoupons.forEach(c => {
+            const tr = document.createElement("tr");
+            const discLabel = c.discount_type === "percentage" ? `${c.discount_value}% OFF` : `₹${c.discount_value} OFF`;
+            const isActive = c.is_active !== false;
+            tr.innerHTML = `
+                <td>
+                    <code style="background: rgba(201,162,39,0.15); color: #E5C365; padding: 6px 12px; border-radius: 6px; font-weight: 800; font-size: 14px; letter-spacing: 1px; border: 1px solid rgba(201,162,39,0.3);">${c.code}</code>
+                </td>
+                <td>
+                    <div style="font-weight: 700; color: #fff; font-size: 15px;">${discLabel}</div>
+                    <div style="color: #94a3b8; font-size: 12px;">Type: ${c.discount_type}</div>
+                </td>
+                <td style="font-family: 'Outfit', sans-serif; font-weight: 600; color: #cbd5e1;">
+                    ${c.min_order_value > 0 ? `₹${c.min_order_value}` : 'No Minimum'}
+                </td>
+                <td style="color: #94a3b8; font-size: 13px;">
+                    🎟️ ${c.usage_count || 0} times
+                </td>
+                <td>
+                    ${isActive ? 
+                      '<span style="background: rgba(16,185,129,0.15); color: #10B981; padding: 4px 10px; border-radius: 99px; font-size: 12px; font-weight: 700;">🟢 Active</span>' : 
+                      '<span style="background: rgba(239,68,68,0.15); color: #f87171; padding: 4px 10px; border-radius: 99px; font-size: 12px; font-weight: 700;">🔴 Inactive</span>'}
+                </td>
+                <td>
+                    <div style="display: flex; gap: 6px;">
+                        <button class="btn-action btn-edit" onclick="editCoupon('${c.code}')">
+                            <i data-lucide="edit" width="14"></i> Edit
+                        </button>
+                        <button class="btn-action btn-danger" onclick="deleteCoupon('${c.code}')">
+                            <i data-lucide="trash-2" width="14"></i> Delete
+                        </button>
+                    </div>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        if (window.lucide) window.lucide.createIcons();
+    } catch (e) {
+        console.error("Error loading coupons:", e);
+    }
+}
+
+window.editCoupon = (code) => {
+    const coupon = cachedCoupons.find(c => c.code === code);
+    if (!coupon) return;
+
+    document.getElementById("coupon-modal-title").textContent = `Edit Promo Coupon: ${coupon.code}`;
+    document.getElementById("coupon-original-code").value = coupon.code;
+    document.getElementById("coupon-code").value = coupon.code;
+    document.getElementById("coupon-code").disabled = true;
+    document.getElementById("coupon-type").value = coupon.discount_type;
+    document.getElementById("coupon-value").value = coupon.discount_value;
+    document.getElementById("coupon-min-order").value = coupon.min_order_value || 0;
+    document.getElementById("coupon-is-active").value = coupon.is_active !== false ? "true" : "false";
+
+    document.getElementById("coupon-modal")?.classList.add("active");
+};
+
+window.deleteCoupon = async (code) => {
+    if (!confirm(`Are you sure you want to delete promo coupon '${code}'?`)) return;
+    try {
+        const res = await fetch(`${API_BASE_URL}/admin/coupons/${code}`, {
+            method: "DELETE",
+            headers: getHeaders()
+        });
+        if (!res.ok) throw new Error("Delete failed");
+        showToast(`🗑️ Coupon '${code}' deleted.`);
+        loadCoupons();
+    } catch (e) {
+        showToast("Error deleting coupon.", true);
+    }
+};
+
 window.toggleUserRole = async (userId, makeAdmin) => {
     if (!confirm(`Are you sure you want to change administrative access for this user?`)) return;
     try {
@@ -399,6 +498,56 @@ function setupEventListeners() {
     const closeModal = () => document.getElementById("product-modal").classList.remove("active");
     document.getElementById("modal-close-btn")?.addEventListener("click", closeModal);
     document.getElementById("modal-cancel-btn")?.addEventListener("click", closeModal);
+
+    // Coupon Modal Handlers
+    const btnOpenCoupon = document.getElementById("btn-open-add-coupon");
+    if (btnOpenCoupon) {
+        btnOpenCoupon.addEventListener("click", () => {
+            document.getElementById("coupon-modal-title").textContent = "Create New Promo Coupon";
+            document.getElementById("coupon-original-code").value = "";
+            document.getElementById("coupon-code").disabled = false;
+            document.getElementById("coupon-form")?.reset();
+            document.getElementById("coupon-modal")?.classList.add("active");
+        });
+    }
+
+    const closeCouponModal = () => document.getElementById("coupon-modal")?.classList.remove("active");
+    document.getElementById("coupon-modal-close-btn")?.addEventListener("click", closeCouponModal);
+    document.getElementById("coupon-modal-cancel-btn")?.addEventListener("click", closeCouponModal);
+
+    document.getElementById("coupon-form")?.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const originalCode = document.getElementById("coupon-original-code").value;
+        const isEdit = !!originalCode;
+
+        const code = document.getElementById("coupon-code").value.trim().toUpperCase();
+        const discount_type = document.getElementById("coupon-type").value;
+        const discount_value = parseFloat(document.getElementById("coupon-value").value) || 0;
+        const min_order_value = parseInt(document.getElementById("coupon-min-order").value) || 0;
+        const is_active = document.getElementById("coupon-is-active").value === "true";
+
+        try {
+            const url = isEdit ? `${API_BASE_URL}/admin/coupons/${originalCode}` : `${API_BASE_URL}/admin/coupons`;
+            const method = isEdit ? "PUT" : "POST";
+
+            const res = await fetch(url, {
+                method: method,
+                headers: getHeaders(true),
+                body: JSON.stringify({ code, discount_type, discount_value, min_order_value, is_active })
+            });
+
+            if (!res.ok) {
+                const err = await res.json();
+                throw new Error(err.detail || "Failed to save coupon");
+            }
+
+            showToast(isEdit ? `✏️ Updated promo coupon '${code}'!` : `🎟️ Published promo coupon '${code}'!`);
+            closeCouponModal();
+            loadCoupons();
+        } catch (err) {
+            showToast(`Error: ${err.message}`, true);
+        }
+    });
 
     // Product Form Submit Handler (Create & Edit)
     document.getElementById("product-form")?.addEventListener("submit", async (e) => {

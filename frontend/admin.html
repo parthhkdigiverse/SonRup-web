@@ -508,6 +508,9 @@
             <button class="sidebar-tab" data-target="section-users">
                 <i data-lucide="users"></i> Registered Users
             </button>
+            <button class="sidebar-tab" data-target="section-coupons">
+                <i data-lucide="ticket"></i> Promo Coupons
+            </button>
         </aside>
 
         <!-- Main Content Area -->
@@ -682,6 +685,35 @@
                 </div>
             </section>
 
+            <!-- 6. PROMO COUPONS SECTION -->
+            <section id="section-coupons" class="admin-section">
+                <div class="section-header">
+                    <div>
+                        <h1 class="section-title">Promo Coupons & Discounts</h1>
+                        <p class="section-subtitle">Manage promotional discount codes usable by customers at checkout.</p>
+                    </div>
+                    <button class="btn-action btn-gold" id="btn-open-add-coupon"><i data-lucide="plus-circle" width="16"></i> Create New Coupon</button>
+                </div>
+
+                <div class="glass-panel">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Coupon Code</th>
+                                <th>Discount Details</th>
+                                <th>Min. Order Value</th>
+                                <th>Times Used</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="coupons-table-body">
+                            <tr><td colspan="6" style="text-align: center; color: #94a3b8;">Loading promo coupons...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
         </main>
     </div>
 
@@ -747,6 +779,50 @@
                 <div class="form-group full-width" style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 16px;">
                     <button type="button" class="btn-action" style="background: rgba(255,255,255,0.1); color:#fff;" id="modal-cancel-btn">Cancel</button>
                     <button type="submit" class="btn-action btn-gold" style="padding: 12px 28px; font-size: 14px;" id="modal-submit-btn"><i data-lucide="check"></i> Save Product to Catalog</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- COUPON ADD / EDIT MODAL -->
+    <div id="coupon-modal" class="admin-modal">
+        <div class="modal-card" style="max-width: 480px;">
+            <button class="modal-close-btn" id="coupon-modal-close-btn">✕</button>
+            <h2 id="coupon-modal-title" style="font-family: 'Outfit', sans-serif; font-size: 22px; color: #fff; margin-top: 0; margin-bottom: 20px;">Create New Promo Coupon</h2>
+
+            <form id="coupon-form" class="form-grid">
+                <input type="hidden" id="coupon-original-code" value="">
+
+                <div class="form-group full-width">
+                    <label class="form-label">Coupon Code (Uppercase)</label>
+                    <input type="text" class="form-input" id="coupon-code" placeholder="e.g. SONRUP20" style="text-transform: uppercase;" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Discount Type</label>
+                    <select class="form-input" id="coupon-type">
+                        <option value="percentage">Percentage Off (%)</option>
+                        <option value="fixed">Fixed Amount (₹)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Discount Value</label>
+                    <input type="number" class="form-input" id="coupon-value" placeholder="20" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Minimum Order Value (₹)</label>
+                    <input type="number" class="form-input" id="coupon-min-order" placeholder="999" value="0" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Status</label>
+                    <select class="form-input" id="coupon-is-active">
+                        <option value="true">🟢 Active</option>
+                        <option value="false">🔴 Inactive</option>
+                    </select>
+                </div>
+
+                <div class="form-group full-width" style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 16px;">
+                    <button type="button" class="btn-action" style="background: rgba(255,255,255,0.1); color:#fff;" id="coupon-modal-cancel-btn">Cancel</button>
+                    <button type="submit" class="btn-action btn-gold" style="padding: 12px 24px; font-size: 14px;" id="coupon-submit-btn"><i data-lucide="plus"></i> Save Coupon</button>
                 </div>
             </form>
         </div>

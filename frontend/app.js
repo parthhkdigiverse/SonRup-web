@@ -1082,12 +1082,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     // Checkout Page Loading & Submission logic
-    if (window.location.pathname.includes("checkout.html")) {
+    if (window.location.pathname.includes("checkout")) {
         const checkoutPageForm = document.getElementById("checkout-page-form");
         const checkoutPageSummaryList = document.getElementById("checkout-page-summary-list");
         const checkoutPageGrandTotal = document.getElementById("checkout-page-grand-total");
         const checkoutPageUpgradeBox = document.getElementById("checkout-page-upgrade-box");
         const checkoutPageUpgradeBtn = document.getElementById("checkout-page-upgrade-btn");
+
+        let appliedCoupon = null;
 
         // Load logged-in user details to shipping form automatically
         const loggedInUser = localStorage.getItem("sonrup_user");
@@ -1102,7 +1104,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             if (nameField) nameField.value = userObj.name || "";
             if (emailField) emailField.value = userObj.email || "";
             if (phoneField) phoneField.value = userObj.phone || "";
-            
+
             // Explicitly populate user address and pincode fields
             if (addressField && userObj.address) addressField.value = userObj.address || "";
             if (pincodeField && userObj.pincode) pincodeField.value = userObj.pincode || "";
@@ -1130,7 +1132,32 @@ document.addEventListener("DOMContentLoaded", async () => {
                 checkoutPageSummaryList.appendChild(row);
             });
 
-            checkoutPageGrandTotal.textContent = `₹${totalPrice.toLocaleString("en-IN")}.00`;
+            const discountRow = document.getElementById("discount-row");
+            const appliedCouponName = document.getElementById("applied-coupon-name");
+            const discountAmountText = document.getElementById("discount-amount-text");
+
+            if (appliedCoupon && appliedCoupon.valid) {
+                if (totalPrice < (appliedCoupon.min_order_value || 0)) {
+                    // Cart dropped below required minimum order value -> invalidate coupon!
+                    appliedCoupon = null;
+                    if (couponMsg) {
+                        couponMsg.style.display = "block";
+                        couponMsg.style.color = "#ef4444";
+                        couponMsg.textContent = `❌ Coupon removed: minimum order value of ₹${appliedCoupon ? appliedCoupon.min_order_value : 0} required.`;
+                    }
+                    if (discountRow) discountRow.style.display = "none";
+                    checkoutPageGrandTotal.textContent = `₹${totalPrice.toLocaleString("en-IN")}.00`;
+                } else {
+                    const finalGrand = Math.max(0, totalPrice - appliedCoupon.discount_amount);
+                    if (discountRow) discountRow.style.display = "flex";
+                    if (appliedCouponName) appliedCouponName.textContent = appliedCoupon.code;
+                    if (discountAmountText) discountAmountText.textContent = `-₹${appliedCoupon.discount_amount.toLocaleString("en-IN")}.00`;
+                    checkoutPageGrandTotal.textContent = `₹${finalGrand.toLocaleString("en-IN")}.00`;
+                }
+            } else {
+                if (discountRow) discountRow.style.display = "none";
+                checkoutPageGrandTotal.textContent = `₹${totalPrice.toLocaleString("en-IN")}.00`;
+            }
 
             // Dynamic upgrade combo box check
             const containsCombo = cart.some(item => item.name.includes("Combo"));
@@ -1143,7 +1170,176 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
         };
 
+        // Fetch & Render Available Coupons on Checkout Page
+        let couponsLoaded = false;
+        const loadAvailableCoupons = async () => {
+            try {
+                const res = await fetch(`${getApiBase()}/api/orders/public-coupons`);
+                const container = document.getElementById("available-coupons-container");
+                const list = document.getElementById("available-coupons-list");
+                const toggleBtn = document.getElementById("toggle-coupons-btn");
+                if (!res.ok || !container || !list) return;
+
+                const coupons = await res.json();
+                if (toggleBtn) toggleBtn.style.display = "inline-flex";
+
+                if (coupons.length === 0) {
+                    list.innerHTML = '<p style="color:#94a3b8; font-size:12px; margin:4px 0;">No active promo codes right now.</p>';
+                    return;
+                }
+
+                const { totalPrice } = getCartTotals();
+                list.innerHTML = "";
+
+                coupons.forEach(c => {
+                    const minVal = c.min_order_value || 0;
+                    const isEligible = totalPrice >= minVal;
+                    const discText = c.discount_type === "percentage" ? `${c.discount_value}% OFF` : `₹${c.discount_value} OFF`;
+                    const badge = document.createElement("div");
+                    badge.style.background = isEligible ? "rgba(201, 162, 39, 0.12)" : "rgba(255, 255, 255, 0.03)";
+                    badge.style.border = isEligible ? "1px solid rgba(201, 162, 39, 0.4)" : "1px dashed rgba(255, 255, 255, 0.15)";
+                    badge.style.padding = "8px 12px";
+                    badge.style.borderRadius = "8px";
+                    badge.style.cursor = "pointer";
+                    badge.style.display = "flex";
+                    badge.style.justifyContent = "space-between";
+                    badge.style.alignItems = "center";
+                    badge.style.fontSize = "12px";
+                    badge.style.transition = "all 0.2s ease";
+                    badge.style.opacity = isEligible ? "1" : "0.75";
+
+                    const unlockTag = !isEligible ? `<span style="color: #ef4444; font-size: 10.5px; font-weight: 600;">(Add ₹${minVal - totalPrice} more)</span>` : `<span style="color: #10B981; font-weight: 700; font-size: 11px;">✓ Click to apply</span>`;
+
+                    badge.innerHTML = `
+                        <div>
+                            <strong style="color: ${isEligible ? '#E5C365' : '#cbd5e1'}; letter-spacing: 0.5px;">${c.code}</strong>
+                            <span style="color: #94a3b8; font-size: 11px; margin-left: 6px;">(${discText}${minVal > 0 ? ` on ₹${minVal}+` : ''})</span>
+                        </div>
+                        ${unlockTag}
+                    `;
+
+                    badge.addEventListener("click", () => {
+                        const couponCodeInput = document.getElementById("coupon-code-input");
+                        const applyCouponBtn = document.getElementById("apply-coupon-btn");
+                        if (couponCodeInput) {
+                            couponCodeInput.value = c.code;
+                            if (applyCouponBtn) applyCouponBtn.click();
+                        }
+                    });
+
+                    list.appendChild(badge);
+                });
+            } catch (e) {
+                console.warn("Could not load public coupons:", e);
+            }
+        };
+
+        // Toggle Available Coupons List Visibility
+        const toggleCouponsBtn = document.getElementById("toggle-coupons-btn");
+        const availableCouponsContainer = document.getElementById("available-coupons-container");
+        if (toggleCouponsBtn && availableCouponsContainer) {
+            toggleCouponsBtn.addEventListener("click", (e) => {
+                e.preventDefault();
+                const isHidden = window.getComputedStyle(availableCouponsContainer).display === "none";
+                availableCouponsContainer.style.display = isHidden ? "block" : "none";
+                const span = toggleCouponsBtn.querySelector("span");
+                if (span) {
+                    span.textContent = isHidden ? "🎟️ Hide Coupons" : "🎟️ See Coupons";
+                }
+            });
+        }
+
+        // Coupon Application Event Listener
+        const applyCouponBtn = document.getElementById("apply-coupon-btn");
+        const couponCodeInput = document.getElementById("coupon-code-input");
+        const couponMsg = document.getElementById("coupon-message");
+        const clearInputBtn = document.getElementById("clear-coupon-input-btn");
+
+        const updateClearInputBtnVisibility = () => {
+            if (clearInputBtn && couponCodeInput) {
+                clearInputBtn.style.display = (couponCodeInput.value.trim().length > 0 || appliedCoupon) ? "flex" : "none";
+            }
+        };
+
+        if (couponCodeInput) {
+            couponCodeInput.addEventListener("input", updateClearInputBtnVisibility);
+        }
+
+        const resetAppliedCoupon = (showNotification = true) => {
+            appliedCoupon = null;
+            if (couponCodeInput) couponCodeInput.value = "";
+            if (couponMsg) {
+                couponMsg.style.display = "none";
+                couponMsg.innerHTML = "";
+            }
+            updateClearInputBtnVisibility();
+            renderCheckoutPageSummary();
+            loadAvailableCoupons();
+            if (showNotification) {
+                showToast("Coupon Removed", "Promo code removed from your order.");
+            }
+        };
+
+        if (clearInputBtn) {
+            clearInputBtn.addEventListener("click", () => resetAppliedCoupon(true));
+        }
+
+        if (applyCouponBtn && couponCodeInput) {
+            applyCouponBtn.addEventListener("click", async () => {
+                const code = couponCodeInput.value.trim();
+                const { totalPrice } = getCartTotals();
+                if (!code) {
+                    showToast("Warning", "Please enter a coupon code.");
+                    return;
+                }
+                if (totalPrice <= 0) {
+                    showToast("Warning", "Your cart is empty.");
+                    return;
+                }
+                try {
+                    const res = await fetch(`${getApiBase()}/api/orders/validate-coupon`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ code, cart_total: totalPrice })
+                    });
+                    const data = await res.json();
+                    if (!res.ok) {
+                        if (couponMsg) {
+                            couponMsg.style.display = "flex";
+                            couponMsg.style.color = "#ef4444";
+                            couponMsg.innerHTML = `<span>${data.detail || "Invalid or ineligible coupon code."}</span>`;
+                        }
+                        appliedCoupon = null;
+                        updateClearInputBtnVisibility();
+                        renderCheckoutPageSummary();
+                        loadAvailableCoupons();
+                        return;
+                    }
+
+                    appliedCoupon = data;
+                    if (couponMsg) {
+                        couponMsg.style.display = "flex";
+                        couponMsg.style.color = "#10B981";
+                        couponMsg.textContent = data.message;
+                    }
+                    updateClearInputBtnVisibility();
+                    renderCheckoutPageSummary();
+                    loadAvailableCoupons();
+                    showToast("Coupon Applied", `Saved ₹${data.discount_amount} on your order!`);
+                } catch (err) {
+                    showToast("Error", "Failed to validate coupon code.");
+                }
+            });
+        }
+
+        // Remove Coupon Handler for Discount Summary Row
+        const removeCouponBtn = document.getElementById("remove-coupon-btn");
+        if (removeCouponBtn) {
+            removeCouponBtn.addEventListener("click", () => resetAppliedCoupon(true));
+        }
+
         renderCheckoutPageSummary();
+        loadAvailableCoupons();
 
         // Upgrade button click
         if (checkoutPageUpgradeBtn) {

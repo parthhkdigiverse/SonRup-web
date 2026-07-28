@@ -229,3 +229,31 @@ async def seed_settings(db):
         await db.settings.insert_one(default_doc)
         print("⚙️ Seeded default website settings into MongoDB.")
 
+
+async def seed_coupons(db):
+    """Seed initial promo coupons if collection is empty."""
+    count = await db.coupons.count_documents({})
+    if count == 0:
+        seed_list = [
+            {
+                "code": "SONRUP20",
+                "discount_type": "percentage",
+                "discount_value": 20,
+                "min_order_value": 999,
+                "is_active": True,
+                "usage_count": 5,
+                "created_at": datetime.now(timezone.utc),
+            },
+            {
+                "code": "WELCOME100",
+                "discount_type": "fixed",
+                "discount_value": 100,
+                "min_order_value": 500,
+                "is_active": True,
+                "usage_count": 12,
+                "created_at": datetime.now(timezone.utc),
+            }
+        ]
+        await db.coupons.insert_many(seed_list)
+        print("🎟️ Seeded default promo coupons into MongoDB.")
+
