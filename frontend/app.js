@@ -851,12 +851,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         if (isLoggedIn()) {
             const userObj = JSON.parse(localStorage.getItem("sonrup_user") || '{}');
-            const adminBadgeHtml = userObj.is_admin ? `
-                <a href="admin" class="nav-admin-btn" style="background: linear-gradient(135deg, #C9A227, #E5C365); color: #000; font-size: 11px; font-weight: 800; padding: 6px 12px; border-radius: 99px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; box-shadow: 0 2px 10px rgba(201, 162, 39, 0.4); text-transform: uppercase;">⚡ Admin Portal</a>
-            ` : '';
             authActionsContainer.innerHTML = `
                 ${headerButtonsHtml}
-                ${adminBadgeHtml}
                 <a href="profile" class="nav-profile-btn" id="header-profile-icon" title="View Profile: ${userObj.name || ''}" style="display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid var(--color-gold); background: rgba(201, 162, 39, 0.1); color: var(--color-gold); cursor: pointer; text-decoration: none;">
                     <i data-lucide="user" style="width: 16px; height: 16px;"></i>
                 </a>
