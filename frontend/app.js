@@ -1191,6 +1191,15 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const { totalPrice } = getCartTotals();
                 list.innerHTML = "";
 
+                // Sort coupons: applicable/eligible ones appear at the top
+                coupons.sort((a, b) => {
+                    const eligibleA = totalPrice >= (a.min_order_value || 0);
+                    const eligibleB = totalPrice >= (b.min_order_value || 0);
+                    if (eligibleA && !eligibleB) return -1;
+                    if (!eligibleA && eligibleB) return 1;
+                    return 0;
+                });
+
                 coupons.forEach(c => {
                     const minVal = c.min_order_value || 0;
                     const isEligible = totalPrice >= minVal;
