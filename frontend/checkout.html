@@ -13,6 +13,8 @@
     <link rel="stylesheet" href="style.css">
     <!-- Lucide Icons CDN -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Razorpay Checkout SDK -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 </head>
 <body class="checkout-page-body">
 
@@ -91,18 +93,22 @@
                     <div class="form-section">
                         <h2 style="font-size: 18px; color: #FFFFFF; margin-bottom: 20px; font-family: var(--font-heading); font-weight: 600;">2. Payment Method</h2>
                         <div class="payment-options" style="display: flex; flex-direction: column; gap: 12px;">
-                            <label class="payment-option-card active" style="display: flex; align-items: center; gap: 15px; background: rgba(255, 255, 255, 0.01); border: 1px solid var(--border-dark); border-radius: 8px; padding: 16px; cursor: pointer; transition: all 0.3s ease;">
-                                <input type="radio" name="payment-method" value="cod" checked style="accent-color: var(--color-gold);">
+                            <label id="razorpay-option-card" class="payment-option-card active" style="display: flex; align-items: center; gap: 15px; background: rgba(201, 162, 39, 0.06); border: 1px solid var(--color-gold); border-radius: 8px; padding: 16px; cursor: pointer; transition: all 0.3s ease;">
+                                <input type="radio" name="payment-method" id="pay-razorpay" value="razorpay" checked style="accent-color: var(--color-gold);">
                                 <div class="payment-info">
-                                    <span class="payment-title" style="display: block; font-weight: 600; color: #FFFFFF; font-size: 14.5px;">Cash on Delivery (COD)</span>
-                                    <span class="payment-sub" style="display: block; font-size: 12px; color: var(--text-on-dark-muted); margin-top: 2px;">Pay in cash when delivery partner arrives</span>
+                                    <span class="payment-title" style="display: flex; align-items: center; gap: 8px; font-weight: 700; color: #FFFFFF; font-size: 14.5px;">
+                                        💳 Razorpay Online Payment
+                                        <span style="font-size: 10px; background: rgba(16,185,129,0.2); color:#10B981; padding: 2px 6px; border-radius: 4px;">UPI, Cards, NetBanking</span>
+                                    </span>
+                                    <span class="payment-sub" style="display: block; font-size: 12px; color: var(--text-on-dark-muted); margin-top: 2px;">Google Pay, PhonePe, Paytm, Credit/Debit Cards, NetBanking & Wallets</span>
                                 </div>
                             </label>
-                            <label class="payment-option-card" style="display: flex; align-items: center; gap: 15px; background: rgba(255, 255, 255, 0.01); border: 1px solid var(--border-dark); border-radius: 8px; padding: 16px; cursor: pointer; transition: all 0.3s ease;">
-                                <input type="radio" name="payment-method" value="upi" style="accent-color: var(--color-gold);">
+
+                            <label id="cod-option-card" class="payment-option-card" style="display: flex; align-items: center; gap: 15px; background: rgba(255, 255, 255, 0.01); border: 1px solid var(--border-dark); border-radius: 8px; padding: 16px; cursor: pointer; transition: all 0.3s ease;">
+                                <input type="radio" name="payment-method" id="pay-cod" value="cod" style="accent-color: var(--color-gold);">
                                 <div class="payment-info">
-                                    <span class="payment-title" style="display: block; font-weight: 600; color: #FFFFFF; font-size: 14.5px;">Instant UPI Pay</span>
-                                    <span class="payment-sub" style="display: block; font-size: 12px; color: var(--text-on-dark-muted); margin-top: 2px;">GPay, PhonePe, Paytm (Simulated)</span>
+                                    <span class="payment-title" style="display: block; font-weight: 600; color: #FFFFFF; font-size: 14.5px;">Cash on Delivery (COD)</span>
+                                    <span class="payment-sub" style="display: block; font-size: 12px; color: var(--text-on-dark-muted); margin-top: 2px;">Pay cash when delivery partner arrives at your door</span>
                                 </div>
                             </label>
                         </div>

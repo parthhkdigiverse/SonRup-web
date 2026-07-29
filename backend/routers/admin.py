@@ -32,6 +32,9 @@ class WebsiteSettingsIn(BaseModel):
     license_number: str
     announcement_banner_enabled: bool = True
     announcement_banner_text: str = ""
+    razorpay_enabled: bool = True
+    razorpay_key_id: str = ""
+    razorpay_key_secret: str = ""
 
 class ProductIn(BaseModel):
     slug: str
@@ -104,18 +107,27 @@ async def get_website_settings():
     db = get_db()
     settings = await db.settings.find_one({"_id": "global_settings"})
     if not settings:
-        from config import FRONTEND_CONFIG
         settings = {
             "_id": "global_settings",
-            "site_name": FRONTEND_CONFIG.get("site_name", "Sonrup"),
-            "support_email": FRONTEND_CONFIG.get("support_email", "info@sonrup.com"),
-            "support_phone": FRONTEND_CONFIG.get("support_phone", "+91 76001 75193"),
-            "support_address": FRONTEND_CONFIG.get("support_address", "A 584 Sitaram Society, Punagam Road, Surat-395010"),
-            "fssai_number": FRONTEND_CONFIG.get("fssai_number", "10726997000544"),
-            "license_number": FRONTEND_CONFIG.get("license_number", "GA/646-A"),
+            "site_name": "Sonrup",
+            "support_email": "info@sonrup.com",
+            "support_phone": "+91 76001 75193",
+            "support_address": "A 584 Sitaram Society, Punagam Road, Surat-395010",
+            "fssai_number": "10726997000544",
+            "license_number": "GA/646-A",
             "announcement_banner_enabled": True,
             "announcement_banner_text": "🌟 Free Express Shipping on All Wellness Orders Above ₹999 across India! 🚀",
+            "razorpay_enabled": True,
+            "razorpay_key_id": "rzp_test_SampleKey123",
+            "razorpay_key_secret": "SampleSecretKey123456"
         }
+    if "razorpay_enabled" not in settings:
+        settings["razorpay_enabled"] = True
+    if "razorpay_key_id" not in settings:
+        settings["razorpay_key_id"] = "rzp_test_SampleKey123"
+    if "razorpay_key_secret" not in settings:
+        settings["razorpay_key_secret"] = "SampleSecretKey123456"
+
     return settings
 
 

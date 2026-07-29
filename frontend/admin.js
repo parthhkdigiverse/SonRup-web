@@ -300,6 +300,9 @@ async function loadSettings() {
         document.getElementById("setting-license").value = data.license_number || "GA/646-A";
         document.getElementById("setting-banner-enabled").value = data.announcement_banner_enabled ? "true" : "false";
         document.getElementById("setting-banner-text").value = data.announcement_banner_text || "";
+        document.getElementById("setting-razorpay-enabled").value = data.razorpay_enabled !== false ? "true" : "false";
+        document.getElementById("setting-razorpay-key-id").value = data.razorpay_key_id || "";
+        document.getElementById("setting-razorpay-key-secret").value = data.razorpay_key_secret || "";
     } catch (e) {
         console.error("Error loading settings:", e);
     }
@@ -656,7 +659,10 @@ function setupEventListeners() {
             fssai_number: document.getElementById("setting-fssai").value.trim(),
             license_number: document.getElementById("setting-license").value.trim(),
             announcement_banner_enabled: document.getElementById("setting-banner-enabled").value === "true",
-            announcement_banner_text: document.getElementById("setting-banner-text").value.trim()
+            announcement_banner_text: document.getElementById("setting-banner-text").value.trim(),
+            razorpay_enabled: document.getElementById("setting-razorpay-enabled").value === "true",
+            razorpay_key_id: document.getElementById("setting-razorpay-key-id").value.trim(),
+            razorpay_key_secret: document.getElementById("setting-razorpay-key-secret").value.trim()
         };
 
         try {

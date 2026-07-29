@@ -224,6 +224,9 @@ async def seed_settings(db):
             "license_number": FRONTEND_CONFIG.get("license_number", "GA/646-A"),
             "announcement_banner_enabled": True,
             "announcement_banner_text": "🌟 Free Express Shipping on All Wellness Orders Above ₹999 across India! 🚀",
+            "razorpay_enabled": True,
+            "razorpay_key_id": "rzp_test_SampleKey123",
+            "razorpay_key_secret": "SampleSecretKey123456",
             "updated_at": datetime.now(timezone.utc),
         }
         await db.settings.insert_one(default_doc)

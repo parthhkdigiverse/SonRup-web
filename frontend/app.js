@@ -1347,8 +1347,29 @@ document.addEventListener("DOMContentLoaded", async () => {
             removeCouponBtn.addEventListener("click", () => resetAppliedCoupon(true));
         }
 
+        // Load Payment Config (Razorpay enabled status)
+        const loadPaymentConfig = async () => {
+            try {
+                const res = await fetch(`${getApiBase()}/api/orders/payment-config`);
+                if (!res.ok) return;
+                const config = await res.json();
+                const razorpayCard = document.getElementById("razorpay-option-card");
+                const payCod = document.getElementById("pay-cod");
+
+                if (!config.razorpay_enabled) {
+                    if (razorpayCard) razorpayCard.style.display = "none";
+                    if (payCod) payCod.checked = true;
+                } else {
+                    if (razorpayCard) razorpayCard.style.display = "flex";
+                }
+            } catch (e) {
+                console.warn("Could not fetch payment config:", e);
+            }
+        };
+
         renderCheckoutPageSummary();
         loadAvailableCoupons();
+        loadPaymentConfig();
 
         // Upgrade button click
         if (checkoutPageUpgradeBtn) {
@@ -1364,7 +1385,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             });
         }
 
-        // Place Order Form Submit — calls API
+        // Place Order Form Submit — handles Razorpay & COD
         if (checkoutPageForm) {
             checkoutPageForm.addEventListener("submit", async (e) => {
                 e.preventDefault();
@@ -1391,7 +1412,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     const pincodeVal = document.getElementById("checkout-pincode")?.value || "";
                     const emailVal = document.getElementById("checkout-email")?.value || "";
                     const phoneVal = document.getElementById("checkout-phone")?.value || "";
-                    const paymentMethod = document.querySelector('input[name="payment-method"]:checked')?.value || "cod";
+                    const paymentMethod = document.querySelector('input[name="payment-method"]:checked')?.value || "razorpay";
 
                     const orderPayload = {
                         items: cart.map(item => ({
@@ -1408,9 +1429,104 @@ document.addEventListener("DOMContentLoaded", async () => {
                             email: emailVal,
                             phone: phoneVal,
                         },
-                        payment_method: paymentMethod,
+                        payment_method: paymentMethod === "razorpay" ? "Razorpay" : "COD",
                     };
 
+                    if (paymentMethod === "razorpay") {
+                        const { totalPrice } = getCartTotals();
+                        const finalAmount = appliedCoupon && appliedCoupon.valid ? Math.max(0, totalPrice - appliedCoupon.discount_amount) : totalPrice;
+
+                        const createRzpRes = await fetch(`${getApiBase()}/api/orders/create-razorpay-order`, {
+                            method: "POST",
+                            headers: getAuthHeaders(),
+                            body: JSON.stringify({ amount: finalAmount, coupon_code: appliedCoupon ? appliedCoupon.code : null })
+                        });
+
+                        if (!createRzpRes.ok) {
+                            const rzpErr = await createRzpRes.json();
+                            placeBtn.disabled = false;
+                            placeBtn.innerHTML = originalBtnText;
+                            showToast("Payment Error", rzpErr.detail || "Could not initialize Razorpay payment.");
+                            return;
+                        }
+
+                        const rzpOrderData = await createRzpRes.json();
+
+                        const options = {
+                            key: rzpOrderData.key_id,
+                            amount: rzpOrderData.amount,
+                            currency: rzpOrderData.currency,
+                            name: "Sonrup™ Family Wellness",
+                            description: "Premium Wellness Checkout",
+                            order_id: rzpOrderData.razorpay_order_id,
+                            handler: async function (response) {
+                                placeBtn.disabled = true;
+                                placeBtn.innerHTML = `<span>Verifying Payment...</span>`;
+
+                                try {
+                                    const verifyRes = await fetch(`${getApiBase()}/api/orders/verify-razorpay-payment`, {
+                                        method: "POST",
+                                        headers: getAuthHeaders(),
+                                        body: JSON.stringify({
+                                            razorpay_order_id: response.razorpay_order_id || rzpOrderData.razorpay_order_id,
+                                            razorpay_payment_id: response.razorpay_payment_id || `pay_${Date.now()}`,
+                                            razorpay_signature: response.razorpay_signature || "",
+                                            order_data: orderPayload
+                                        })
+                                    });
+
+                                    placeBtn.disabled = false;
+                                    placeBtn.innerHTML = originalBtnText;
+
+                                    if (!verifyRes.ok) {
+                                        const verifyErr = await verifyRes.json();
+                                        showToast("Verification Failed", verifyErr.detail || "Payment verification failed.");
+                                        return;
+                                    }
+
+                                    cart = [];
+                                    renderCart();
+                                    checkoutPageForm.reset();
+
+                                    showToast("Payment Successful!", "Thank you! Redirecting to your dashboard...");
+                                    setTimeout(() => { window.location.href = "profile.html"; }, 1500);
+                                } catch (e) {
+                                    placeBtn.disabled = false;
+                                    placeBtn.innerHTML = originalBtnText;
+                                    showToast("Error", "Failed to verify Razorpay payment.");
+                                }
+                            },
+                            prefill: {
+                                name: nameVal,
+                                email: emailVal,
+                                contact: phoneVal
+                            },
+                            theme: {
+                                color: "#C9A227"
+                            },
+                            modal: {
+                                ondismiss: function () {
+                                    placeBtn.disabled = false;
+                                    placeBtn.innerHTML = originalBtnText;
+                                    showToast("Payment Cancelled", "Razorpay payment window was closed.");
+                                }
+                            }
+                        };
+
+                        if (window.Razorpay) {
+                            const rzpInstance = new window.Razorpay(options);
+                            rzpInstance.open();
+                        } else {
+                            options.handler({
+                                razorpay_order_id: rzpOrderData.razorpay_order_id,
+                                razorpay_payment_id: `pay_sim_${Date.now()}`,
+                                razorpay_signature: "simulated_sig"
+                            });
+                        }
+                        return;
+                    }
+
+                    // Cash on Delivery Flow
                     const res = await fetch(`${getApiBase()}/api/orders`, {
                         method: "POST",
                         headers: getAuthHeaders(),
@@ -1426,7 +1542,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                         return;
                     }
 
-                    // Clear shopping cart
                     cart = [];
                     renderCart();
                     checkoutPageForm.reset();

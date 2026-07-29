@@ -652,7 +652,36 @@
                         <label class="form-label">Announcement Banner Copy / Promo Text</label>
                         <input type="text" class="form-input" id="setting-banner-text">
                     </div>
-                    <div class="form-group full-width" style="display: flex; justify-content: flex-end; margin-top: 12px;">
+
+                    <div class="form-group full-width" style="margin-top: 24px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 20px;">
+                        <h3 style="font-family: 'Outfit', sans-serif; font-size: 18px; color: #fff; margin: 0 0 4px 0; display: flex; align-items: center; gap: 8px;">
+                            <span>💳 Razorpay Payment Gateway Settings</span>
+                        </h3>
+                        <p style="font-size: 12.5px; color: #94a3b8; margin-bottom: 16px;">Control customer checkout payment options and manage live or test Razorpay API credentials.</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Razorpay Gateway Status</label>
+                        <select class="form-input" id="setting-razorpay-enabled">
+                            <option value="true">🟢 Enabled (Accept Online Payments)</option>
+                            <option value="false">🔴 Disabled (Turn Off Gateway)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Razorpay Key ID</label>
+                        <input type="text" class="form-input" id="setting-razorpay-key-id" placeholder="rzp_live_XXXXXXXXXXXXXX">
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label class="form-label">Razorpay Key Secret</label>
+                        <div class="password-wrapper">
+                            <input type="password" class="form-input" id="setting-razorpay-key-secret" placeholder="Key Secret string" style="padding-right: 42px;">
+                            <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('setting-razorpay-key-secret', this)" title="Toggle Secret Visibility">👁️</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group full-width" style="display: flex; justify-content: flex-end; margin-top: 16px;">
                         <button type="submit" class="btn-action btn-gold" style="padding: 14px 32px; font-size: 15px;"><i data-lucide="save"></i> Save Website Configuration</button>
                     </div>
                 </form>
