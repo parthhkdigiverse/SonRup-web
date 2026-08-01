@@ -232,9 +232,30 @@ async function loadOrders() {
         }
 
         orders.forEach(order => {
-            const orderDate = order.created_at ? new Date(order.created_at).toLocaleDateString() : "Today";
+            const orderDate = order.date || (order.created_at ? new Date(order.created_at).toLocaleDateString() : "Today");
             const itemsText = (order.items || []).map(i => `${i.quantity}x ${i.name}`).join("<br>");
             const status = order.status || "Processing";
+            
+            const shipping = order.shipping || {};
+            const shippingName = shipping.name || "Customer";
+            const phone = shipping.phone || "N/A";
+            const address = shipping.address || "";
+            const pincode = shipping.pincode || "";
+
+            let deliveryActionHtml = "";
+            if (order.waybill) {
+                deliveryActionHtml = `
+                    <div style="margin-top: 6px; font-size: 11.5px; color: #94a3b8;">
+                        🚚 Delhivery Waybill:<br>
+                        <span style="font-family: monospace; font-weight: 700; color: #fff;">${order.waybill}</span>
+                        <button class="btn-action btn-edit" onclick="trackDelhivery('${order.waybill}')" style="margin-top: 4px; padding: 4px 8px; font-size: 10px; width: 100%; justify-content: center; height: auto;">📍 Track</button>
+                    </div>
+                `;
+            } else {
+                deliveryActionHtml = `
+                    <button class="btn-action btn-gold" onclick="shipDelhivery('${order.order_id || order.id}')" style="margin-top: 6px; padding: 4px 8px; font-size: 10px; width: 100%; justify-content: center; height: auto;">🚚 Ship Delhivery</button>
+                `;
+            }
 
             const tr = document.createElement("tr");
             tr.innerHTML = `
@@ -243,9 +264,9 @@ async function loadOrders() {
                     <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">📅 ${orderDate}</div>
                 </td>
                 <td>
-                    <div style="font-weight: 700; color: #fff;">${order.shipping_name || 'Valued Customer'}</div>
-                    <div style="color: #cbd5e1; font-size: 12px;">📞 ${order.phone || 'N/A'}</div>
-                    <div style="color: #94a3b8; font-size: 12px; max-width: 240px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">📍 ${order.address || 'India'}, ${order.pincode || ''}</div>
+                    <div style="font-weight: 700; color: #fff;">${shippingName}</div>
+                    <div style="color: #cbd5e1; font-size: 12px;">📞 ${phone}</div>
+                    <div style="color: #94a3b8; font-size: 12px; max-width: 240px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">📍 ${address}, ${pincode}</div>
                 </td>
                 <td style="font-size: 13px; color: #e2e8f0;">
                     ${itemsText}
@@ -259,6 +280,7 @@ async function loadOrders() {
                         <option value="Delivered" ${status === 'Delivered' ? 'selected' : ''}>🟢 Delivered</option>
                         <option value="Cancelled" ${status === 'Cancelled' ? 'selected' : ''}>🔴 Cancelled</option>
                     </select>
+                    ${deliveryActionHtml}
                 </td>
             `;
             tbody.appendChild(tr);
@@ -303,6 +325,17 @@ async function loadSettings() {
         document.getElementById("setting-razorpay-enabled").value = data.razorpay_enabled !== false ? "true" : "false";
         document.getElementById("setting-razorpay-key-id").value = data.razorpay_key_id || "";
         document.getElementById("setting-razorpay-key-secret").value = data.razorpay_key_secret || "";
+        
+        // Delhivery
+        document.getElementById("setting-delhivery-enabled").value = data.delhivery_enabled === true ? "true" : "false";
+        document.getElementById("setting-delhivery-environment").value = data.delhivery_environment || "staging";
+        document.getElementById("setting-delhivery-api-token").value = data.delhivery_api_token || "";
+        document.getElementById("setting-delhivery-warehouse-name").value = data.delhivery_warehouse_name || "";
+        document.getElementById("setting-delhivery-warehouse-address").value = data.delhivery_warehouse_address || "";
+        document.getElementById("setting-delhivery-warehouse-city").value = data.delhivery_warehouse_city || "";
+        document.getElementById("setting-delhivery-warehouse-state").value = data.delhivery_warehouse_state || "";
+        document.getElementById("setting-delhivery-warehouse-pincode").value = data.delhivery_warehouse_pincode || "";
+        document.getElementById("setting-delhivery-warehouse-phone").value = data.delhivery_warehouse_phone || "";
     } catch (e) {
         console.error("Error loading settings:", e);
     }
@@ -662,7 +695,16 @@ function setupEventListeners() {
             announcement_banner_text: document.getElementById("setting-banner-text").value.trim(),
             razorpay_enabled: document.getElementById("setting-razorpay-enabled").value === "true",
             razorpay_key_id: document.getElementById("setting-razorpay-key-id").value.trim(),
-            razorpay_key_secret: document.getElementById("setting-razorpay-key-secret").value.trim()
+            razorpay_key_secret: document.getElementById("setting-razorpay-key-secret").value.trim(),
+            delhivery_enabled: document.getElementById("setting-delhivery-enabled").value === "true",
+            delhivery_environment: document.getElementById("setting-delhivery-environment").value.trim(),
+            delhivery_api_token: document.getElementById("setting-delhivery-api-token").value.trim(),
+            delhivery_warehouse_name: document.getElementById("setting-delhivery-warehouse-name").value.trim(),
+            delhivery_warehouse_address: document.getElementById("setting-delhivery-warehouse-address").value.trim(),
+            delhivery_warehouse_city: document.getElementById("setting-delhivery-warehouse-city").value.trim(),
+            delhivery_warehouse_state: document.getElementById("setting-delhivery-warehouse-state").value.trim(),
+            delhivery_warehouse_pincode: document.getElementById("setting-delhivery-warehouse-pincode").value.trim(),
+            delhivery_warehouse_phone: document.getElementById("setting-delhivery-warehouse-phone").value.trim()
         };
 
         try {
@@ -757,3 +799,61 @@ function hideAdminLoginScreen() {
         screen.style.display = "none";
     }
 }
+
+// ─── Delhivery Shipment Handlers ───
+window.shipDelhivery = async (orderRef) => {
+    if (!confirm(`Manifest this shipment via Delhivery Logistics for Order #${orderRef}?`)) return;
+    try {
+        const res = await fetch(`${API_BASE_URL}/admin/orders/${orderRef}/ship-delhivery`, {
+            method: "POST",
+            headers: getHeaders(true)
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || "Manifestation failed");
+
+        showToast(`🚚 Shipment successfully created! Waybill: ${data.waybill}`);
+        loadOrders();
+    } catch (e) {
+        showToast(e.message, true);
+    }
+};
+
+window.trackDelhivery = async (waybill) => {
+    try {
+        const res = await fetch(`${API_BASE_URL}/orders/track/${waybill}`);
+        if (!res.ok) throw new Error("Could not retrieve tracking details");
+
+        const data = await res.json();
+        if (!data.success) throw new Error("No tracking information available yet.");
+
+        document.getElementById("tracking-waybill-title").textContent = waybill;
+        document.getElementById("tracking-status").textContent = data.status || "In Transit";
+
+        const timeline = document.getElementById("tracking-timeline");
+        timeline.innerHTML = "";
+
+        if (!data.scans || data.scans.length === 0) {
+            timeline.innerHTML = '<div style="color: #94a3b8; font-size:12.5px;">No courier facility updates logged yet.</div>';
+        } else {
+            data.scans.forEach(scan => {
+                const item = document.createElement("div");
+                item.style.position = "relative";
+                item.innerHTML = `
+                    <div style="position: absolute; left: -25px; top: 4px; width: 8px; height: 8px; border-radius: 50%; background: #C9A227; border: 2px solid #121212;"></div>
+                    <div style="font-weight: 700; color: #fff; font-size:13px;">${scan.status}</div>
+                    <div style="color: #cbd5e1; font-size: 12px; margin-top: 2px;">${scan.activity}</div>
+                    <div style="color: #94a3b8; font-size: 11px; margin-top: 2px;">📅 ${scan.date}</div>
+                `;
+                timeline.appendChild(item);
+            });
+        }
+
+        document.getElementById("delhivery-tracking-modal").style.display = "flex";
+    } catch (e) {
+        showToast(e.message, true);
+    }
+};
+
+window.closeTrackingModal = () => {
+    document.getElementById("delhivery-tracking-modal").style.display = "none";
+};

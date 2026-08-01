@@ -39,3 +39,4 @@ class OrderOut(BaseModel):
     shipping: dict
     payment_method: str
     date: str
+    waybill: Optional[str] = None

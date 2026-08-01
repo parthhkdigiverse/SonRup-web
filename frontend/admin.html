@@ -681,6 +681,67 @@
                         </div>
                     </div>
 
+                    <div class="form-group full-width" style="margin-top: 28px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 20px;">
+                        <h3 style="font-family: 'Outfit', sans-serif; font-size: 18px; color: #fff; margin: 0 0 4px 0; display: flex; align-items: center; gap: 8px;">
+                            <span>🚚 Delhivery Logistics Gateway Settings</span>
+                        </h3>
+                        <p style="font-size: 12.5px; color: #94a3b8; margin-bottom: 16px;">Configure your Delhivery API credentials, environment modes, and warehouse pickup location details.</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Delhivery Gateway Status</label>
+                        <select class="form-input" id="setting-delhivery-enabled">
+                            <option value="true">🟢 Enabled (Auto-manifest Shipment)</option>
+                            <option value="false">🔴 Disabled (Manual Processing Only)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">API Environment Mode</label>
+                        <select class="form-input" id="setting-delhivery-environment">
+                            <option value="staging">🧪 Staging Sandbox (Test Mode)</option>
+                            <option value="production">🚀 Production Live (Real Shipments)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label class="form-label">Delhivery API Token</label>
+                        <div class="password-wrapper">
+                            <input type="password" class="form-input" id="setting-delhivery-api-token" placeholder="API access authorization token" style="padding-right: 42px;">
+                            <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('setting-delhivery-api-token', this)" title="Toggle Token Visibility">👁️</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Warehouse Name (Pickup Location)</label>
+                        <input type="text" class="form-input" id="setting-delhivery-warehouse-name" placeholder="Sonrup Surat Warehouse">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Warehouse Contact Phone</label>
+                        <input type="text" class="form-input" id="setting-delhivery-warehouse-phone" placeholder="+91 XXXXXXXXXX">
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label class="form-label">Warehouse Pickup Street Address</label>
+                        <input type="text" class="form-input" id="setting-delhivery-warehouse-address" placeholder="Building, Society, Street detail">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Warehouse City</label>
+                        <input type="text" class="form-input" id="setting-delhivery-warehouse-city" placeholder="Surat">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Warehouse State</label>
+                        <input type="text" class="form-input" id="setting-delhivery-warehouse-state" placeholder="Gujarat">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Warehouse Pincode</label>
+                        <input type="text" class="form-input" id="setting-delhivery-warehouse-pincode" placeholder="395010">
+                    </div>
+
                     <div class="form-group full-width" style="display: flex; justify-content: flex-end; margin-top: 16px;">
                         <button type="submit" class="btn-action btn-gold" style="padding: 14px 32px; font-size: 15px;"><i data-lucide="save"></i> Save Website Configuration</button>
                     </div>
@@ -854,6 +915,36 @@
                     <button type="submit" class="btn-action btn-gold" style="padding: 12px 24px; font-size: 14px;" id="coupon-submit-btn"><i data-lucide="plus"></i> Save Coupon</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- DELHIVERY TRACKING MODAL -->
+    <div id="delhivery-tracking-modal" class="admin-modal">
+        <div class="modal-card" style="max-width: 500px;">
+            <button class="modal-close-btn" id="tracking-modal-close-btn" onclick="closeTrackingModal()">✕</button>
+            <h2 style="font-family: 'Outfit', sans-serif; font-size: 22px; color: #fff; margin-top: 0; margin-bottom: 8px;">🚚 Delhivery Shipment Tracking</h2>
+            <p style="color: #cbd5e1; font-size: 13px; margin-bottom: 20px;">Waybill Number: <strong id="tracking-waybill-title" style="color: var(--color-gold);"></strong></p>
+
+            <div style="max-height: 380px; overflow-y: auto; padding-right: 8px;">
+                <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 12px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <span style="font-size: 11px; color:#94a3b8; display:block;">Current Status</span>
+                        <strong id="tracking-status" style="color:#10B981; font-size:15px;">In Transit</strong>
+                    </div>
+                    <div style="text-align: right;">
+                        <span style="font-size: 11px; color:#94a3b8; display:block;">Delivery Provider</span>
+                        <span style="color:#fff; font-size:14px; font-weight:700;">Delhivery Logistics</span>
+                    </div>
+                </div>
+
+                <div id="tracking-timeline" style="display: flex; flex-direction: column; gap: 16px; position: relative; padding-left: 20px; border-left: 2px solid rgba(201, 162, 39, 0.2);">
+                    <!-- Dynamic scan items go here -->
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; margin-top: 24px;">
+                <button type="button" class="btn-action" style="background: rgba(255,255,255,0.1); color:#fff; padding: 10px 24px;" onclick="closeTrackingModal()">Dismiss</button>
+            </div>
         </div>
     </div>
 

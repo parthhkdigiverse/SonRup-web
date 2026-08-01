@@ -26,6 +26,7 @@ def _order_to_out(order: dict) -> OrderOut:
         shipping=order["shipping"],
         payment_method=order["payment_method"],
         date=order["created_at"].strftime("%d/%m/%Y"),
+        waybill=order.get("waybill"),
     )
 
 
@@ -62,6 +63,8 @@ async def create_order(
 
     result = await db.orders.insert_one(order_doc)
     order_doc["_id"] = result.inserted_id
+
+    await auto_manifest_if_enabled(order_doc)
 
     return _order_to_out(order_doc)
 
@@ -253,8 +256,54 @@ async def verify_razorpay_payment(data: RazorpayPaymentVerifyIn):
     res = await db.orders.insert_one(order)
     order["_id"] = str(res.inserted_id)
 
+    await auto_manifest_if_enabled(order)
+
     return {
         "success": True,
         "message": "Payment verified and order placed successfully!",
         "order": _order_to_out(order)
     }
+
+
+async def auto_manifest_if_enabled(order_doc: dict):
+    """Automatically manifest shipment via Delhivery if logistics are enabled."""
+    db = get_db()
+    settings = await db.settings.find_one({"_id": "global_settings"}) or {}
+    if settings.get("delhivery_enabled", False):
+        try:
+            from services.delhivery import create_shipment
+            res = await create_shipment(order_doc, settings)
+            if res.get("success"):
+                waybill = res["waybill"]
+                await db.orders.update_one(
+                    {"_id": order_doc["_id"]},
+                    {"$set": {
+                        "waybill": waybill,
+                        "status": "Shipped",
+                        "updated_at": datetime.now(timezone.utc)
+                    }}
+                )
+                order_doc["waybill"] = waybill
+                order_doc["status"] = "Shipped"
+        except Exception as e:
+            print(f"⚠️ Auto Delhivery manifestation failed: {e}")
+
+
+@router.get("/check-pincode/{pincode}")
+async def public_check_pincode(pincode: str):
+    """Check pincode serviceability dynamically for shipping configuration."""
+    db = get_db()
+    settings = await db.settings.find_one({"_id": "global_settings"}) or {}
+    from services.delhivery import check_pincode_serviceability
+    res = await check_pincode_serviceability(pincode, settings)
+    return res
+
+
+@router.get("/track/{waybill}")
+async def public_track_shipment(waybill: str):
+    """Retrieve tracking scan progression logs for a manifested waybill."""
+    db = get_db()
+    settings = await db.settings.find_one({"_id": "global_settings"}) or {}
+    from services.delhivery import track_shipment
+    res = await track_shipment(waybill, settings)
+    return res

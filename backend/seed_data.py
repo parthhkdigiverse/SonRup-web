@@ -227,6 +227,15 @@ async def seed_settings(db):
             "razorpay_enabled": True,
             "razorpay_key_id": "rzp_test_SampleKey123",
             "razorpay_key_secret": "SampleSecretKey123456",
+            "delhivery_enabled": False,
+            "delhivery_api_token": "dummy",
+            "delhivery_warehouse_name": "Sonrup Warehouse",
+            "delhivery_warehouse_address": "A 584 Sitaram Society, Punagam Road",
+            "delhivery_warehouse_city": "Surat",
+            "delhivery_warehouse_state": "Gujarat",
+            "delhivery_warehouse_pincode": "395010",
+            "delhivery_warehouse_phone": "+91 76001 75193",
+            "delhivery_environment": "staging",
             "updated_at": datetime.now(timezone.utc),
         }
         await db.settings.insert_one(default_doc)

@@ -181,6 +181,36 @@
         </div>
     </div>
 
+    <!-- DELHIVERY TRACKING MODAL -->
+    <div id="delhivery-tracking-modal" class="admin-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px); z-index: 9999; justify-content: center; align-items: center; padding: 20px;">
+        <div class="modal-card" style="background: var(--bg-dark-card); border: 1px solid var(--border-dark); border-radius: 16px; padding: 30px; width: 100%; max-width: 500px; position: relative;">
+            <button class="modal-close-btn" onclick="closeTrackingModal()" style="position: absolute; right: 20px; top: 20px; background: none; border: none; color: #fff; font-size: 20px; cursor: pointer;">✕</button>
+            <h2 style="font-family: var(--font-heading); font-size: 22px; color: #fff; margin-top: 0; margin-bottom: 8px;">🚚 Shipment tracking details</h2>
+            <p style="color: #cbd5e1; font-size: 13px; margin-bottom: 20px;">Waybill ID: <strong id="tracking-waybill-title" style="color: var(--color-gold);"></strong></p>
+
+            <div style="max-height: 380px; overflow-y: auto; padding-right: 8px;">
+                <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 12px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <span style="font-size: 11px; color:#94a3b8; display:block;">Current Status</span>
+                        <strong id="tracking-status" style="color:#10B981; font-size:15px;">In Transit</strong>
+                    </div>
+                    <div style="text-align: right;">
+                        <span style="font-size: 11px; color:#94a3b8; display:block;">Courier Partner</span>
+                        <span style="color:#fff; font-size:14px; font-weight:700;">Delhivery Logistics</span>
+                    </div>
+                </div>
+
+                <div id="tracking-timeline" style="display: flex; flex-direction: column; gap: 16px; position: relative; padding-left: 20px; border-left: 2px solid rgba(201, 162, 39, 0.2);">
+                    <!-- Timeline items will load here -->
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; margin-top: 24px;">
+                <button type="button" class="btn-secondary" style="padding: 10px 24px; font-size: 13.5px;" onclick="closeTrackingModal()">Dismiss</button>
+            </div>
+        </div>
+    </div>
+
     <script src="app.js"></script>
 </body>
 </html>

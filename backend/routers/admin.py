@@ -35,6 +35,15 @@ class WebsiteSettingsIn(BaseModel):
     razorpay_enabled: bool = True
     razorpay_key_id: str = ""
     razorpay_key_secret: str = ""
+    delhivery_enabled: bool = False
+    delhivery_api_token: str = ""
+    delhivery_warehouse_name: str = ""
+    delhivery_warehouse_address: str = ""
+    delhivery_warehouse_city: str = ""
+    delhivery_warehouse_state: str = ""
+    delhivery_warehouse_pincode: str = ""
+    delhivery_warehouse_phone: str = ""
+    delhivery_environment: str = "staging"
 
 class ProductIn(BaseModel):
     slug: str
@@ -119,7 +128,16 @@ async def get_website_settings():
             "announcement_banner_text": "🌟 Free Express Shipping on All Wellness Orders Above ₹999 across India! 🚀",
             "razorpay_enabled": True,
             "razorpay_key_id": "rzp_test_SampleKey123",
-            "razorpay_key_secret": "SampleSecretKey123456"
+            "razorpay_key_secret": "SampleSecretKey123456",
+            "delhivery_enabled": False,
+            "delhivery_api_token": "dummy",
+            "delhivery_warehouse_name": "Sonrup Warehouse",
+            "delhivery_warehouse_address": "A 584 Sitaram Society, Punagam Road",
+            "delhivery_warehouse_city": "Surat",
+            "delhivery_warehouse_state": "Gujarat",
+            "delhivery_warehouse_pincode": "395010",
+            "delhivery_warehouse_phone": "+91 76001 75193",
+            "delhivery_environment": "staging"
         }
     if "razorpay_enabled" not in settings:
         settings["razorpay_enabled"] = True
@@ -127,6 +145,21 @@ async def get_website_settings():
         settings["razorpay_key_id"] = "rzp_test_SampleKey123"
     if "razorpay_key_secret" not in settings:
         settings["razorpay_key_secret"] = "SampleSecretKey123456"
+    
+    # Delhivery fields check
+    for field, default in [
+        ("delhivery_enabled", False),
+        ("delhivery_api_token", "dummy"),
+        ("delhivery_warehouse_name", "Sonrup Warehouse"),
+        ("delhivery_warehouse_address", "A 584 Sitaram Society, Punagam Road"),
+        ("delhivery_warehouse_city", "Surat"),
+        ("delhivery_warehouse_state", "Gujarat"),
+        ("delhivery_warehouse_pincode", "395010"),
+        ("delhivery_warehouse_phone", "+91 76001 75193"),
+        ("delhivery_environment", "staging")
+    ]:
+        if field not in settings:
+            settings[field] = default
 
     return settings
 
@@ -225,6 +258,45 @@ async def update_order_status(order_ref: str, data: OrderStatusUpdateIn):
     if result.matched_count == 0:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Order not found.")
     return {"message": f"Order {order_ref} status updated to {data.status}."}
+
+
+@router.post("/orders/{order_ref}/ship-delhivery")
+async def ship_delhivery(order_ref: str):
+    """Trigger manual shipment manifestation with Delhivery."""
+    db = get_db()
+    query = {"order_id": order_ref}
+    if ObjectId.is_valid(order_ref):
+        query = {"$or": [{"order_id": order_ref}, {"_id": ObjectId(order_ref)}]}
+        
+    order = await db.orders.find_one(query)
+    if not order:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Order not found.")
+
+    if order.get("waybill"):
+        return {"message": "Shipment already manifested.", "waybill": order["waybill"]}
+
+    settings = await db.settings.find_one({"_id": "global_settings"}) or {}
+    
+    from services.delhivery import create_shipment
+    res = await create_shipment(order, settings)
+    if not res.get("success"):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Delhivery Manifestation Failed: {res.get('message', 'Unknown Error')}"
+        )
+
+    waybill = res["waybill"]
+    await db.orders.update_one(
+        query,
+        {
+            "$set": {
+                "waybill": waybill,
+                "status": "Shipped",
+                "updated_at": datetime.now(timezone.utc)
+            }
+        }
+    )
+    return {"message": "Shipment manifested successfully via Delhivery.", "waybill": waybill}
 
 
 # ─── 5. Registered Users Overwatch ───

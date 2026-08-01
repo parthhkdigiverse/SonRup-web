@@ -1056,12 +1056,15 @@ document.addEventListener("DOMContentLoaded", async () => {
                                 <div style="margin-bottom:12px;">
                                     ${itemsSummaryHtml}
                                 </div>
-                                <div style="display:flex; justify-content:space-between; align-items:center; border-top: 1px solid rgba(255,255,255,0.05); padding-top:12px; font-weight:600;">
+                                <div style="display:flex; justify-content:space-between; align-items:center; border-top: 1px solid rgba(255,255,255,0.05); padding-top:12px; font-weight:600; flex-wrap: wrap; gap: 10px;">
                                     <div>
                                         <span style="font-size:11px; text-transform:uppercase; color:var(--text-on-dark-muted); font-weight:normal; display:block;">Grand Total</span>
                                         <span style="color:var(--color-gold); font-size:16px;">₹${order.total.toLocaleString("en-IN")}</span>
                                     </div>
-                                    <span style="font-size:12px; padding: 4px 10px; border-radius: 20px; background: rgba(0, 180, 100, 0.15); color: #00FF7F; border: 1px solid rgba(0, 180, 100, 0.2);"><i data-lucide="truck" style="width: 12px; height: 12px; margin-right: 4px; display:inline-block; vertical-align:middle;"></i> ${order.status}</span>
+                                    <div style="display:flex; align-items:center; gap:8px;">
+                                        ${order.waybill ? `<button onclick="trackDelhivery('${order.waybill}')" style="background: rgba(201, 162, 39, 0.15); border: 1px solid rgba(201, 162, 39, 0.3); color: var(--color-gold); font-size:11.5px; padding: 4px 10px; border-radius: 6px; cursor:pointer; font-weight: 700;">📦 Track Shipment</button>` : ''}
+                                        <span style="font-size:12px; padding: 4px 10px; border-radius: 20px; background: rgba(0, 180, 100, 0.15); color: #00FF7F; border: 1px solid rgba(0, 180, 100, 0.2);"><i data-lucide="truck" style="width: 12px; height: 12px; margin-right: 4px; display:inline-block; vertical-align:middle;"></i> ${order.status}</span>
+                                    </div>
                                 </div>
                             `;
                             ordersListContainer.appendChild(orderCard);
@@ -1104,6 +1107,46 @@ document.addEventListener("DOMContentLoaded", async () => {
             // Explicitly populate user address and pincode fields
             if (addressField && userObj.address) addressField.value = userObj.address || "";
             if (pincodeField && userObj.pincode) pincodeField.value = userObj.pincode || "";
+
+            // Listen to pincode changes and check serviceability dynamically
+            if (pincodeField) {
+                const checkServiceability = async (pincode) => {
+                    const badge = document.getElementById("pincode-status-badge");
+                    if (!badge) return;
+                    if (pincode.length !== 6 || !/^\d+$/.test(pincode)) {
+                        badge.style.display = "none";
+                        return;
+                    }
+                    try {
+                        badge.style.display = "inline";
+                        badge.style.color = "#FFD700";
+                        badge.textContent = "Checking...";
+                        
+                        const res = await fetch(`${getApiBase()}/api/orders/check-pincode/${pincode}`);
+                        if (!res.ok) throw new Error();
+                        const info = await res.json();
+                        
+                        if (info.serviceable) {
+                            badge.style.color = "#10B981";
+                            badge.textContent = `✅ Serviceable: ${info.city}`;
+                        } else {
+                            badge.style.color = "#EF4444";
+                            badge.textContent = "❌ Unserviceable";
+                        }
+                    } catch (e) {
+                        badge.style.display = "none";
+                    }
+                };
+
+                pincodeField.addEventListener("input", (e) => {
+                    checkServiceability(e.target.value.trim());
+                });
+
+                // Initial check if populated
+                if (pincodeField.value) {
+                    checkServiceability(pincodeField.value.trim());
+                }
+            }
         }
 
         const renderCheckoutPageSummary = () => {
@@ -1830,3 +1873,44 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     }
 });
+
+// ─── Delhivery Tracking Handlers ───
+window.trackDelhivery = async (waybill) => {
+    try {
+        const res = await fetch(`/api/orders/track/${waybill}`);
+        if (!res.ok) throw new Error("Could not retrieve tracking details");
+
+        const data = await res.json();
+        if (!data.success) throw new Error("No tracking information available yet.");
+
+        document.getElementById("tracking-waybill-title").textContent = waybill;
+        document.getElementById("tracking-status").textContent = data.status || "In Transit";
+
+        const timeline = document.getElementById("tracking-timeline");
+        timeline.innerHTML = "";
+
+        if (!data.scans || data.scans.length === 0) {
+            timeline.innerHTML = '<div style="color: #94a3b8; font-size:12.5px;">No courier facility updates logged yet.</div>';
+        } else {
+            data.scans.forEach(scan => {
+                const item = document.createElement("div");
+                item.style.position = "relative";
+                item.innerHTML = `
+                    <div style="position: absolute; left: -25px; top: 4px; width: 8px; height: 8px; border-radius: 50%; background: var(--color-gold); border: 2px solid var(--bg-dark-card);"></div>
+                    <div style="font-weight: 700; color: #fff; font-size:13px;">${scan.status}</div>
+                    <div style="color: #cbd5e1; font-size: 12px; margin-top: 2px;">${scan.activity}</div>
+                    <div style="color: #94a3b8; font-size: 11px; margin-top: 2px;">📅 ${scan.date}</div>
+                `;
+                timeline.appendChild(item);
+            });
+        }
+
+        document.getElementById("delhivery-tracking-modal").style.display = "flex";
+    } catch (e) {
+        showToast("Tracking Error", e.message);
+    }
+};
+
+window.closeTrackingModal = () => {
+    document.getElementById("delhivery-tracking-modal").style.display = "none";
+};
