@@ -2114,3 +2114,20 @@ button {
         gap: 10px;
     }
 }
+
+/* Smooth Skeleton Loader Animation for Profile & Dynamic Blocks */
+@keyframes skeleton-shimmer {
+    0% { background-position: -200px 0; }
+    100% { background-position: 200px 0; }
+}
+
+.profile-skeleton {
+    display: inline-block;
+    height: 1em;
+    border-radius: 6px;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.04) 0%, rgba(201, 162, 39, 0.2) 50%, rgba(255, 255, 255, 0.04) 100%);
+    background-size: 400px 100%;
+    animation: skeleton-shimmer 1.4s infinite ease-in-out;
+    vertical-align: middle;
+}
+

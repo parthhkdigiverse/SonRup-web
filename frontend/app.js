@@ -841,26 +841,26 @@ document.addEventListener("DOMContentLoaded", async () => {
         const authActionsContainer = document.getElementById("header-auth-actions");
         if (!authActionsContainer) return;
 
-        // Keep cart trigger
-        const headerButtonsHtml = `
+        const cartQty = getCartTotals().totalQty;
+        const headerCartHtml = `
             <button class="cart-trigger" id="cart-button" aria-label="View Cart" style="cursor: pointer;">
-                <i data-lucide="shopping-cart" style="width: 18px; height: 18px;"></i>
-                <span class="cart-badge" id="cart-count">${getCartTotals().totalQty}</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
+                <span class="cart-badge" id="cart-count">${cartQty}</span>
             </button>
         `;
 
         if (isLoggedIn()) {
             const userObj = JSON.parse(localStorage.getItem("sonrup_user") || '{}');
             authActionsContainer.innerHTML = `
-                ${headerButtonsHtml}
-                <a href="profile" class="nav-profile-btn" id="header-profile-icon" title="View Profile: ${userObj.name || ''}" style="display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid var(--color-gold); background: rgba(201, 162, 39, 0.1); color: var(--color-gold); cursor: pointer; text-decoration: none;">
-                    <i data-lucide="user" style="width: 16px; height: 16px;"></i>
+                ${headerCartHtml}
+                <a href="profile.html" class="nav-profile-btn" id="header-profile-icon" title="View Profile: ${userObj.name || ''}" style="display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid var(--color-gold); background: rgba(201, 162, 39, 0.1); color: var(--color-gold); cursor: pointer; text-decoration: none;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                 </a>
             `;
         } else {
             authActionsContainer.innerHTML = `
-                ${headerButtonsHtml}
-                <a href="login" class="btn-secondary btn-sm" id="header-login-btn">Login</a>
+                ${headerCartHtml}
+                <a href="login.html" class="btn-secondary btn-sm" id="header-login-btn" style="text-decoration: none;">Login</a>
             `;
         }
 
@@ -871,8 +871,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                 openCartDrawer();
             });
         }
-
-        if (window.lucide) window.lucide.createIcons();
     };
 
     // Run dynamic header update on page load
@@ -978,104 +976,187 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     }
 
-    // Profile Page Loader — fetches data from API
-    if (window.location.pathname.includes("profile.html")) {
-        if (!isLoggedIn()) {
-            window.location.href = "login.html";
-        } else {
-            // Fetch user profile from API
+    // Profile Page Loader — handles logged-in user, guest with order details, and default guest visitor
+    if (window.location.pathname.includes("profile")) {
+        const welcomeEl = document.getElementById("profile-welcome-name");
+        const welcomeSubEl = document.getElementById("profile-welcome-subtitle");
+        const detailNameEl = document.getElementById("profile-detail-name");
+        const detailEmailEl = document.getElementById("profile-detail-email");
+        const detailPhoneEl = document.getElementById("profile-detail-phone");
+        const detailAddressEl = document.getElementById("profile-detail-address");
+        const logoutBtn = document.getElementById("logout-btn");
+        const loginLink = document.getElementById("profile-login-link");
+        const signupLink = document.getElementById("profile-signup-link");
+        const ordersListContainer = document.getElementById("profile-orders-list");
+        const noOrdersMsg = document.getElementById("no-orders-msg");
+
+        const renderOrderCards = (orders) => {
+            if (!ordersListContainer) return;
+            ordersListContainer.innerHTML = "";
+
+            if (!orders || orders.length === 0) {
+                if (noOrdersMsg) noOrdersMsg.style.display = "block";
+                ordersListContainer.appendChild(noOrdersMsg);
+                return;
+            }
+
+            if (noOrdersMsg) noOrdersMsg.style.display = "none";
+
+            orders.forEach(order => {
+                const orderCard = document.createElement("div");
+                orderCard.style.border = "1px solid var(--border-dark)";
+                orderCard.style.borderRadius = "12px";
+                orderCard.style.padding = "20px";
+                orderCard.style.backgroundColor = "rgba(255, 255, 255, 0.01)";
+
+                let itemsSummaryHtml = "";
+                (order.items || []).forEach(item => {
+                    itemsSummaryHtml += `
+                        <div style="display:flex; justify-content:space-between; margin-bottom: 6px; font-size: 13px;">
+                            <span>${item.name} x ${item.quantity}</span>
+                            <span>₹${((item.price || 0) * (item.quantity || 1)).toLocaleString("en-IN")}</span>
+                        </div>
+                    `;
+                });
+
+                orderCard.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom:12px; margin-bottom:12px;">
+                        <div>
+                            <span style="font-size:11px; text-transform:uppercase; color:var(--text-on-dark-muted);">Order ID</span>
+                            <strong style="display:block; color:#FFFFFF; font-size:14px;">#${order.order_id || 'N/A'}</strong>
+                        </div>
+                        <div style="text-align:right;">
+                            <span style="font-size:11px; text-transform:uppercase; color:var(--text-on-dark-muted);">Order Date</span>
+                            <span style="display:block; color:#FFFFFF; font-size:13px;">${order.date || 'Recent'}</span>
+                        </div>
+                    </div>
+                    <div style="margin-bottom:12px;">
+                        ${itemsSummaryHtml}
+                    </div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; border-top: 1px solid rgba(255,255,255,0.05); padding-top:12px; font-weight:600; flex-wrap: wrap; gap: 10px;">
+                        <div>
+                            <span style="font-size:11px; text-transform:uppercase; color:var(--text-on-dark-muted); font-weight:normal; display:block;">Grand Total</span>
+                            <span style="color:var(--color-gold); font-size:16px;">₹${(order.total || 0).toLocaleString("en-IN")}</span>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            ${order.waybill ? `<button onclick="trackDelhivery('${order.waybill}')" style="background: rgba(201, 162, 39, 0.15); border: 1px solid rgba(201, 162, 39, 0.3); color: var(--color-gold); font-size:11.5px; padding: 4px 10px; border-radius: 6px; cursor:pointer; font-weight: 700;">📦 Track Shipment</button>` : ''}
+                            <span style="font-size:12px; padding: 4px 10px; border-radius: 20px; background: rgba(0, 180, 100, 0.15); color: #00FF7F; border: 1px solid rgba(0, 180, 100, 0.2);"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px; display:inline-block; vertical-align:middle;"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="6.5" cy="17.5" r="2.5"/><circle cx="16.5" cy="17.5" r="2.5"/></svg> ${order.status || 'Processing'}</span>
+                        </div>
+                    </div>
+                `;
+                ordersListContainer.appendChild(orderCard);
+            });
+            if (window.lucide) window.lucide.createIcons();
+        };
+
+        const cachedUser = JSON.parse(localStorage.getItem("sonrup_user") || "null");
+        const lastShipping = JSON.parse(localStorage.getItem("sonrup_last_order_shipping") || "null");
+        const guestOrders = JSON.parse(localStorage.getItem("sonrup_guest_orders") || "[]");
+
+        if (isLoggedIn()) {
+            // User is Logged In
+            if (logoutBtn) logoutBtn.style.display = "inline-flex";
+            if (loginLink) loginLink.style.display = "none";
+            if (signupLink) signupLink.style.display = "none";
+
+            // ⚡ Instant pre-render from local cache (0ms latency, eliminates flash of placeholder text!)
+            if (cachedUser || lastShipping) {
+                const nameVal = (cachedUser && cachedUser.name) ? cachedUser.name : (lastShipping ? lastShipping.name : "");
+                const emailVal = (cachedUser && cachedUser.email) ? cachedUser.email : (lastShipping ? lastShipping.email : "");
+                const phoneVal = (cachedUser && cachedUser.phone) ? cachedUser.phone : (lastShipping ? lastShipping.phone : "");
+
+                let addressVal = "";
+                if (cachedUser && cachedUser.address) {
+                    addressVal = cachedUser.address + (cachedUser.pincode ? `, ${cachedUser.pincode}` : "");
+                } else if (lastShipping && lastShipping.address) {
+                    addressVal = lastShipping.address + (lastShipping.city ? `, ${lastShipping.city}` : "") + (lastShipping.pincode ? ` - ${lastShipping.pincode}` : "");
+                }
+
+                if (welcomeEl && nameVal) welcomeEl.textContent = nameVal;
+                if (welcomeSubEl) welcomeSubEl.textContent = "Welcome to your Sonrup wellness dashboard. View orders and update addresses.";
+                if (detailNameEl && nameVal) detailNameEl.textContent = nameVal;
+                if (detailEmailEl && emailVal) detailEmailEl.textContent = emailVal;
+                if (detailPhoneEl && phoneVal) detailPhoneEl.textContent = phoneVal;
+                if (detailAddressEl && addressVal) detailAddressEl.textContent = addressVal;
+            }
+
             try {
                 const profileRes = await fetch(`${getApiBase()}/api/auth/me`, {
                     headers: getAuthHeaders(),
                 });
 
-                if (!profileRes.ok) {
-                    clearAuth();
-                    window.location.href = "login.html";
-                    return;
-                }
+                if (profileRes.ok) {
+                    const userObj = await profileRes.json();
+                    localStorage.setItem("sonrup_user", JSON.stringify(userObj));
 
-                const userObj = await profileRes.json();
-                // Update localStorage cache
-                localStorage.setItem("sonrup_user", JSON.stringify(userObj));
+                    const nameVal = userObj.name || (lastShipping ? lastShipping.name : "Valued Customer");
+                    const emailVal = userObj.email || (lastShipping ? lastShipping.email : "Not Provided");
+                    const phoneVal = userObj.phone || (lastShipping ? lastShipping.phone : "Not Provided");
 
-                const welcomeEl = document.getElementById("profile-welcome-name");
-                const detailNameEl = document.getElementById("profile-detail-name");
-                const detailEmailEl = document.getElementById("profile-detail-email");
-                const detailPhoneEl = document.getElementById("profile-detail-phone");
-                const detailAddressEl = document.getElementById("profile-detail-address");
-
-                if (welcomeEl) welcomeEl.textContent = userObj.name;
-                if (detailNameEl) detailNameEl.textContent = userObj.name;
-                if (detailEmailEl) detailEmailEl.textContent = userObj.email;
-                if (detailPhoneEl) detailPhoneEl.textContent = userObj.phone;
-                if (detailAddressEl) detailAddressEl.textContent = userObj.address + (userObj.pincode ? `, ${userObj.pincode}` : "");
-
-                // Fetch Orders from API
-                const ordersListContainer = document.getElementById("profile-orders-list");
-                const noOrdersMsg = document.getElementById("no-orders-msg");
-
-                const ordersRes = await fetch(`${getApiBase()}/api/orders`, {
-                    headers: getAuthHeaders(),
-                });
-
-                if (ordersRes.ok) {
-                    const orders = await ordersRes.json();
-
-                    if (orders.length > 0) {
-                        noOrdersMsg.style.display = "none";
-
-                        orders.forEach(order => {
-                            const orderCard = document.createElement("div");
-                            orderCard.style.border = "1px solid var(--border-dark)";
-                            orderCard.style.borderRadius = "12px";
-                            orderCard.style.padding = "20px";
-                            orderCard.style.backgroundColor = "rgba(255, 255, 255, 0.01)";
-
-                            let itemsSummaryHtml = "";
-                            order.items.forEach(item => {
-                                itemsSummaryHtml += `
-                                    <div style="display:flex; justify-content:space-between; margin-bottom: 6px; font-size: 13px;">
-                                        <span>${item.name} x ${item.quantity}</span>
-                                        <span>₹${(item.price * item.quantity).toLocaleString("en-IN")}</span>
-                                    </div>
-                                `;
-                            });
-
-                            orderCard.innerHTML = `
-                                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom:12px; margin-bottom:12px;">
-                                    <div>
-                                        <span style="font-size:11px; text-transform:uppercase; color:var(--text-on-dark-muted);">Order ID</span>
-                                        <strong style="display:block; color:#FFFFFF; font-size:14px;">#${order.order_id}</strong>
-                                    </div>
-                                    <div style="text-align:right;">
-                                        <span style="font-size:11px; text-transform:uppercase; color:var(--text-on-dark-muted);">Order Date</span>
-                                        <span style="display:block; color:#FFFFFF; font-size:13px;">${order.date}</span>
-                                    </div>
-                                </div>
-                                <div style="margin-bottom:12px;">
-                                    ${itemsSummaryHtml}
-                                </div>
-                                <div style="display:flex; justify-content:space-between; align-items:center; border-top: 1px solid rgba(255,255,255,0.05); padding-top:12px; font-weight:600; flex-wrap: wrap; gap: 10px;">
-                                    <div>
-                                        <span style="font-size:11px; text-transform:uppercase; color:var(--text-on-dark-muted); font-weight:normal; display:block;">Grand Total</span>
-                                        <span style="color:var(--color-gold); font-size:16px;">₹${order.total.toLocaleString("en-IN")}</span>
-                                    </div>
-                                    <div style="display:flex; align-items:center; gap:8px;">
-                                        ${order.waybill ? `<button onclick="trackDelhivery('${order.waybill}')" style="background: rgba(201, 162, 39, 0.15); border: 1px solid rgba(201, 162, 39, 0.3); color: var(--color-gold); font-size:11.5px; padding: 4px 10px; border-radius: 6px; cursor:pointer; font-weight: 700;">📦 Track Shipment</button>` : ''}
-                                        <span style="font-size:12px; padding: 4px 10px; border-radius: 20px; background: rgba(0, 180, 100, 0.15); color: #00FF7F; border: 1px solid rgba(0, 180, 100, 0.2);"><i data-lucide="truck" style="width: 12px; height: 12px; margin-right: 4px; display:inline-block; vertical-align:middle;"></i> ${order.status}</span>
-                                    </div>
-                                </div>
-                            `;
-                            ordersListContainer.appendChild(orderCard);
-                        });
-
-                        if (window.lucide) window.lucide.createIcons();
+                    let addressVal = "Not Provided";
+                    if (userObj.address) {
+                        addressVal = userObj.address + (userObj.pincode ? `, ${userObj.pincode}` : "");
+                    } else if (lastShipping && lastShipping.address) {
+                        addressVal = lastShipping.address + (lastShipping.city ? `, ${lastShipping.city}` : "") + (lastShipping.pincode ? ` - ${lastShipping.pincode}` : "");
                     }
+
+                    if (welcomeEl) welcomeEl.textContent = nameVal;
+                    if (welcomeSubEl) welcomeSubEl.textContent = "Welcome to your Sonrup wellness dashboard. View orders and update addresses.";
+                    if (detailNameEl) detailNameEl.textContent = nameVal;
+                    if (detailEmailEl) detailEmailEl.textContent = emailVal;
+                    if (detailPhoneEl) detailPhoneEl.textContent = phoneVal;
+                    if (detailAddressEl) detailAddressEl.textContent = addressVal;
+
+                    const ordersRes = await fetch(`${getApiBase()}/api/orders`, {
+                        headers: getAuthHeaders(),
+                    });
+
+                    if (ordersRes.ok) {
+                        const apiOrders = await ordersRes.json();
+                        renderOrderCards(apiOrders);
+                    } else {
+                        renderOrderCards(guestOrders);
+                    }
+                } else if (profileRes.status === 401 || profileRes.status === 403) {
+                    clearAuth();
+                    if (logoutBtn) logoutBtn.style.display = "none";
+                    if (loginLink) loginLink.style.display = "inline-flex";
+                    if (signupLink) signupLink.style.display = "inline-flex";
                 }
             } catch (err) {
                 console.error("Error loading profile:", err);
-                showToast("Error", "Could not load profile data.");
+            }
+        } else {
+            // NOT Logged In (Guest View)
+            if (logoutBtn) logoutBtn.style.display = "none";
+            if (loginLink) loginLink.style.display = "inline-flex";
+            if (signupLink) signupLink.style.display = "inline-flex";
+
+            if (lastShipping) {
+                // Guest has placed an order and filled shipping details!
+                const nameVal = lastShipping.name || "Guest Customer";
+                const emailVal = lastShipping.email || "Not Provided";
+                const phoneVal = lastShipping.phone || "Not Provided";
+                const addressVal = (lastShipping.address || "") + (lastShipping.city ? `, ${lastShipping.city}` : "") + (lastShipping.pincode ? ` - ${lastShipping.pincode}` : "");
+
+                if (welcomeEl) welcomeEl.textContent = nameVal;
+                if (welcomeSubEl) welcomeSubEl.textContent = "Showing shipping details & order history from your recent purchase.";
+                if (detailNameEl) detailNameEl.textContent = nameVal;
+                if (detailEmailEl) detailEmailEl.textContent = emailVal;
+                if (detailPhoneEl) detailPhoneEl.textContent = phoneVal;
+                if (detailAddressEl) detailAddressEl.textContent = addressVal || "Not Provided";
+
+                renderOrderCards(guestOrders);
+            } else {
+                // Default guest visitor — NO account & NO order placed yet
+                if (welcomeEl) welcomeEl.textContent = "Guest Visitor";
+                if (welcomeSubEl) welcomeSubEl.textContent = "Please log in or sign up to save your account details, or place an order to see shipping details.";
+                if (detailNameEl) detailNameEl.textContent = "Not Provided";
+                if (detailEmailEl) detailEmailEl.textContent = "Not Provided";
+                if (detailPhoneEl) detailPhoneEl.textContent = "Not Provided";
+                if (detailAddressEl) detailAddressEl.textContent = "Not Provided";
+
+                renderOrderCards([]);
             }
         }
     }
@@ -1471,6 +1552,22 @@ document.addEventListener("DOMContentLoaded", async () => {
                         payment_method: paymentMethod === "razorpay" ? "Razorpay" : "COD",
                     };
 
+                    localStorage.setItem("sonrup_last_order_shipping", JSON.stringify(orderPayload.shipping));
+
+                    const recordGuestOrder = (orderId) => {
+                        const newOrder = {
+                            order_id: orderId || `SR${Math.floor(100000 + Math.random() * 900000)}`,
+                            date: new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }),
+                            items: orderPayload.items,
+                            total: getCartTotals().totalPrice,
+                            status: 'Processing',
+                            shipping: orderPayload.shipping
+                        };
+                        let list = JSON.parse(localStorage.getItem("sonrup_guest_orders") || "[]");
+                        list.unshift(newOrder);
+                        localStorage.setItem("sonrup_guest_orders", JSON.stringify(list));
+                    };
+
                     if (paymentMethod === "razorpay") {
                         const { totalPrice } = getCartTotals();
                         const finalAmount = appliedCoupon && appliedCoupon.valid ? Math.max(0, totalPrice - appliedCoupon.discount_amount) : totalPrice;
@@ -1523,6 +1620,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                                         return;
                                     }
 
+                                    recordGuestOrder(response.razorpay_order_id || rzpOrderData.razorpay_order_id);
                                     cart = [];
                                     renderCart();
                                     checkoutPageForm.reset();
@@ -1581,6 +1679,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                         return;
                     }
 
+                    const codResData = await res.json();
+                    recordGuestOrder(codResData.order_id);
                     cart = [];
                     renderCart();
                     checkoutPageForm.reset();
