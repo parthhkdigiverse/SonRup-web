@@ -116,12 +116,12 @@ if __name__ == "__main__":
     host = os.getenv("HOST", "0.0.0.0")
     debug = os.getenv("DEBUG", "false").lower() == "true"
 
-    print("=" * 66)
-    print("🌟   STARTING SONRUP FULL-STACK WEB APPLICATION   🌟")
-    print("=" * 66)
-    print(f"🔗 Backend API Server Port : {backend_port}  (http://localhost:{backend_port})")
-    print(f"🔗 Frontend UI Server Port : {frontend_port}  (http://localhost:{frontend_port})")
-    print(f"📦 Python Runtime          : {sys.executable}")
+    print("==================================================================")
+    print("   STARTING SONRUP FULL-STACK WEB APPLICATION   ")
+    print("==================================================================")
+    print(f"Backend API Server Port : {backend_port}  (http://localhost:{backend_port})")
+    print(f"Frontend UI Server Port : {frontend_port}  (http://localhost:{frontend_port})")
+    print(f"Python Runtime          : {sys.executable}")
     print("=" * 66)
 
     # Check that development ports are free before attempting to launch servers

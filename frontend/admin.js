@@ -350,7 +350,10 @@ window.changeOrderStatus = async (orderRef, newStatus) => {
  */
 async function loadSettings() {
     try {
-        const res = await fetch(`${API_BASE_URL}/admin/settings`, { headers: getHeaders() });
+        const res = await fetch(`${API_BASE_URL}/admin/settings?_t=${Date.now()}`, { 
+            headers: getHeaders(),
+            cache: "no-store"
+        });
         if (!res.ok) throw new Error("Could not fetch general website settings");
         const data = await res.json();
 
@@ -575,6 +578,18 @@ async function loadSettings() {
             { id: "stat_3", number: "GMP", label: "Certified Facility" }
         ];
         renderStoryCRUD();
+
+        // Blog Page Settings
+        if (document.getElementById("setting-blog-subheading")) document.getElementById("setting-blog-subheading").value = data.blog_subheading || "WELLNESS CORNER";
+        if (document.getElementById("setting-blog-title")) document.getElementById("setting-blog-title").value = data.blog_title || "The Sonrup Blog";
+        if (document.getElementById("setting-blog-desc")) document.getElementById("setting-blog-desc").value = data.blog_desc || "Expert insights, lifestyle tips, and the scientific research behind sugar-free Ayurvedic restauratives and premium multivitamin gummies.";
+
+        currentBlogArticles = (data.blog_articles && data.blog_articles.length > 0) ? data.blog_articles : [
+            { id: "blog_1", title: "The Power of Pure Shilajit: Why Fulvic Acid Matters", category: "Ayurveda", date: "June 28, 2026", read_time: "5 Min Read", image: "assets/images/shilajit-bottle.jpg", excerpt: "Discover how Himalayan shilajit resin boosts stamina, supports cellular rejuvenation, and why our 75% Fulvic Acid Ayurvedic extract is safe for daily performance.", link: "blog-shilajit.html" },
+            { id: "blog_2", title: "Biotin & Zinc: The Daily Vitality Shield", category: "Science", date: "June 15, 2026", read_time: "4 Min Read", image: "assets/images/biotin-bottle.jpg", excerpt: "Unpack the biological functions of high-potency Biotin (Vitamin H), Vitamin C, and Zinc in protecting nail strength, hair growth, and overall skin cell turnover.", link: "blog-biotin.html" },
+            { id: "blog_3", title: "Sugar-Free Kids Nutrition: Safety & Pediatric Care", category: "Nutrition", date: "May 29, 2026", read_time: "6 Min Read", image: "assets/images/kids-bottle.jpg", excerpt: "Why we completely avoid high fructose corn syrup and sugar in children's multivitamins, focusing instead on safe fruit pectin, Iron, Zinc, and Choline.", link: "blog-kids.html" }
+        ];
+        renderBlogCRUD();
     } catch (e) {
         console.error("Error loading settings:", e);
     }
@@ -1208,6 +1223,201 @@ async function loadUsers() {
         console.error("Error loading users:", e);
     }
 }
+
+// ─── Blog Articles CRUD Controller ───
+function syncBlogInputsFromDOM() {
+    const container = document.getElementById("blog-articles-list-container");
+    if (!container) return;
+
+    const cards = container.querySelectorAll(".blog-article-card");
+    const updated = [];
+    cards.forEach((cardEl, idx) => {
+        const title = cardEl.querySelector(".blog-title-input")?.value.trim() || "";
+        const category = cardEl.querySelector(".blog-category-input")?.value.trim() || "Wellness";
+        const link = `article.html?id=${currentBlogArticles[idx]?.id || 'blog_' + Date.now() + '_' + idx}`;
+        const image = cardEl.querySelector(".blog-img-input")?.value.trim() || "assets/images/shilajit-bottle.jpg";
+        const excerpt = cardEl.querySelector(".blog-excerpt-input")?.value.trim() || "";
+        const content = cardEl.querySelector(".ql-editor")?.innerHTML || "";
+        const inner_image = cardEl.querySelector(".blog-inner-img-input")?.value.trim() || "";
+
+        updated.push({
+            id: currentBlogArticles[idx]?.id || `blog_${Date.now()}_${idx}`,
+            title,
+            category,
+            link,
+            image,
+            inner_image,
+            excerpt,
+            content
+        });
+    });
+    currentBlogArticles = updated;
+}
+
+function renderBlogCRUD() {
+    const container = document.getElementById("blog-articles-list-container");
+    if (!container) return;
+
+    if (!currentBlogArticles || currentBlogArticles.length === 0) {
+        container.innerHTML = `
+            <div style="text-align: center; padding: 30px; background: rgba(255,255,255,0.02); border: 1px dashed rgba(255,255,255,0.1); border-radius: 10px; color: #94a3b8;">
+                <p style="margin: 0; font-size: 14px;">No blog articles currently configured. Click <strong>+ Add Article</strong> to create one.</p>
+            </div>
+        `;
+        return;
+    }
+
+    container.innerHTML = currentBlogArticles.map((art, idx) => {
+        return `
+            <div class="glass-panel blog-article-card" data-id="${art.id || ('blog_' + idx)}" style="padding: 20px; border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; background: rgba(0,0,0,0.3); display: flex; flex-direction: column; gap: 14px;">
+                <!-- Card Header -->
+                <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 10px; flex-wrap: wrap; gap: 10px;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span style="background: rgba(201,162,39,0.15); border: 1px solid #C9A227; color: #E5C365; width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; flex-shrink: 0;">${idx + 1}</span>
+                        <h4 style="font-family: 'Outfit', sans-serif; font-size: 14px; color: #fff; margin: 0;">Article #${idx + 1}: ${art.title ? (art.title.length > 30 ? art.title.substring(0, 30) + '...' : art.title) : 'Untitled Article'}</h4>
+                    </div>
+
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <button type="button" class="btn-action btn-secondary move-blog-up-btn" data-index="${idx}" ${idx === 0 ? 'disabled style="opacity: 0.3; cursor: not-allowed;"' : ''} style="padding: 4px 8px; font-size: 11px; border-radius: 4px;">
+                            <i data-lucide="arrow-up" style="width: 14px; height: 14px;"></i> Move Up
+                        </button>
+                        <button type="button" class="btn-action btn-secondary move-blog-down-btn" data-index="${idx}" ${idx === currentBlogArticles.length - 1 ? 'disabled style="opacity: 0.3; cursor: not-allowed;"' : ''} style="padding: 4px 8px; font-size: 11px; border-radius: 4px;">
+                            <i data-lucide="arrow-down" style="width: 14px; height: 14px;"></i> Move Down
+                        </button>
+                        <button type="button" class="btn-action btn-danger delete-blog-article-btn" data-index="${idx}" title="Delete Article" style="padding: 6px 10px; font-size: 12px; border-radius: 6px; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); color: #f87171; cursor: pointer; display: inline-flex; align-items: center;">
+                            <i data-lucide="trash-2" style="width: 15px; height: 15px;"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Form Fields Grid -->
+                <div class="form-grid">
+                    <div class="form-group" style="grid-column: 1 / span 2;">
+                        <label class="form-label">Article Title</label>
+                        <input type="text" class="form-input blog-title-input" value="${(art.title || '').replace(/"/g, '&quot;')}" placeholder="e.g. The Power of Pure Shilajit" style="background: rgba(0,0,0,0.5);">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Category Badge</label>
+                        <input type="text" class="form-input blog-category-input" value="${(art.category || 'Ayurveda').replace(/"/g, '&quot;')}" placeholder="e.g. Ayurveda, Science, Nutrition" style="background: rgba(0,0,0,0.5);">
+                    </div>
+                    </div>
+                </div>
+
+                <!-- Cover Photo Upload Picker -->
+                <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin-top: 8px;">
+                    <div style="width: 90px; height: 60px; border-radius: 8px; overflow: hidden; border: 1.5px solid #C9A227; background: #000; flex-shrink: 0;">
+                        <img class="blog-img-preview" src="${art.image || 'assets/images/shilajit-bottle.jpg'}" alt="Preview" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                    <div style="flex: 1; display: flex; flex-direction: column; gap: 6px;">
+                        <p style="font-size: 12px; color: #94a3b8; margin: 0;">Select a photo file to set as the blog article <strong>Cover Image</strong>.</p>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <input type="file" class="form-input blog-img-file" accept="image/*" onchange="uploadBlogArticleImage(this, ${idx})" style="padding: 6px; font-size: 12px; cursor: pointer; flex: 1;">
+                            <input type="text" class="form-input blog-img-input" value="${(art.image || '').replace(/"/g, '&quot;')}" placeholder="assets/images/shilajit-bottle.jpg" style="background: rgba(0,0,0,0.5); flex: 2; font-size: 12px; padding: 6px 10px;">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Inner Detail Photo Upload Picker -->
+                <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px dashed rgba(255,255,255,0.08);">
+                    <div style="width: 90px; height: 60px; border-radius: 8px; overflow: hidden; border: 1.5px solid #C9A227; background: #000; flex-shrink: 0;">
+                        <img class="blog-inner-img-preview" src="${art.inner_image || 'assets/images/shilajit-detail1.jpg'}" alt="Preview" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                    <div style="flex: 1; display: flex; flex-direction: column; gap: 6px;">
+                        <p style="font-size: 12px; color: #94a3b8; margin: 0;">Select a photo file to set as the <strong>Inner Content Image</strong> (shown inside the article).</p>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <input type="file" class="form-input blog-inner-img-file" accept="image/*" onchange="uploadBlogInnerImage(this, ${idx})" style="padding: 6px; font-size: 12px; cursor: pointer; flex: 1;">
+                            <input type="text" class="form-input blog-inner-img-input" value="${(art.inner_image || '').replace(/"/g, '&quot;')}" placeholder="assets/images/shilajit-detail1.jpg" style="background: rgba(0,0,0,0.5); flex: 2; font-size: 12px; padding: 6px 10px;">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Excerpt / Short Summary -->
+                <div class="form-group full-width" style="margin-top: 12px;">
+                    <label class="form-label">Article Excerpt / Card Summary</label>
+                    <textarea class="form-input blog-excerpt-input" rows="2" placeholder="Brief 1-2 sentence description shown on the blog grid..." style="background: rgba(0,0,0,0.5);">${art.excerpt || ''}</textarea>
+                </div>
+
+                <!-- Full Article Rich Text Content -->
+                <div class="form-group full-width" style="margin-top: 16px;">
+                    <label class="form-label" style="color: #E5C365;">Full Article Content (Rich Text)</label>
+                    <div class="blog-content-editor" id="blog_quill_${idx}"></div>
+                </div>
+            </div>
+        `;
+    }).join("");
+
+    if (window.lucide) window.lucide.createIcons();
+
+    // Initialize Quill Editors
+    currentBlogArticles.forEach((art, idx) => {
+        const editorContainer = document.getElementById(`blog_quill_${idx}`);
+        if (editorContainer && window.Quill) {
+            const quill = new Quill(editorContainer, {
+                theme: 'snow',
+                placeholder: 'Write the full blog article here...',
+                modules: {
+                    toolbar: [
+                        [{ 'header': [2, 3, 4, false] }],
+                        ['bold', 'italic', 'underline', 'strike'],
+                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                        ['link', 'image', 'video'],
+                        ['clean']
+                    ]
+                }
+            });
+            // Load existing content safely into Quill
+            if (art.content) {
+                quill.clipboard.dangerouslyPasteHTML(art.content);
+            }
+        }
+    });
+
+    // Attach Move Up / Down Handlers
+    container.querySelectorAll(".move-blog-up-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            syncBlogInputsFromDOM();
+            const idx = parseInt(btn.dataset.index);
+            if (idx > 0) {
+                const temp = currentBlogArticles[idx];
+                currentBlogArticles[idx] = currentBlogArticles[idx - 1];
+                currentBlogArticles[idx - 1] = temp;
+                renderBlogCRUD();
+                showToast("⬆️ Article moved up!");
+            }
+        });
+    });
+
+    container.querySelectorAll(".move-blog-down-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            syncBlogInputsFromDOM();
+            const idx = parseInt(btn.dataset.index);
+            if (idx < currentBlogArticles.length - 1) {
+                const temp = currentBlogArticles[idx];
+                currentBlogArticles[idx] = currentBlogArticles[idx + 1];
+                currentBlogArticles[idx + 1] = temp;
+                renderBlogCRUD();
+                showToast("⬇️ Article moved down!");
+            }
+        });
+    });
+
+    // Attach Delete Handlers
+    container.querySelectorAll(".delete-blog-article-btn").forEach(btn => {
+        btn.addEventListener("click", async () => {
+            syncBlogInputsFromDOM();
+            const idx = parseInt(btn.dataset.index);
+            if (confirm(`Delete blog article #${idx + 1}?`)) {
+                currentBlogArticles.splice(idx, 1);
+                renderBlogCRUD();
+                showToast("⏳ Deleting article...");
+                await saveBlogArticlesToDB();
+                showToast("🗑️ Article permanently deleted.");
+            }
+        });
+    });
+}
+
+
 
 
 /**
@@ -2132,6 +2342,82 @@ function setupEventListeners() {
         }
     });
 
+    // ─── Blog Builder CRUD Handlers ───
+    document.getElementById("btn-add-blog-article")?.addEventListener("click", () => {
+        syncBlogInputsFromDOM();
+        const newId = `blog_${Date.now()}`;
+        currentBlogArticles.push({
+            id: newId,
+            title: "",
+            category: "Ayurveda",
+            date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+            read_time: "5 Min Read",
+            image: "assets/images/shilajit-bottle.jpg",
+            excerpt: "",
+            link: "blog-shilajit.html"
+        });
+        renderBlogCRUD();
+        showToast("✨ New Blog Article added!");
+
+        setTimeout(() => {
+            const newCard = document.querySelector(`.blog-article-card[data-id="${newId}"]`);
+            if (newCard) {
+                newCard.scrollIntoView({ behavior: "smooth", block: "center" });
+                newCard.style.outline = "2px solid #C9A227";
+                newCard.style.boxShadow = "0 0 20px rgba(201, 162, 39, 0.45)";
+                const titleInput = newCard.querySelector(".blog-title-input");
+                if (titleInput) titleInput.focus();
+                setTimeout(() => {
+                    newCard.style.outline = "none";
+                    newCard.style.boxShadow = "none";
+                }, 2200);
+            }
+        }, 120);
+    });
+
+    async function saveBlogArticlesToDB() {
+        let currentSettings = {};
+        try {
+            const res = await fetch(`${API_BASE_URL}/admin/settings`, { headers: getHeaders() });
+            if (res.ok) currentSettings = await res.json();
+        } catch (e) {}
+
+        const payload = {
+            ...currentSettings,
+            blog_subheading: document.getElementById("setting-blog-subheading")?.value.trim() || "WELLNESS CORNER",
+            blog_title: document.getElementById("setting-blog-title")?.value.trim() || "The Sonrup Blog",
+            blog_desc: document.getElementById("setting-blog-desc")?.value.trim() || "Expert insights, lifestyle tips, and the scientific research behind sugar-free Ayurvedic restauratives and premium multivitamin gummies.",
+            blog_articles: currentBlogArticles
+        };
+
+        try {
+            const res = await fetch(`${API_BASE_URL}/admin/settings`, {
+                method: "PUT",
+                headers: getHeaders(true),
+                body: JSON.stringify(payload)
+            });
+            if (!res.ok) throw new Error("Could not save Blog section");
+            return true;
+        } catch (err) {
+            console.error(err);
+            return false;
+        }
+    }
+
+    // Attach function to window so it can be called from dynamically rendered elements
+    window.saveBlogArticlesToDB = saveBlogArticlesToDB;
+
+    document.getElementById("blog-builder-form")?.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        syncBlogInputsFromDOM();
+        const success = await saveBlogArticlesToDB();
+        if (success) {
+            showToast("🌟 Blog Articles updated & live on website!");
+        } else {
+            showToast("Failed to save Blog section.", true);
+        }
+    });
+
     // Logout Handler
     document.getElementById("admin-logout-btn")?.addEventListener("click", () => {
         if (confirm("Log out from Administrator Session?")) {
@@ -2445,3 +2731,57 @@ function syncStoryInputsFromDOM() {
         });
     }
 }
+
+window.uploadBlogInnerImage = async function(fileInput, idx) {
+    const file = fileInput.files[0];
+    if (!file) return;
+    const formData = new FormData();
+    formData.append("file", file);
+    const preview = fileInput.closest(".blog-article-card").querySelector(".blog-inner-img-preview");
+    const input = fileInput.closest(".blog-article-card").querySelector(".blog-inner-img-input");
+    try {
+        preview.style.opacity = "0.5";
+        const res = await fetch(`${API_BASE_URL}/admin/upload-product-image`, { method: "POST", headers: getHeaders(false), body: formData });
+        const data = await res.json();
+        if (res.ok && data.filename) {
+            const imgUrl = `assets/images/${data.filename}`;
+            input.value = imgUrl;
+            preview.src = imgUrl;
+            showToast("Inner Image uploaded!");
+            syncBlogInputsFromDOM();
+        } else {
+            throw new Error("Upload failed");
+        }
+    } catch (e) {
+        showToast("Upload failed", true);
+    } finally {
+        preview.style.opacity = "1";
+    }
+};
+
+window.uploadBlogArticleImage = async function(fileInput, idx) {
+    const file = fileInput.files[0];
+    if (!file) return;
+    const formData = new FormData();
+    formData.append("file", file);
+    const preview = fileInput.closest(".blog-article-card").querySelector(".blog-img-preview");
+    const input = fileInput.closest(".blog-article-card").querySelector(".blog-img-input");
+    try {
+        preview.style.opacity = "0.5";
+        const res = await fetch(`${API_BASE_URL}/admin/upload-product-image`, { method: "POST", headers: getHeaders(false), body: formData });
+        const data = await res.json();
+        if (res.ok && data.filename) {
+            const imgUrl = `assets/images/${data.filename}`;
+            input.value = imgUrl;
+            preview.src = imgUrl;
+            showToast("Cover Image uploaded!");
+            syncBlogInputsFromDOM();
+        } else {
+            throw new Error("Upload failed");
+        }
+    } catch (e) {
+        showToast("Upload failed", true);
+    } finally {
+        preview.style.opacity = "1";
+    }
+};

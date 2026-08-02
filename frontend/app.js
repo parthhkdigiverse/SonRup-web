@@ -73,6 +73,8 @@ async function loadAppConfig() {
         renderFaqFromConfig();
         renderDietaryGuideFromConfig();
         renderStoryFromConfig();
+        renderBlogFromConfig();
+        renderSingleArticleView();
         renderSiteFooterAndContactFromConfig();
     } catch (err) {
         console.warn("Could not load app config, using defaults.", err);
@@ -452,9 +454,11 @@ function renderDietaryGuideFromConfig() {
 function renderStoryFromConfig() {
     if (!APP_CONFIG) return;
 
-    // 1. Hero Header on about.html
+    // 1. Hero Header on about.html only!
     const heroSec = document.querySelector(".about-hero");
-    if (heroSec && APP_CONFIG.story_bg_image) {
+    if (!heroSec) return; // Exit immediately if not on about.html!
+
+    if (APP_CONFIG.story_bg_image) {
         heroSec.style.backgroundImage = `linear-gradient(180deg, rgba(18,18,18,0.3) 0%, rgba(15,15,16,1) 100%), url('${APP_CONFIG.story_bg_image}')`;
     }
 
@@ -470,8 +474,8 @@ function renderStoryFromConfig() {
         if (desc && APP_CONFIG.story_desc) desc.textContent = APP_CONFIG.story_desc;
     }
 
-    // 2. Main Story Sections & Stat Highlights on about.html
-    const mainContainer = document.querySelector("body.shop-catalog-body .container[style*='padding-top'], main .story-container");
+    // 2. Main Story Sections & Stat Highlights on about.html only!
+    const mainContainer = document.querySelector(".story-container, #story-sections-container") || heroSec.nextElementSibling;
     if (!mainContainer) return;
 
     const storySections = (APP_CONFIG.story_sections && APP_CONFIG.story_sections.length > 0) ? APP_CONFIG.story_sections : [
@@ -524,6 +528,89 @@ function renderStoryFromConfig() {
 
     mainContainer.innerHTML = sectionsHTML + statsHTML;
     if (window.lucide) window.lucide.createIcons();
+}
+
+function renderBlogFromConfig() {
+    const blogGrid = document.querySelector(".blog-grid");
+    if (!blogGrid || !APP_CONFIG) return;
+
+    // 1. Header Title & Subheading
+    const headerSec = document.querySelector("main.container .section-header");
+    if (headerSec) {
+        const sub = headerSec.querySelector(".sub-heading");
+        if (sub && APP_CONFIG.blog_subheading) sub.textContent = APP_CONFIG.blog_subheading;
+
+        const title = headerSec.querySelector("h1");
+        if (title && APP_CONFIG.blog_title) title.textContent = APP_CONFIG.blog_title;
+
+        const desc = headerSec.querySelector(".section-desc");
+        if (desc && APP_CONFIG.blog_desc) desc.textContent = APP_CONFIG.blog_desc;
+    }
+
+    // 2. Blog Articles Grid
+    const articles = (APP_CONFIG.blog_articles && APP_CONFIG.blog_articles.length > 0) ? APP_CONFIG.blog_articles : [
+        { title: "The Power of Pure Shilajit: Why Fulvic Acid Matters", category: "Ayurveda", image: "assets/images/shilajit-bottle.jpg", excerpt: "Discover how Himalayan shilajit resin boosts stamina, supports cellular rejuvenation, and why our 75% Fulvic Acid Ayurvedic extract is safe for daily performance.", link: "/blog/pure-shilajit" },
+        { title: "Biotin & Zinc: The Daily Vitality Shield", category: "Science", image: "assets/images/biotin-bottle.jpg", excerpt: "Unpack the biological functions of high-potency Biotin (Vitamin H), Vitamin C, and Zinc in protecting nail strength, hair growth, and overall skin cell turnover.", link: "/blog/biotin-zinc" },
+        { title: "Sugar-Free Kids Nutrition: Safety & Pediatric Care", category: "Nutrition", image: "assets/images/kids-bottle.jpg", excerpt: "Why we completely avoid high fructose corn syrup and sugar in children's multivitamins, focusing instead on safe fruit pectin, Iron, Zinc, and Choline.", link: "/blog/kids-nutrition" }
+    ];
+
+    blogGrid.innerHTML = articles.map(art => `
+        <article class="blog-card">
+            <a href="article.html?id=${art.id}" style="display: block; text-decoration: none; color: inherit;">
+                <div class="blog-card-img">
+                    <div class="blog-category">${art.category || 'Wellness'}</div>
+                    <img src="${art.image || 'assets/images/shilajit-bottle.jpg'}" alt="${art.title || 'Blog Article'}" style="object-fit: contain; width: auto; height: 160px;">
+                </div>
+            </a>
+            <div class="blog-card-body">
+                <a href="article.html?id=${art.id}" style="text-decoration: none; color: inherit;">
+                    <h3 style="margin-top: 0;">${art.title || ''}</h3>
+                </a>
+                <p>${art.excerpt || ''}</p>
+                <a href="article.html?id=${art.id}" class="read-more-btn">Read Full Article <i data-lucide="arrow-right" style="width: 14px; height: 14px;"></i></a>
+            </div>
+        </article>
+    `).join("");
+
+    if (window.lucide) window.lucide.createIcons();
+}
+
+function renderSingleArticleView() {
+    if (!window.location.pathname.includes("article")) return;
+    
+    // Always wait for the fresh API response before rendering an article to ensure real-time updates
+    if (!APP_CONFIG || !APP_CONFIG.blog_articles) return;
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const articleId = urlParams.get('id');
+    
+    if (!articleId) {
+        document.getElementById("article-title").textContent = "Article Not Found";
+        document.getElementById("article-content").innerHTML = "<p>Please select a valid article from the blog page.</p>";
+        return;
+    }
+
+    const article = APP_CONFIG.blog_articles.find(a => a.id === articleId);
+    
+    if (article) {
+        document.getElementById("article-head-title").textContent = (article.title || "Article") + " - Sonrup™ Wellness Blog";
+        document.getElementById("article-category").textContent = article.category || "Wellness";
+        document.getElementById("article-title").textContent = article.title || "";
+        document.getElementById("article-image").src = article.image || "assets/images/shilajit-bottle.jpg";
+        
+        let contentHtml = article.content || "<p>No content written for this article yet.</p>";
+        if (article.inner_image) {
+            // Check if the article already contains this image natively, if not, prepend it.
+            if (!contentHtml.includes(article.inner_image)) {
+                contentHtml = `<img src="${article.inner_image}" style="width: 100%; max-width: 600px; border-radius: 8px; margin: 20px 0;" alt="Blog Inner Image"><br>` + contentHtml;
+            }
+        }
+        
+        document.getElementById("article-content").innerHTML = contentHtml;
+    } else {
+        document.getElementById("article-title").textContent = "Article Not Found";
+        document.getElementById("article-content").innerHTML = "<p>The requested article could not be found.</p>";
+    }
 }
 
 function renderSiteFooterAndContactFromConfig() {
@@ -617,6 +704,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             renderFaqFromConfig();
             renderDietaryGuideFromConfig();
             renderStoryFromConfig();
+            renderBlogFromConfig();
+            renderSingleArticleView();
             renderSiteFooterAndContactFromConfig();
         } catch (e) {
             console.error("Error loading cached config", e);
@@ -1262,8 +1351,11 @@ document.addEventListener("DOMContentLoaded", async () => {
             card.dataset.cardEventBound = "true";
             
             card.addEventListener("click", (e) => {
-                if (e.target.closest(".add-to-cart-btn") || e.target.closest(".buy-now-btn")) {
-                    return;
+                // Only redirect if clicking on product image or title
+                const clickedImg = e.target.closest(".product-img-holder");
+                const clickedTitle = e.target.closest("h3");
+                if (!clickedImg && !clickedTitle) {
+                    return; // Prevent accidental redirection on buttons, bullets, or card whitespace!
                 }
                 const name = card.getAttribute("data-name") || card.querySelector("h3")?.textContent || "";
                 
@@ -1282,8 +1374,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                         window.location.href = "mom-kid.html";
                     } else if (name.includes("Dad & Kid")) {
                         window.location.href = "dad-kid.html";
-                    } else {
-                        window.location.href = "shop.html";
                     }
                 }
             });

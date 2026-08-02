@@ -103,6 +103,11 @@ class WebsiteSettingsIn(BaseModel):
     story_bg_image: str = "assets/images/wellness-login-hero.jpg"
     story_sections: list[dict] = []
     story_stats: list[dict] = []
+    # Blog Page Fields
+    blog_subheading: str = "WELLNESS CORNER"
+    blog_title: str = "The Sonrup Blog"
+    blog_desc: str = "Expert insights, lifestyle tips, and the scientific research behind sugar-free Ayurvedic restauratives and premium multivitamin gummies."
+    blog_articles: list[dict] = []
 
 class ProductIn(BaseModel):
     slug: str
@@ -489,6 +494,41 @@ async def get_website_settings():
             { "id": "stat_1", "number": "16k+ Ft", "label": "Himalayan Sourcing" },
             { "id": "stat_2", "number": "100%", "label": "Sugar-Free Formula" },
             { "id": "stat_3", "number": "GMP", "label": "Certified Facility" }
+        ]
+
+    if "blog_subheading" not in settings: settings["blog_subheading"] = "WELLNESS CORNER"
+    if "blog_title" not in settings: settings["blog_title"] = "The Sonrup Blog"
+    if "blog_desc" not in settings: settings["blog_desc"] = "Expert insights, lifestyle tips, and the scientific research behind sugar-free Ayurvedic restauratives and premium multivitamin gummies."
+
+    if "blog_articles" not in settings or not settings["blog_articles"]:
+        settings["blog_articles"] = [
+            {
+                "id": "blog_1",
+                "title": "The Power of Pure Shilajit: Why Fulvic Acid Matters",
+                "category": "Ayurveda",
+                "image": "assets/images/shilajit-bottle.jpg",
+                "excerpt": "Discover how Himalayan shilajit resin boosts stamina, supports cellular rejuvenation, and why our 75% Fulvic Acid Ayurvedic extract is safe for daily performance.",
+                "link": "article.html?id=blog_1",
+                "content": "<h2>The Science of Fulvic Acid</h2><p>Shilajit is a powerful sticky resin exuded from the rocks of the Himalayas. It develops over centuries from the slow decomposition of plants. For centuries, Ayurvedic practitioners have relied on it as a core rejuvenator.</p><p>Our 75% Fulvic Acid extract ensures maximum bioavailability, allowing the rich minerals to penetrate cellular walls effectively, boosting ATP production and physical stamina.</p>"
+            },
+            {
+                "id": "blog_2",
+                "title": "Biotin & Zinc: The Daily Vitality Shield",
+                "category": "Science",
+                "image": "assets/images/biotin-bottle.jpg",
+                "excerpt": "Unpack the biological functions of high-potency Biotin (Vitamin H), Vitamin C, and Zinc in protecting nail strength, hair growth, and overall skin cell turnover.",
+                "link": "article.html?id=blog_2",
+                "content": "<h2>Cellular Protection</h2><p>Biotin, or Vitamin H, acts as a crucial coenzyme in the metabolism of fatty acids, carbohydrates, and amino acids. When combined with Zinc, the body's natural defense mechanism against oxidative stress is significantly enhanced.</p><p>Daily supplementation can dramatically improve keratin infrastructure, meaning thicker hair and stronger nails.</p>"
+            },
+            {
+                "id": "blog_3",
+                "title": "Sugar-Free Kids Nutrition: Safety & Pediatric Care",
+                "category": "Nutrition",
+                "image": "assets/images/kids-bottle.jpg",
+                "excerpt": "Why we completely avoid high fructose corn syrup and sugar in children's multivitamins, focusing instead on safe fruit pectin, Iron, Zinc, and Choline.",
+                "link": "article.html?id=blog_3",
+                "content": "<h2>No Sugar, No Compromises</h2><p>The pediatric dietary guidelines are clear: added sugars are detrimental to early childhood development, contributing to metabolic irregularities and dental issues.</p><p>Our gummies use natural fruit pectin and stevia, delivering essential nutrients like Iron for cognitive development and Zinc for immune support without the sugar crash.</p>"
+            }
         ]
 
     return settings
