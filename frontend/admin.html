@@ -511,6 +511,9 @@
             <button class="sidebar-tab" data-target="section-coupons">
                 <i data-lucide="ticket"></i> Promo Coupons
             </button>
+            <button class="sidebar-tab" data-target="section-inquiries">
+                <i data-lucide="message-square"></i> Contact Inquiries
+            </button>
         </aside>
 
         <!-- Main Content Area -->
@@ -543,6 +546,10 @@
                     <div class="kpi-card">
                         <div class="kpi-title">Registered Customers <i data-lucide="users" stroke="var(--color-gold)"></i></div>
                         <p class="kpi-value" id="kpi-users">0</p>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-title">Contact Inquiries <i data-lucide="mail" stroke="var(--color-gold)"></i></div>
+                        <p class="kpi-value" id="kpi-inquiries">0</p>
                     </div>
                 </div>
 
@@ -804,6 +811,34 @@
                 </div>
             </section>
 
+            <!-- 7. CONTACT INQUIRIES SECTION -->
+            <section id="section-inquiries" class="admin-section">
+                <div class="section-header">
+                    <div>
+                        <h1 class="section-title">Contact Us Inquiries</h1>
+                        <p class="section-subtitle">Manage customer messages, product questions, and support inquiries.</p>
+                    </div>
+                    <button class="btn-action btn-gold" onclick="loadInquiries()"><i data-lucide="refresh-cw" width="16"></i> Refresh Inquiries</button>
+                </div>
+
+                <div class="glass-panel">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Date & Time (IST)</th>
+                                <th>Sender Name & Email</th>
+                                <th>Mobile Phone</th>
+                                <th>Message Content</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inquiries-table-body">
+                            <tr><td colspan="5" style="text-align: center; color: #94a3b8;">Loading contact inquiries...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
         </main>
     </div>
 
@@ -944,6 +979,41 @@
 
             <div style="display: flex; justify-content: flex-end; margin-top: 24px;">
                 <button type="button" class="btn-action" style="background: rgba(255,255,255,0.1); color:#fff; padding: 10px 24px;" onclick="closeTrackingModal()">Dismiss</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- INQUIRY MESSAGE DETAIL MODAL -->
+    <div id="inquiry-modal" class="admin-modal">
+        <div class="modal-card" style="max-width: 550px;">
+            <button class="modal-close-btn" onclick="closeInquiryModal()">✕</button>
+            <h2 style="font-family: 'Outfit', sans-serif; font-size: 22px; color: #fff; margin-top: 0; margin-bottom: 6px;">📩 Contact Inquiry Detail</h2>
+            <p style="color: #94a3b8; font-size: 13px; margin-bottom: 20px;" id="inquiry-modal-date"></p>
+
+            <div style="display: flex; flex-direction: column; gap: 14px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); padding: 18px; border-radius: 14px; margin-bottom: 20px;">
+                <div>
+                    <span style="font-size: 11px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 2px;">Sender Name</span>
+                    <strong style="color: #fff; font-size: 15px;" id="inquiry-modal-name"></strong>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div>
+                        <span style="font-size: 11px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 2px;">Email</span>
+                        <a id="inquiry-modal-email-link" href="#" style="color: #C9A227; font-size: 13px; word-break: break-all; text-decoration: none;"></a>
+                    </div>
+                    <div>
+                        <span style="font-size: 11px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 2px;">Mobile Phone</span>
+                        <a id="inquiry-modal-phone-link" href="#" style="color: #60a5fa; font-weight: 600; font-size: 13.5px; text-decoration: none;"></a>
+                    </div>
+                </div>
+                <div>
+                    <span style="font-size: 11px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 4px;">Full Message</span>
+                    <div style="color: #cbd5e1; font-size: 13.5px; line-height: 1.6; white-space: pre-wrap; background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);" id="inquiry-modal-message"></div>
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <a id="inquiry-modal-reply-btn" href="#" target="_blank" class="btn-action btn-gold" style="padding: 10px 20px; font-size: 13px; text-decoration: none;"><i data-lucide="mail" width="16"></i> Reply via Email</a>
+                <button type="button" class="btn-action" style="background: rgba(255,255,255,0.1); color:#fff; padding: 10px 20px;" onclick="closeInquiryModal()">Close</button>
             </div>
         </div>
     </div>

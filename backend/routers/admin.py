@@ -76,6 +76,9 @@ class OrderStatusUpdateIn(BaseModel):
 class UserRoleUpdateIn(BaseModel):
     is_admin: bool
 
+class InquiryStatusUpdateIn(BaseModel):
+    status: str
+
 
 def _clean_doc(doc: dict) -> dict:
     """Convert ObjectId fields to string for clean JSON response."""
@@ -93,6 +96,7 @@ async def get_dashboard_stats():
     users_count = await db.users.count_documents({})
     products_count = await db.products.count_documents({})
     orders_count = await db.orders.count_documents({})
+    inquiries_count = await db.contact_messages.count_documents({})
     
     # Calculate Total Revenue across all orders
     pipeline = [{"$group": {"_id": None, "total_revenue": {"$sum": "$total"}}}]
@@ -105,6 +109,7 @@ async def get_dashboard_stats():
         "orders_count": orders_count,
         "products_count": products_count,
         "users_count": users_count,
+        "inquiries_count": inquiries_count,
         "updated_at": datetime.now(timezone.utc).isoformat(),
     }
 
@@ -387,3 +392,50 @@ async def delete_admin_coupon(code: str):
     if res.deleted_count == 0:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Coupon not found.")
     return {"message": f"Coupon '{code}' deleted."}
+
+
+# ─── 7. Contact Us Inquiries Overwatch ───
+@router.get("/inquiries")
+async def list_all_inquiries():
+    """Retrieve all contact form inquiries submitted by website visitors, newest first."""
+    db = get_db()
+    messages = await db.contact_messages.find({}).sort("created_at", -1).to_list(1000)
+    result = []
+    for msg in messages:
+        doc = _clean_doc(msg)
+        if "created_at" in doc and isinstance(doc["created_at"], datetime):
+            dt = doc["created_at"]
+            if dt.tzinfo is None:
+                dt = dt.replace(tzinfo=timezone.utc)
+            doc["created_at"] = dt.isoformat()
+        result.append(doc)
+    return result
+
+
+@router.put("/inquiries/{inquiry_id}/status")
+async def update_inquiry_status(inquiry_id: str, data: InquiryStatusUpdateIn):
+    """Update contact inquiry status (e.g. New -> Read -> Replied)."""
+    db = get_db()
+    if not ObjectId.is_valid(inquiry_id):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid inquiry ID format.")
+    
+    result = await db.contact_messages.update_one(
+        {"_id": ObjectId(inquiry_id)},
+        {"$set": {"status": data.status, "updated_at": datetime.now(timezone.utc)}}
+    )
+    if result.matched_count == 0:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Inquiry not found.")
+    return {"message": f"Inquiry status updated to {data.status}."}
+
+
+@router.delete("/inquiries/{inquiry_id}")
+async def delete_inquiry(inquiry_id: str):
+    """Remove a contact inquiry message from the database."""
+    db = get_db()
+    if not ObjectId.is_valid(inquiry_id):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid inquiry ID format.")
+    
+    result = await db.contact_messages.delete_one({"_id": ObjectId(inquiry_id)})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Inquiry not found.")
+    return {"message": "Contact inquiry permanently deleted."}

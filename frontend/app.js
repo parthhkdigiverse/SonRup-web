@@ -1815,7 +1815,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             const nameVal = document.getElementById("contact-name")?.value || "";
             const emailVal = document.getElementById("contact-email")?.value || "";
             const phoneVal = document.getElementById("contact-phone")?.value || "";
-            const subjectVal = document.getElementById("contact-subject")?.value || "General Inquiry";
             const messageVal = document.getElementById("contact-message")?.value || "";
 
             try {
@@ -1826,7 +1825,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                         name: nameVal,
                         email: emailVal,
                         phone: phoneVal,
-                        subject: subjectVal,
+                        subject: "General Inquiry",
                         message: messageVal,
                     }),
                 });

@@ -9,5 +9,5 @@ class ContactCreate(BaseModel):
     name: str
     email: EmailStr
     phone: Optional[str] = ""
-    subject: str
+    subject: Optional[str] = "General Inquiry"
     message: str

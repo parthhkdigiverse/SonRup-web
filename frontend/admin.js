@@ -87,7 +87,8 @@ async function initDashboard() {
         loadOrders(),
         loadSettings(),
         loadUsers(),
-        loadCoupons()
+        loadCoupons(),
+        loadInquiries()
     ]);
     showToast("✅ Admin Dashboard fully synchronized.");
 }
@@ -116,6 +117,9 @@ async function loadStats() {
         document.getElementById("kpi-orders").textContent = data.orders_count;
         document.getElementById("kpi-products").textContent = data.products_count;
         document.getElementById("kpi-users").textContent = data.users_count;
+        if (document.getElementById("kpi-inquiries")) {
+            document.getElementById("kpi-inquiries").textContent = data.inquiries_count || 0;
+        }
         return true;
     } catch (e) {
         console.error(e);
@@ -496,6 +500,156 @@ window.toggleUserRole = async (userId, makeAdmin) => {
         loadUsers();
     } catch (e) {
         showToast("Error altering user privileges.", true);
+    }
+};
+
+
+/**
+ * Helper to format date/time in Indian Standard Time (IST / Asia/Kolkata)
+ */
+function formatIndianDateTime(isoString) {
+    if (!isoString) return 'N/A';
+    try {
+        let str = isoString;
+        if (typeof str === 'string' && !str.includes('Z') && !str.includes('+') && !str.includes('-')) {
+            str += 'Z';
+        }
+        const d = new Date(str);
+        if (isNaN(d.getTime())) return isoString;
+        return d.toLocaleString('en-IN', {
+            timeZone: 'Asia/Kolkata',
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true
+        });
+    } catch (e) {
+        return isoString;
+    }
+}
+
+
+/**
+ * 7. CONTACT INQUIRIES MANAGER
+ */
+let currentInquiries = [];
+
+async function loadInquiries() {
+    try {
+        const res = await fetch(`${API_BASE_URL}/admin/inquiries`, { headers: getHeaders() });
+        const tbody = document.getElementById("inquiries-table-body");
+        if (!tbody) return;
+        if (!res.ok) throw new Error("Could not fetch contact inquiries");
+
+        currentInquiries = await res.json();
+        tbody.innerHTML = "";
+
+        if (currentInquiries.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #94a3b8;">No contact inquiries received yet.</td></tr>';
+            return;
+        }
+
+        currentInquiries.forEach(item => {
+            const dateStr = formatIndianDateTime(item.created_at);
+
+            const rawMsg = item.message || '';
+            const msgSnippet = rawMsg.length > 60 ? rawMsg.substring(0, 60) + '...' : rawMsg;
+
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td style="font-size: 13px; color: #E5C365; font-weight: 500;">📅 ${dateStr}</td>
+                <td>
+                    <div style="font-weight: 700; color: #fff; font-size: 14px;">${item.name || 'Anonymous'}</div>
+                    <div style="color: #C9A227; font-size: 12px;">📧 ${item.email || 'No Email'}</div>
+                </td>
+                <td>
+                    <a href="tel:${item.phone || ''}" style="color: #60a5fa; font-weight: 600; font-size: 13px; text-decoration: none;">📞 ${item.phone || 'N/A'}</a>
+                </td>
+                <td style="color: #cbd5e1; font-size: 13px; max-width: 320px; overflow: hidden; text-overflow: ellipsis;">${msgSnippet}</td>
+                <td>
+                    <div style="display: flex; gap: 8px;">
+                        <button class="btn-action btn-edit" onclick="viewInquiryDetail('${item._id}')"><i data-lucide="eye" width="14"></i> View</button>
+                        <a href="mailto:${item.email}?subject=Re: Sonrup Customer Inquiry" class="btn-action btn-gold" style="text-decoration: none;" onclick="updateInquiryStatus('${item._id}', 'Replied')"><i data-lucide="mail" width="14"></i> Reply</a>
+                        <button class="btn-action btn-danger" onclick="deleteInquiry('${item._id}')"><i data-lucide="trash-2" width="14"></i></button>
+                    </div>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        if (window.lucide) window.lucide.createIcons();
+    } catch (e) {
+        console.error("Error loading contact inquiries:", e);
+    }
+}
+window.loadInquiries = loadInquiries;
+
+window.viewInquiryDetail = (id) => {
+    const item = currentInquiries.find(i => i._id === id);
+    if (!item) return;
+
+    document.getElementById("inquiry-modal-date").textContent = `📅 Received on: ${formatIndianDateTime(item.created_at)}`;
+    document.getElementById("inquiry-modal-name").textContent = item.name || 'Anonymous';
+
+    const emailLink = document.getElementById("inquiry-modal-email-link");
+    emailLink.textContent = item.email || 'N/A';
+    emailLink.href = `mailto:${item.email}`;
+
+    const phoneLink = document.getElementById("inquiry-modal-phone-link");
+    if (phoneLink) {
+        phoneLink.textContent = item.phone ? `📞 ${item.phone}` : 'N/A';
+        phoneLink.href = item.phone ? `tel:${item.phone}` : '#';
+    }
+    document.getElementById("inquiry-modal-message").textContent = item.message || '';
+
+    const replyBtn = document.getElementById("inquiry-modal-reply-btn");
+    replyBtn.href = `mailto:${item.email}?subject=Re: Sonrup Customer Inquiry`;
+    replyBtn.onclick = () => {
+        updateInquiryStatus(id, 'Replied');
+        closeInquiryModal();
+    };
+
+    document.getElementById("inquiry-modal").classList.add("active");
+
+    if (!item.status || item.status === 'New') {
+        updateInquiryStatus(id, 'Read');
+    }
+};
+
+window.closeInquiryModal = () => {
+    document.getElementById("inquiry-modal").classList.remove("active");
+};
+
+window.updateInquiryStatus = async (id, newStatus) => {
+    try {
+        const res = await fetch(`${API_BASE_URL}/admin/inquiries/${id}/status`, {
+            method: "PUT",
+            headers: getHeaders(true),
+            body: JSON.stringify({ status: newStatus })
+        });
+        if (!res.ok) throw new Error("Status update failed");
+        showToast(`Inquiry status updated to '${newStatus}'`);
+        loadInquiries();
+    } catch (e) {
+        showToast("Error updating inquiry status", true);
+    }
+};
+
+window.deleteInquiry = async (id) => {
+    if (!confirm("Are you sure you want to delete this contact inquiry?")) return;
+    try {
+        const res = await fetch(`${API_BASE_URL}/admin/inquiries/${id}`, {
+            method: "DELETE",
+            headers: getHeaders(true)
+        });
+        if (!res.ok) throw new Error("Deletion failed");
+        showToast("🗑️ Contact inquiry deleted.");
+        loadInquiries();
+        loadStats();
+    } catch (e) {
+        showToast("Error deleting contact inquiry.", true);
     }
 };
 
