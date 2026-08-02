@@ -72,6 +72,7 @@ async function loadAppConfig() {
         renderGuidanceFromConfig();
         renderFaqFromConfig();
         renderDietaryGuideFromConfig();
+        renderStoryFromConfig();
         renderSiteFooterAndContactFromConfig();
     } catch (err) {
         console.warn("Could not load app config, using defaults.", err);
@@ -448,6 +449,83 @@ function renderDietaryGuideFromConfig() {
     if (window.lucide) window.lucide.createIcons();
 }
 
+function renderStoryFromConfig() {
+    if (!APP_CONFIG) return;
+
+    // 1. Hero Header on about.html
+    const heroSec = document.querySelector(".about-hero");
+    if (heroSec && APP_CONFIG.story_bg_image) {
+        heroSec.style.backgroundImage = `linear-gradient(180deg, rgba(18,18,18,0.3) 0%, rgba(15,15,16,1) 100%), url('${APP_CONFIG.story_bg_image}')`;
+    }
+
+    const heroContent = document.querySelector(".about-hero-content");
+    if (heroContent) {
+        const sub = heroContent.querySelector(".sub-heading");
+        if (sub && APP_CONFIG.story_subheading) sub.textContent = APP_CONFIG.story_subheading;
+
+        const title = heroContent.querySelector("h1");
+        if (title && APP_CONFIG.story_title) title.innerHTML = APP_CONFIG.story_title;
+
+        const desc = heroContent.querySelector("p");
+        if (desc && APP_CONFIG.story_desc) desc.textContent = APP_CONFIG.story_desc;
+    }
+
+    // 2. Main Story Sections & Stat Highlights on about.html
+    const mainContainer = document.querySelector("body.shop-catalog-body .container[style*='padding-top'], main .story-container");
+    if (!mainContainer) return;
+
+    const storySections = (APP_CONFIG.story_sections && APP_CONFIG.story_sections.length > 0) ? APP_CONFIG.story_sections : [
+        { badge: "01. PURE SOURCE", title: "Harvested From the Peaks", image: "assets/images/shilajit-detail1.jpg", p1: "Our flagship ingredient, pure Shilajit resin, is wild-harvested at elevations above 16,000 feet in the pristine Himalayan ranges. Formed over centuries, this dense Ayurvedic restorative is packed with over 84 ionic minerals.", p2: "We purify this raw resin under strict laboratory standards to achieve an industry-leading 75% Fulvic Acid concentration, ensuring maximum bioavailability and strength in every single bite." },
+        { badge: "02. THE SCIENCE", title: "100% Sugar-Free Nutrition", image: "assets/images/biotin-detail1.jpg", p1: "Most wellness gummies on the market are packed with processed sugars, glucose syrups, and gelatin—turning vital supplements into unhealthy candy. At Sonrup, we knew there was a better way.", p2: "Our research team formulated a completely sugar-free gummie base that retains premium textures and natural, kid-approved fruit flavours (like Tamarind and Orange Citrus) without compromising your metabolic health." },
+        { badge: "03. TRUST & HYGIENE", title: "GMP & ISO Certified Labs", image: "assets/images/kids-detail1.jpg", p1: "Quality and safety are the core pillars of Sonrup. Every bottle is manufactured at our state-of-the-art facility operated by Kellen Healthcare. Our plant operates under strict GMP (Good Manufacturing Practices) and ISO-9001 quality guidelines.", p2: "From heavy-metal clearance tests to batch consistency, we guarantee a safe, pure, and premium supplement that you can trust for your children, parents, and yourself." }
+    ];
+
+    const storyStats = (APP_CONFIG.story_stats && APP_CONFIG.story_stats.length > 0) ? APP_CONFIG.story_stats : [
+        { number: "16k+ Ft", label: "Himalayan Sourcing" },
+        { number: "100%", label: "Sugar-Free Formula" },
+        { number: "GMP", label: "Certified Facility" }
+    ];
+
+    // Build Story Sections HTML
+    const sectionsHTML = storySections.map((sec, idx) => {
+        const isReverse = idx % 2 === 1 ? 'reverse' : '';
+        const imgHTML = `
+            <div class="story-img-container">
+                <img src="${sec.image || 'assets/images/shilajit-detail1.jpg'}" alt="${sec.title || 'Sonrup Story'}">
+            </div>
+        `;
+        const textHTML = `
+            <div class="story-text">
+                <span class="sub-heading" style="color: var(--color-gold);">${sec.badge || `0${idx + 1}. STORY`}</span>
+                <h2>${sec.title || ''}</h2>
+                ${sec.p1 ? `<p>${sec.p1}</p>` : ''}
+                ${sec.p2 ? `<p>${sec.p2}</p>` : ''}
+            </div>
+        `;
+
+        return `
+            <div class="story-section ${isReverse}">
+                ${isReverse ? (textHTML + imgHTML) : (imgHTML + textHTML)}
+            </div>
+        `;
+    }).join("");
+
+    // Build Stats Grid HTML
+    const statsHTML = `
+        <div class="stat-grid">
+            ${storyStats.map(st => `
+                <div class="stat-card">
+                    <div class="stat-number">${st.number || ''}</div>
+                    <div class="stat-label">${st.label || ''}</div>
+                </div>
+            `).join("")}
+        </div>
+    `;
+
+    mainContainer.innerHTML = sectionsHTML + statsHTML;
+    if (window.lucide) window.lucide.createIcons();
+}
+
 function renderSiteFooterAndContactFromConfig() {
     if (!APP_CONFIG) return;
 
@@ -538,6 +616,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             renderGuidanceFromConfig();
             renderFaqFromConfig();
             renderDietaryGuideFromConfig();
+            renderStoryFromConfig();
             renderSiteFooterAndContactFromConfig();
         } catch (e) {
             console.error("Error loading cached config", e);

@@ -96,6 +96,13 @@ class WebsiteSettingsIn(BaseModel):
     dietary_guide_title: str = "Dosages & Usage Instructions"
     dietary_guide_desc: str = "Follow our certified dietary guides to maximize the energy, vitality, and cellular protection benefits of your daily Sonrup gummies."
     dietary_guide_cards: list[dict] = []
+    # Our Story / About Us Section Fields
+    story_subheading: str = "OUR STORY"
+    story_title: str = "Himalayan Purity, Modern Scientific Wellness"
+    story_desc: str = "At Sonrup™, we bridge the wisdom of traditional Ayurveda with clean, modern dietary science to empower the health of your entire household."
+    story_bg_image: str = "assets/images/wellness-login-hero.jpg"
+    story_sections: list[dict] = []
+    story_stats: list[dict] = []
 
 class ProductIn(BaseModel):
     slug: str
@@ -442,6 +449,46 @@ async def get_website_settings():
                 "dosage": "1 Gummy daily. Carefully balanced with Iron, Zinc, and Choline.",
                 "target": "Formulated for active growing kids aged 5 to 16. Chew thoroughly before swallowing."
             }
+        ]
+
+    if "story_subheading" not in settings: settings["story_subheading"] = "OUR STORY"
+    if "story_title" not in settings: settings["story_title"] = "Himalayan Purity, Modern Scientific Wellness"
+    if "story_desc" not in settings: settings["story_desc"] = "At Sonrup™, we bridge the wisdom of traditional Ayurveda with clean, modern dietary science to empower the health of your entire household."
+    if "story_bg_image" not in settings: settings["story_bg_image"] = "assets/images/wellness-login-hero.jpg"
+
+    if "story_sections" not in settings or not settings["story_sections"]:
+        settings["story_sections"] = [
+            {
+                "id": "story_1",
+                "badge": "01. PURE SOURCE",
+                "title": "Harvested From the Peaks",
+                "image": "assets/images/shilajit-detail1.jpg",
+                "p1": "Our flagship ingredient, pure Shilajit resin, is wild-harvested at elevations above 16,000 feet in the pristine Himalayan ranges. Formed over centuries, this dense Ayurvedic restorative is packed with over 84 ionic minerals.",
+                "p2": "We purify this raw resin under strict laboratory standards to achieve an industry-leading 75% Fulvic Acid concentration, ensuring maximum bioavailability and strength in every single bite."
+            },
+            {
+                "id": "story_2",
+                "badge": "02. THE SCIENCE",
+                "title": "100% Sugar-Free Nutrition",
+                "image": "assets/images/biotin-detail1.jpg",
+                "p1": "Most wellness gummies on the market are packed with processed sugars, glucose syrups, and gelatin—turning vital supplements into unhealthy candy. At Sonrup, we knew there was a better way.",
+                "p2": "Our research team formulated a completely sugar-free gummie base that retains premium textures and natural, kid-approved fruit flavours (like Tamarind and Orange Citrus) without compromising your metabolic health."
+            },
+            {
+                "id": "story_3",
+                "badge": "03. TRUST & HYGIENE",
+                "title": "GMP & ISO Certified Labs",
+                "image": "assets/images/kids-detail1.jpg",
+                "p1": "Quality and safety are the core pillars of Sonrup. Every bottle is manufactured at our state-of-the-art facility operated by Kellen Healthcare. Our plant operates under strict GMP (Good Manufacturing Practices) and ISO-9001 quality guidelines.",
+                "p2": "From heavy-metal clearance tests to batch consistency, we guarantee a safe, pure, and premium supplement that you can trust for your children, parents, and yourself."
+            }
+        ]
+
+    if "story_stats" not in settings or not settings["story_stats"]:
+        settings["story_stats"] = [
+            { "id": "stat_1", "number": "16k+ Ft", "label": "Himalayan Sourcing" },
+            { "id": "stat_2", "number": "100%", "label": "Sugar-Free Formula" },
+            { "id": "stat_3", "number": "GMP", "label": "Certified Facility" }
         ]
 
     return settings

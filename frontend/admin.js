@@ -560,6 +560,21 @@ async function loadSettings() {
             { id: "faq_5", question: "Can both men and women take the Shilajit and Biotin gummies?", answer: "Absolutely. Both products are unisex. Shilajit gummies help improve stamina and strength for anyone, while Biotin + Multivitamin gummies support skin, hair, and nail health for all adults." }
         ];
         renderFaqCRUD();
+
+        // Dynamic Our Story / About Us Section
+        window.LAST_SETTINGS_DATA = data;
+        currentStorySections = (data.story_sections && data.story_sections.length > 0) ? data.story_sections : [
+            { id: "story_1", badge: "01. PURE SOURCE", title: "Harvested From the Peaks", image: "assets/images/shilajit-detail1.jpg", p1: "Our flagship ingredient, pure Shilajit resin, is wild-harvested at elevations above 16,000 feet in the pristine Himalayan ranges. Formed over centuries, this dense Ayurvedic restorative is packed with over 84 ionic minerals.", p2: "We purify this raw resin under strict laboratory standards to achieve an industry-leading 75% Fulvic Acid concentration, ensuring maximum bioavailability and strength in every single bite." },
+            { id: "story_2", badge: "02. THE SCIENCE", title: "100% Sugar-Free Nutrition", image: "assets/images/biotin-detail1.jpg", p1: "Most wellness gummies on the market are packed with processed sugars, glucose syrups, and gelatin—turning vital supplements into unhealthy candy. At Sonrup, we knew there was a better way.", p2: "Our research team formulated a completely sugar-free gummie base that retains premium textures and natural, kid-approved fruit flavours (like Tamarind and Orange Citrus) without compromising your metabolic health." },
+            { id: "story_3", badge: "03. TRUST & HYGIENE", title: "GMP & ISO Certified Labs", image: "assets/images/kids-detail1.jpg", p1: "Quality and safety are the core pillars of Sonrup. Every bottle is manufactured at our state-of-the-art facility operated by Kellen Healthcare. Our plant operates under strict GMP (Good Manufacturing Practices) and ISO-9001 quality guidelines.", p2: "From heavy-metal clearance tests to batch consistency, we guarantee a safe, pure, and premium supplement that you can trust for your children, parents, and yourself." }
+        ];
+
+        currentStoryStats = (data.story_stats && data.story_stats.length > 0) ? data.story_stats : [
+            { id: "stat_1", number: "16k+ Ft", label: "Himalayan Sourcing" },
+            { id: "stat_2", number: "100%", label: "Sugar-Free Formula" },
+            { id: "stat_3", number: "GMP", label: "Certified Facility" }
+        ];
+        renderStoryCRUD();
     } catch (e) {
         console.error("Error loading settings:", e);
     }
@@ -1622,11 +1637,32 @@ function setupEventListeners() {
         });
     });
 
-    // Live Hero Image File Selection Preview
-    document.getElementById("setting-hero-image-file")?.addEventListener("change", (e) => {
+    // Live Hero Image File Selection & Instant Upload
+    document.getElementById("setting-hero-image-file")?.addEventListener("change", async (e) => {
         if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
             const previewImg = document.getElementById("setting-hero-image-preview");
-            if (previewImg) previewImg.src = URL.createObjectURL(e.target.files[0]);
+            if (previewImg) previewImg.src = URL.createObjectURL(file);
+
+            showToast("⏳ Uploading Hero banner photo...");
+            const formData = new FormData();
+            formData.append("file", file);
+            try {
+                const uploadRes = await fetch(`${API_BASE_URL}/admin/upload-image`, {
+                    method: "POST",
+                    headers: { "Authorization": `Bearer ${localStorage.getItem("sonrup_token") || localStorage.getItem("access_token") || localStorage.getItem("auth_token") || localStorage.getItem("token")}` },
+                    body: formData
+                });
+                if (uploadRes.ok) {
+                    const uploadData = await uploadRes.json();
+                    const path = uploadData.path || uploadData.image_path || uploadData.url;
+                    document.getElementById("setting-hero-image-path").value = path;
+                    if (previewImg) previewImg.src = path;
+                    showToast("✨ Hero photo uploaded successfully!");
+                }
+            } catch (err) {
+                console.error("Hero upload error:", err);
+            }
         }
     });
 
@@ -1649,10 +1685,11 @@ function setupEventListeners() {
                 });
                 if (uploadRes.ok) {
                     const uploadData = await uploadRes.json();
-                    heroImagePath = uploadData.image_path;
+                    heroImagePath = uploadData.path || uploadData.image_path || uploadData.url;
                     document.getElementById("setting-hero-image-path").value = heroImagePath;
                     const previewImg = document.getElementById("setting-hero-image-preview");
                     if (previewImg) previewImg.src = heroImagePath;
+                    showToast("✨ Hero photo uploaded!");
                 }
             } catch (err) {
                 console.error("Hero upload error:", err);
@@ -1953,6 +1990,148 @@ function setupEventListeners() {
         }
     });
 
+    // ─── Our Story Builder CRUD Handlers ───
+    document.getElementById("setting-story-bg-file")?.addEventListener("change", async (e) => {
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            const previewImg = document.getElementById("setting-story-bg-preview");
+            if (previewImg) previewImg.src = URL.createObjectURL(file);
+
+            showToast("⏳ Uploading header background photo...");
+            const formData = new FormData();
+            formData.append("file", file);
+            try {
+                const uploadRes = await fetch(`${API_BASE_URL}/admin/upload-image`, {
+                    method: "POST",
+                    headers: { "Authorization": `Bearer ${localStorage.getItem("sonrup_token") || localStorage.getItem("access_token") || localStorage.getItem("auth_token") || localStorage.getItem("token")}` },
+                    body: formData
+                });
+                if (uploadRes.ok) {
+                    const uploadData = await uploadRes.json();
+                    const path = uploadData.path || uploadData.image_path || uploadData.url;
+                    document.getElementById("setting-story-bg-path").value = path;
+                    if (previewImg) previewImg.src = path;
+                    showToast("✨ Story Header background uploaded!");
+                }
+            } catch (err) {
+                console.error("Story bg upload error:", err);
+            }
+        }
+    });
+
+    document.getElementById("btn-add-story-section")?.addEventListener("click", () => {
+        syncStoryInputsFromDOM();
+        const newId = `story_${Date.now()}`;
+        currentStorySections.push({
+            id: newId,
+            badge: `0${currentStorySections.length + 1}. NEW SECTION`,
+            title: "",
+            image: "assets/images/shilajit-detail1.jpg",
+            p1: "",
+            p2: ""
+        });
+        renderStoryCRUD();
+        showToast("✨ New Story Block added!");
+
+        setTimeout(() => {
+            const newCard = document.querySelector(`.story-section-card[data-id="${newId}"]`);
+            if (newCard) {
+                newCard.scrollIntoView({ behavior: "smooth", block: "center" });
+                newCard.style.outline = "2px solid #C9A227";
+                newCard.style.boxShadow = "0 0 25px rgba(201, 162, 39, 0.5)";
+                const titleInput = newCard.querySelector(".story-title-input") || newCard.querySelector("input");
+                if (titleInput) titleInput.focus();
+                setTimeout(() => {
+                    newCard.style.outline = "none";
+                    newCard.style.boxShadow = "none";
+                }, 2200);
+            }
+        }, 100);
+    });
+
+    document.getElementById("btn-add-story-stat")?.addEventListener("click", () => {
+        syncStoryInputsFromDOM();
+        const newId = `stat_${Date.now()}`;
+        currentStoryStats.push({
+            id: newId,
+            number: "100%",
+            label: "Quality Certified"
+        });
+        renderStoryCRUD();
+        showToast("✨ New Stat Card added!");
+
+        setTimeout(() => {
+            const newCard = document.querySelector(`.story-stat-card[data-id="${newId}"]`);
+            if (newCard) {
+                newCard.scrollIntoView({ behavior: "smooth", block: "center" });
+                newCard.style.outline = "2px solid #C9A227";
+                newCard.style.boxShadow = "0 0 25px rgba(201, 162, 39, 0.5)";
+                const numInput = newCard.querySelector(".story-stat-num-input") || newCard.querySelector("input");
+                if (numInput) numInput.focus();
+                setTimeout(() => {
+                    newCard.style.outline = "none";
+                    newCard.style.boxShadow = "none";
+                }, 2200);
+            }
+        }, 100);
+    });
+
+    document.getElementById("story-builder-form")?.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        syncStoryInputsFromDOM();
+
+        let currentSettings = {};
+        try {
+            const res = await fetch(`${API_BASE_URL}/admin/settings`, { headers: getHeaders() });
+            if (res.ok) currentSettings = await res.json();
+        } catch (e) {}
+
+        let bgImgPath = document.getElementById("setting-story-bg-path")?.value.trim() || "assets/images/wellness-login-hero.jpg";
+        const bgFile = document.getElementById("setting-story-bg-file");
+        if (bgFile && bgFile.files && bgFile.files[0]) {
+            showToast("Uploading header background photo...");
+            const formData = new FormData();
+            formData.append("file", bgFile.files[0]);
+            try {
+                const uploadRes = await fetch(`${API_BASE_URL}/admin/upload-image`, {
+                    method: "POST",
+                    headers: { "Authorization": `Bearer ${localStorage.getItem("sonrup_token") || localStorage.getItem("access_token") || localStorage.getItem("auth_token") || localStorage.getItem("token")}` },
+                    body: formData
+                });
+                if (uploadRes.ok) {
+                    const uploadData = await uploadRes.json();
+                    bgImgPath = uploadData.path || uploadData.image_path || uploadData.url;
+                    document.getElementById("setting-story-bg-path").value = bgImgPath;
+                    const previewImg = document.getElementById("setting-story-bg-preview");
+                    if (previewImg) previewImg.src = bgImgPath;
+                }
+            } catch (err) {}
+        }
+
+        const payload = {
+            ...currentSettings,
+            story_subheading: document.getElementById("setting-story-subheading")?.value.trim() || "OUR STORY",
+            story_title: document.getElementById("setting-story-title")?.value.trim() || "Himalayan Purity, Modern Scientific Wellness",
+            story_desc: document.getElementById("setting-story-desc")?.value.trim() || "At Sonrup™, we bridge the wisdom of traditional Ayurveda...",
+            story_bg_image: bgImgPath,
+            story_sections: currentStorySections,
+            story_stats: currentStoryStats
+        };
+
+        try {
+            const res = await fetch(`${API_BASE_URL}/admin/settings`, {
+                method: "PUT",
+                headers: getHeaders(true),
+                body: JSON.stringify(payload)
+            });
+            if (!res.ok) throw new Error("Could not save Our Story section");
+
+            showToast("🌟 Our Story section updated & live on website!");
+        } catch (err) {
+            showToast("Failed to save Our Story section.", true);
+        }
+    });
+
     // Logout Handler
     document.getElementById("admin-logout-btn")?.addEventListener("click", () => {
         if (confirm("Log out from Administrator Session?")) {
@@ -2089,3 +2268,180 @@ window.trackDelhivery = async (waybill) => {
 window.closeTrackingModal = () => {
     document.getElementById("delhivery-tracking-modal").style.display = "none";
 };
+
+// ─── Our Story Builder CRUD Renderers & Helper Handlers ───
+let currentStorySections = [];
+let currentStoryStats = [];
+
+function renderStoryCRUD() {
+    // 1. Render Story Header Texts & Background Image Preview
+    if (document.getElementById("setting-story-subheading") && window.LAST_SETTINGS_DATA) document.getElementById("setting-story-subheading").value = window.LAST_SETTINGS_DATA.story_subheading || "OUR STORY";
+    if (document.getElementById("setting-story-title") && window.LAST_SETTINGS_DATA) document.getElementById("setting-story-title").value = window.LAST_SETTINGS_DATA.story_title || "Himalayan Purity, Modern Scientific Wellness";
+    if (document.getElementById("setting-story-desc") && window.LAST_SETTINGS_DATA) document.getElementById("setting-story-desc").value = window.LAST_SETTINGS_DATA.story_desc || "At Sonrup™, we bridge the wisdom of traditional Ayurveda with clean, modern dietary science to empower the health of your entire household.";
+
+    const bgImgPath = window.LAST_SETTINGS_DATA?.story_bg_image || "assets/images/wellness-login-hero.jpg";
+    if (document.getElementById("setting-story-bg-path")) document.getElementById("setting-story-bg-path").value = bgImgPath;
+    if (document.getElementById("setting-story-bg-preview")) document.getElementById("setting-story-bg-preview").src = bgImgPath;
+
+    // 2. Render Story Blocks Container
+    const secContainer = document.getElementById("story-sections-list-container");
+    if (secContainer) {
+        if (!currentStorySections || currentStorySections.length === 0) {
+            secContainer.innerHTML = `<div style="padding: 20px; text-align: center; color: #94a3b8; background: rgba(0,0,0,0.2); border-radius: 8px;">No story narrative blocks yet. Click <strong>+ Add Story Block</strong>.</div>`;
+        } else {
+            secContainer.innerHTML = currentStorySections.map((item, idx) => `
+                <div class="story-section-card glass-panel" data-id="${item.id}" style="padding: 16px 20px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; position: relative;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px;">
+                        <span style="font-size: 13px; font-weight: 700; color: #E5C365;">BLOCK #${idx + 1} (${item.badge || '0' + (idx+1) + '. STORY'})</span>
+                        <div style="display: flex; gap: 6px;">
+                            <button type="button" onclick="moveStoryBlock(${idx}, -1)" class="btn-action" style="padding: 4px 8px; font-size: 11px; background: rgba(255,255,255,0.05); color: #ccc;" title="Move Up">▲</button>
+                            <button type="button" onclick="moveStoryBlock(${idx}, 1)" class="btn-action" style="padding: 4px 8px; font-size: 11px; background: rgba(255,255,255,0.05); color: #ccc;" title="Move Down">▼</button>
+                            <button type="button" onclick="deleteStoryBlock(${idx})" class="btn-action btn-danger" style="padding: 6px 9px; font-size: 12px; border-radius: 6px; background: rgba(239,68,68,0.18); border: 1px solid rgba(239,68,68,0.35); color: #f87171; cursor: pointer; display: inline-flex; align-items: center; justify-content: center;" title="Delete Story Block"><i data-lucide="trash-2" style="width: 14px; height: 14px;"></i></button>
+                        </div>
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label" style="font-size: 11.5px;">Badge Label</label>
+                            <input type="text" class="form-input story-badge-input" value="${item.badge || ''}" placeholder="01. PURE SOURCE" style="padding: 7px 10px; font-size: 13px;">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" style="font-size: 11.5px;">Block Title</label>
+                            <input type="text" class="form-input story-title-input" value="${item.title || ''}" placeholder="Harvested From the Peaks" style="padding: 7px 10px; font-size: 13px;">
+                        </div>
+                        <div class="form-group full-width" style="background: rgba(255,255,255,0.02); border: 1px dashed rgba(201,162,39,0.25); padding: 12px 14px; border-radius: 10px;">
+                            <label class="form-label" style="font-size: 11.5px; font-weight: 700; color: #E5C365; display: flex; align-items: center; gap: 6px;">
+                                <i data-lucide="image"></i> Block Image (Upload Custom Photo File or Edit Path)
+                            </label>
+                            <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-top: 6px;">
+                                <div style="width: 70px; height: 70px; border-radius: 8px; overflow: hidden; border: 1.5px solid #C9A227; background: #000; flex-shrink: 0;">
+                                    <img class="story-img-preview" src="${item.image || 'assets/images/shilajit-detail1.jpg'}" alt="Preview" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                                <div style="flex: 1; display: flex; flex-direction: column; gap: 6px;">
+                                    <input type="file" class="form-input story-image-file" accept="image/*" onchange="uploadStoryBlockImage(this, ${idx})" style="padding: 5px; font-size: 11.5px; cursor: pointer;">
+                                    <input type="text" class="form-input story-image-input" value="${item.image || ''}" placeholder="assets/images/shilajit-detail1.jpg" style="padding: 5px 8px; font-size: 12px;">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group full-width">
+                            <label class="form-label" style="font-size: 11.5px;">Paragraph 1 Text</label>
+                            <textarea class="form-input story-p1-input" rows="2" style="padding: 7px 10px; font-size: 13px;">${item.p1 || ''}</textarea>
+                        </div>
+                        <div class="form-group full-width">
+                            <label class="form-label" style="font-size: 11.5px;">Paragraph 2 Text (Optional)</label>
+                            <textarea class="form-input story-p2-input" rows="2" style="padding: 7px 10px; font-size: 13px;">${item.p2 || ''}</textarea>
+                        </div>
+                    </div>
+                </div>
+            `).join("");
+        }
+    }
+
+    // 3. Render Stat Cards Container
+    const statContainer = document.getElementById("story-stats-list-container");
+    if (statContainer) {
+        if (!currentStoryStats || currentStoryStats.length === 0) {
+            statContainer.innerHTML = `<div style="padding: 16px; text-align: center; color: #94a3b8; background: rgba(0,0,0,0.2); border-radius: 8px;">No stat cards. Click <strong>+ Add Stat Card</strong>.</div>`;
+        } else {
+            statContainer.innerHTML = currentStoryStats.map((stat, idx) => `
+                <div class="story-stat-card glass-panel" data-id="${stat.id}" style="padding: 12px 16px; background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+                    <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
+                        <div style="flex: 1;">
+                            <label class="form-label" style="font-size: 10.5px; margin-bottom: 2px;">Number Highlight</label>
+                            <input type="text" class="form-input story-stat-num-input" value="${stat.number || ''}" placeholder="16k+ Ft" style="padding: 5px 8px; font-size: 12.5px;">
+                        </div>
+                        <div style="flex: 1.5;">
+                            <label class="form-label" style="font-size: 10.5px; margin-bottom: 2px;">Label Text</label>
+                            <input type="text" class="form-input story-stat-label-input" value="${stat.label || ''}" placeholder="Himalayan Sourcing" style="padding: 5px 8px; font-size: 12.5px;">
+                        </div>
+                    </div>
+                    <button type="button" onclick="deleteStoryStat(${idx})" class="btn-action btn-danger" style="padding: 6px 9px; font-size: 12px; border-radius: 6px; background: rgba(239,68,68,0.18); border: 1px solid rgba(239,68,68,0.35); color: #f87171; cursor: pointer; display: inline-flex; align-items: center; justify-content: center;" title="Delete Stat Card"><i data-lucide="trash-2" style="width: 14px; height: 14px;"></i></button>
+                </div>
+            `).join("");
+        }
+    }
+
+    if (window.lucide) window.lucide.createIcons();
+}
+
+window.deleteStoryBlock = function(idx) {
+    syncStoryInputsFromDOM();
+    currentStorySections.splice(idx, 1);
+    renderStoryCRUD();
+};
+
+window.moveStoryBlock = function(idx, dir) {
+    syncStoryInputsFromDOM();
+    const newIdx = idx + dir;
+    if (newIdx < 0 || newIdx >= currentStorySections.length) return;
+    const temp = currentStorySections[idx];
+    currentStorySections[idx] = currentStorySections[newIdx];
+    currentStorySections[newIdx] = temp;
+    renderStoryCRUD();
+};
+
+window.deleteStoryStat = function(idx) {
+    syncStoryInputsFromDOM();
+    currentStoryStats.splice(idx, 1);
+    renderStoryCRUD();
+};
+
+window.uploadStoryBlockImage = async function(fileInput, idx) {
+    if (!fileInput.files || fileInput.files.length === 0) return;
+    const file = fileInput.files[0];
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+        showToast("⏳ Uploading photo...");
+        const res = await fetch(`${API_BASE_URL}/admin/upload-image`, {
+            method: "POST",
+            headers: getHeaders(false),
+            body: formData
+        });
+        if (!res.ok) throw new Error("Upload failed");
+        const data = await res.json();
+
+        const cardEl = fileInput.closest(".story-section-card");
+        if (cardEl) {
+            const pathInput = cardEl.querySelector(".story-image-input");
+            if (pathInput) pathInput.value = data.path;
+            const imgPreview = cardEl.querySelector(".story-img-preview");
+            if (imgPreview) imgPreview.src = data.path;
+        }
+
+        if (currentStorySections[idx]) {
+            currentStorySections[idx].image = data.path;
+        }
+
+        showToast("✨ Photo uploaded successfully!");
+    } catch (e) {
+        showToast("Could not upload image.", true);
+    }
+};
+
+function syncStoryInputsFromDOM() {
+    const secContainer = document.getElementById("story-sections-list-container");
+    if (secContainer) {
+        const cards = secContainer.querySelectorAll(".story-section-card");
+        cards.forEach((cardEl, idx) => {
+            if (currentStorySections[idx]) {
+                currentStorySections[idx].badge = cardEl.querySelector(".story-badge-input")?.value.trim() || "";
+                currentStorySections[idx].title = cardEl.querySelector(".story-title-input")?.value.trim() || "";
+                currentStorySections[idx].image = cardEl.querySelector(".story-image-input")?.value.trim() || "";
+                currentStorySections[idx].p1 = cardEl.querySelector(".story-p1-input")?.value.trim() || "";
+                currentStorySections[idx].p2 = cardEl.querySelector(".story-p2-input")?.value.trim() || "";
+            }
+        });
+    }
+
+    const statContainer = document.getElementById("story-stats-list-container");
+    if (statContainer) {
+        const cards = statContainer.querySelectorAll(".story-stat-card");
+        cards.forEach((cardEl, idx) => {
+            if (currentStoryStats[idx]) {
+                currentStoryStats[idx].number = cardEl.querySelector(".story-stat-num-input")?.value.trim() || "";
+                currentStoryStats[idx].label = cardEl.querySelector(".story-stat-label-input")?.value.trim() || "";
+            }
+        });
+    }
+}
