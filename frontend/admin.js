@@ -357,6 +357,32 @@ async function loadSettings() {
         if (!res.ok) throw new Error("Could not fetch general website settings");
         const data = await res.json();
 
+        
+        
+        // Contact Page Settings
+        const cs = data.contact_settings || {};
+        if (document.getElementById("setting-contact-page-hq")) document.getElementById("setting-contact-page-hq").value = cs.hq || "SONRUP\\nA 584 Sitaram Society, Punagam Road,\\nSurat - 395010, Gujarat, India";
+        if (document.getElementById("setting-contact-page-lab")) document.getElementById("setting-contact-page-lab").value = cs.lab || "KELLEN HEALTHCARE\\nGMP & ISO Certified Facility";
+        if (document.getElementById("setting-contact-page-emails")) document.getElementById("setting-contact-page-emails").value = cs.emails || "info@sonrup.com\\nsales@sonrup.com";
+        if (document.getElementById("setting-contact-page-phone")) document.getElementById("setting-contact-page-phone").value = cs.phone || "+91 76001 75193";
+        if (document.getElementById("setting-contact-page-hours")) document.getElementById("setting-contact-page-hours").value = cs.hours || "Mon - Sat, 10:00 AM - 6:00 PM IST";
+        
+        // Footer Settings
+        const fs = data.footer_settings || {};
+        if (document.getElementById("setting-footer-logo-input")) document.getElementById("setting-footer-logo-input").value = fs.logo || "";
+        if (document.getElementById("setting-footer-logo-preview")) document.getElementById("setting-footer-logo-preview").src = fs.logo || "";
+        if (document.getElementById("setting-footer-desc")) document.getElementById("setting-footer-desc").value = fs.desc || "Premium natural wellness solutions. Empowering health, strength, and happiness across generations.";
+        
+        if (document.getElementById("setting-social-facebook")) document.getElementById("setting-social-facebook").value = fs.facebook || "";
+        if (document.getElementById("setting-social-instagram")) document.getElementById("setting-social-instagram").value = fs.instagram || "";
+        if (document.getElementById("setting-social-twitter")) document.getElementById("setting-social-twitter").value = fs.twitter || "";
+        if (document.getElementById("setting-social-whatsapp")) document.getElementById("setting-social-whatsapp").value = fs.whatsapp || "";
+        
+        if (document.getElementById("setting-reg-lic")) document.getElementById("setting-reg-lic").value = fs.license || "GA/646-A";
+        if (document.getElementById("setting-reg-fssai")) document.getElementById("setting-reg-fssai").value = fs.fssai || "10726997000544";
+        if (document.getElementById("setting-reg-disclaimer")) document.getElementById("setting-reg-disclaimer").value = fs.disclaimer || "Disclaimer: These products are nutraceuticals and not intended to diagnose, treat, cure, or prevent any disease.";
+
+
         document.getElementById("setting-site-name").value = data.site_name || "Sonrup";
         document.getElementById("setting-support-email").value = data.support_email || "info@sonrup.com";
         document.getElementById("setting-support-phone").value = data.support_phone || "+91 76001 75193";
@@ -1807,6 +1833,22 @@ function setupEventListeners() {
             delhivery_warehouse_state: document.getElementById("setting-delhivery-warehouse-state").value.trim(),
             delhivery_warehouse_pincode: document.getElementById("setting-delhivery-warehouse-pincode").value.trim(),
             delhivery_warehouse_phone: document.getElementById("setting-delhivery-warehouse-phone").value.trim()
+        ,
+            footer_settings: {
+                logo: document.getElementById("setting-footer-logo-input")?.value.trim(),
+                desc: document.getElementById("setting-footer-desc")?.value.trim(),
+                facebook: document.getElementById("setting-social-facebook")?.value.trim(),
+                instagram: document.getElementById("setting-social-instagram")?.value.trim(),
+                twitter: document.getElementById("setting-social-twitter")?.value.trim(),
+                whatsapp: document.getElementById("setting-social-whatsapp")?.value.trim(),
+                license: document.getElementById("setting-reg-lic")?.value.trim(),
+                fssai: document.getElementById("setting-reg-fssai")?.value.trim(),
+                disclaimer: document.getElementById("setting-reg-disclaimer")?.value.trim(),
+                marketed_by: document.getElementById("setting-contact-marketed")?.value.trim(),
+                manufactured_by: document.getElementById("setting-contact-manufactured")?.value.trim(),
+                email: document.getElementById("setting-contact-email")?.value.trim(),
+                phone: document.getElementById("setting-contact-phone")?.value.trim()
+            }
         };
 
         try {
@@ -2783,5 +2825,126 @@ window.uploadBlogArticleImage = async function(fileInput, idx) {
         showToast("Upload failed", true);
     } finally {
         preview.style.opacity = "1";
+    }
+};
+
+
+window.saveSiteSettingsToDB = async function() {
+    try {
+        const btn = document.querySelector("#form-footer-settings button[type='submit']");
+        if(btn) btn.innerHTML = '<i data-lucide="loader" class="spin"></i> Saving...';
+        
+        // Let's reuse the existing settings form handler's logic by triggering it, or we can just fetch all current inputs
+        const payload = {
+            site_name: document.getElementById("setting-site-name").value?.trim() || "Sonrup",
+            support_email: document.getElementById("setting-support-email").value?.trim(),
+            support_phone: document.getElementById("setting-support-phone").value?.trim(),
+            support_address: document.getElementById("setting-address").value?.trim(),
+            fssai_number: document.getElementById("setting-fssai").value?.trim(),
+            license_number: document.getElementById("setting-license").value?.trim(),
+            announcement_banner_enabled: document.getElementById("setting-banner-enabled").value === "true",
+            announcement_banner_text: document.getElementById("setting-banner-text").value?.trim(),
+            razorpay_enabled: document.getElementById("setting-razorpay-enabled").value === "true",
+            razorpay_key_id: document.getElementById("setting-razorpay-key-id").value?.trim(),
+            razorpay_key_secret: document.getElementById("setting-razorpay-key-secret").value?.trim(),
+            delhivery_enabled: document.getElementById("setting-delhivery-enabled") ? document.getElementById("setting-delhivery-enabled").value === "true" : false,
+            delhivery_environment: document.getElementById("setting-delhivery-environment")?.value?.trim(),
+            delhivery_api_token: document.getElementById("setting-delhivery-api-token")?.value?.trim(),
+            delhivery_warehouse_name: document.getElementById("setting-delhivery-warehouse-name")?.value?.trim(),
+            delhivery_warehouse_address: document.getElementById("setting-delhivery-warehouse-address")?.value?.trim(),
+            delhivery_warehouse_city: document.getElementById("setting-delhivery-warehouse-city")?.value?.trim(),
+            delhivery_warehouse_state: document.getElementById("setting-delhivery-warehouse-state")?.value?.trim(),
+            delhivery_warehouse_pincode: document.getElementById("setting-delhivery-warehouse-pincode")?.value?.trim(),
+            delhivery_warehouse_phone: document.getElementById("setting-delhivery-warehouse-phone")?.value?.trim(),
+            footer_settings: {
+                logo: document.getElementById("setting-footer-logo-input")?.value.trim(),
+                desc: document.getElementById("setting-footer-desc")?.value.trim(),
+                facebook: document.getElementById("setting-social-facebook")?.value.trim(),
+                instagram: document.getElementById("setting-social-instagram")?.value.trim(),
+                twitter: document.getElementById("setting-social-twitter")?.value.trim(),
+                license: document.getElementById("setting-reg-lic")?.value.trim(),
+                fssai: document.getElementById("setting-reg-fssai")?.value.trim(),
+                disclaimer: document.getElementById("setting-reg-disclaimer")?.value.trim()
+            }
+        };
+
+        const res = await fetch(`${API_BASE_URL}/admin/settings`, {
+            method: "PUT",
+            headers: getHeaders(true),
+            body: JSON.stringify(payload)
+        });
+        if (!res.ok) throw new Error("Could not save settings");
+        
+        showToast("🌟 Footer Settings successfully published!");
+        if(btn) {
+            btn.innerHTML = '<i data-lucide="check"></i> Saved';
+            setTimeout(() => { btn.innerHTML = '<i data-lucide="save"></i> Save & Publish Footer Settings'; lucide.createIcons(); }, 2000);
+        }
+    } catch (err) {
+        showToast("Failed to save footer settings.", true);
+    }
+};
+
+window.uploadFooterLogo = async function(fileInput) {
+    const file = fileInput.files[0];
+    if (!file) return;
+    const formData = new FormData();
+    formData.append("file", file);
+    const preview = document.getElementById("setting-footer-logo-preview");
+    const input = document.getElementById("setting-footer-logo-input");
+    try {
+        if(preview) preview.style.opacity = "0.5";
+        const res = await fetch(`${API_BASE_URL}/admin/upload-product-image`, { method: "POST", headers: getHeaders(false), body: formData });
+        const data = await res.json();
+        if (res.ok && data.filename) {
+            const imgUrl = `assets/images/${data.filename}`;
+            if(input) input.value = imgUrl;
+            if(preview) preview.src = imgUrl;
+            showToast("Footer logo uploaded!");
+        } else {
+            throw new Error("Upload failed");
+        }
+    } catch (e) {
+        showToast("Upload failed", true);
+    } finally {
+        if(preview) preview.style.opacity = "1";
+    }
+};
+
+
+window.saveContactPageSettingsToDB = async function() {
+    try {
+        const btn = document.querySelector("#form-contact-page-settings button[type='submit']");
+        if(btn) btn.innerHTML = '<i data-lucide="loader" class="spin"></i> Saving...';
+        
+        // We reuse the existing settings fetch to pull all settings, then PUT it back with updated contact_settings
+        const getRes = await fetch(`${API_BASE_URL}/admin/settings?_t=${Date.now()}`, { headers: getHeaders() });
+        const existingData = getRes.ok ? await getRes.json() : {};
+
+        const payload = {
+            ...existingData,
+            contact_settings: {
+                hq: document.getElementById("setting-contact-page-hq")?.value.trim(),
+                lab: document.getElementById("setting-contact-page-lab")?.value.trim(),
+                emails: document.getElementById("setting-contact-page-emails")?.value.trim(),
+                phone: document.getElementById("setting-contact-page-phone")?.value.trim(),
+                hours: document.getElementById("setting-contact-page-hours")?.value.trim()
+            }
+        };
+
+        const res = await fetch(`${API_BASE_URL}/admin/settings`, {
+            method: "PUT",
+            headers: getHeaders(true),
+            body: JSON.stringify(payload)
+        });
+        if (!res.ok) throw new Error("Could not save settings");
+        
+        showToast("🌟 Contact Page Settings successfully published!");
+        if(btn) {
+            btn.innerHTML = '<i data-lucide="check"></i> Saved';
+            setTimeout(() => { btn.innerHTML = '<i data-lucide="save"></i> Save Contact Page Settings'; lucide.createIcons(); }, 2000);
+        }
+    } catch (err) {
+        showToast("Failed to save contact settings.", true);
     }
 };

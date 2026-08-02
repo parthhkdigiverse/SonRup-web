@@ -76,6 +76,7 @@ async function loadAppConfig() {
         renderBlogFromConfig();
         renderSingleArticleView();
         renderSiteFooterAndContactFromConfig();
+        renderContactPageFromConfig();
     } catch (err) {
         console.warn("Could not load app config, using defaults.", err);
         APP_CONFIG = { backend_port: 8010 };
@@ -617,35 +618,96 @@ function renderSiteFooterAndContactFromConfig() {
     if (!APP_CONFIG) return;
 
     if (APP_CONFIG.site_name) {
-        document.querySelectorAll(".brand-name").forEach(el => el.textContent = APP_CONFIG.site_name.toLowerCase());
+        document.querySelectorAll(".brand-name").forEach(el => el.textContent = APP_CONFIG.site_name.toUpperCase());
         document.querySelectorAll(".site-title-name").forEach(el => el.textContent = APP_CONFIG.site_name);
     }
 
-    const legalCol = document.querySelector(".footer-legal-col");
-    if (legalCol) {
-        if (APP_CONFIG.license_number) {
-            const licEl = legalCol.querySelector("p:nth-of-type(1)");
-            if (licEl) licEl.innerHTML = `<strong>Lic No:</strong> ${APP_CONFIG.license_number}`;
+    const fs = APP_CONFIG.footer_settings || {};
+    
+    // 1. Logo & Desc
+    const footerLogo = document.querySelector(".footer-logo svg, .footer-logo img");
+    const navLogo = document.querySelector(".nav-logo svg, .nav-logo img"); // Also target header logo
+
+    if (fs.logo) {
+        if (footerLogo) {
+            const logoParent = footerLogo.parentElement;
+            logoParent.innerHTML = `<img src="${fs.logo}" alt="Footer Logo" style="height: 45px; object-fit: contain;"> <span class="brand-name">${APP_CONFIG.site_name ? APP_CONFIG.site_name.toUpperCase() : 'SONRUP'}</span>`;
         }
-        if (APP_CONFIG.fssai_number) {
-            const fssaiEl = legalCol.querySelector("p:nth-of-type(2)");
-            if (fssaiEl) fssaiEl.innerHTML = `<strong>FSSAI:</strong> ${APP_CONFIG.fssai_number}`;
+        if (navLogo) {
+            const navParent = navLogo.parentElement;
+            navParent.innerHTML = `<img src="${fs.logo}" alt="Header Logo" style="height: 40px; object-fit: contain;"> <span class="brand-name">${APP_CONFIG.site_name ? APP_CONFIG.site_name.toUpperCase() : 'SONRUP'}</span>`;
+        }
+    }
+    const footerDesc = document.querySelector(".footer-desc");
+    if (footerDesc) footerDesc.textContent = fs.desc || "Premium natural wellness solutions. Empowering health, strength, and happiness across generations.";
+
+    // 2. Social Links
+    const socialLinks = document.querySelector(".social-links");
+    if (socialLinks) {
+        socialLinks.innerHTML = '';
+        if (fs.facebook) socialLinks.innerHTML += `<a href="${fs.facebook}" aria-label="Facebook" target="_blank"><i data-lucide="facebook"></i></a>`;
+        if (fs.instagram) socialLinks.innerHTML += `<a href="${fs.instagram}" aria-label="Instagram" target="_blank"><i data-lucide="instagram"></i></a>`;
+        if (fs.twitter) socialLinks.innerHTML += `<a href="${fs.twitter}" aria-label="Twitter" target="_blank"><i data-lucide="twitter"></i></a>`;
+        if (fs.whatsapp) socialLinks.innerHTML += `<a href="${fs.whatsapp}" aria-label="WhatsApp" target="_blank"><i data-lucide="phone-call"></i></a>`;
+        if (!fs.facebook && !fs.instagram && !fs.twitter && !fs.whatsapp) {
+            socialLinks.innerHTML = `
+                <a href="#" aria-label="Facebook"><i data-lucide="facebook"></i></a>
+                <a href="#" aria-label="Instagram"><i data-lucide="instagram"></i></a>
+                <a href="#" aria-label="Twitter"><i data-lucide="twitter"></i></a>
+            `;
         }
     }
 
+    // 3. Regulatory Info
+    const legalCol = document.querySelector(".footer-legal-col");
+    if (legalCol) {
+        legalCol.innerHTML = `
+            <h3>Regulatory Info</h3>
+            <p><strong>Lic No:</strong> ${fs.license || APP_CONFIG.license_number || "GA/646-A"}</p>
+            <p><strong>FSSAI:</strong> ${fs.fssai || APP_CONFIG.fssai_number || "10726997000544"}</p>
+            <p class="disclaimer">${fs.disclaimer || "Disclaimer: These products are nutraceuticals and not intended to diagnose, treat, cure, or prevent any disease."}</p>
+        `;
+    }
+
+    // 4. Contact & Manufacturing
+    const contactCol = document.querySelector(".footer-contact-col");
+    if (contactCol) {
+        const cs = APP_CONFIG.contact_settings || {};
+        const marketed = cs.hq || "SONRUP\\nA 584 Sitaram Society, Punagam Road,\\nSurat - 395010, Gujarat, India";
+        const manufactured = cs.lab || "KELLEN HEALTHCARE\\nGMP & ISO Certified Facility";
+        // Extract the first email from the newline-separated list
+        const emailStr = cs.emails || "vip-support@sonrup.com";
+        const firstEmail = emailStr.split('\\n')[0].trim();
+        const phone = cs.phone || "+91 88888 99999";
+
+        contactCol.innerHTML = `
+            <p><strong>Marketed By:</strong> ${marketed.replace(/\\n/g, '<br>')}</p>
+            <br>
+            <p><strong>Manufactured By:</strong> ${manufactured.replace(/\\n/g, '<br>')}</p>
+            <br>
+            <p class="contact-methods">
+                <span style="display: flex; align-items: center; gap: 8px;"><i data-lucide="mail"></i> <a href="mailto:${firstEmail}" style="color: inherit; text-decoration: none;">${firstEmail}</a></span>
+                <span style="display: flex; align-items: center; gap: 8px; margin-top: 5px;"><i data-lucide="phone"></i> <a href="tel:${phone.replace(/\\s+/g, '')}" style="color: inherit; text-decoration: none;">${phone}</a></span>
+            </p>
+        `;
+    }
+
+    // Update global support emails/phones everywhere else just in case
     const supportEmailElements = document.querySelectorAll(".contact-email-val, #footer-support-email");
     supportEmailElements.forEach(el => {
-        if (APP_CONFIG.support_email) {
-            el.textContent = APP_CONFIG.support_email;
-            if (el.tagName === 'A') el.href = `mailto:${APP_CONFIG.support_email}`;
+        const email = fs.email || APP_CONFIG.support_email;
+        if (email) {
+            el.textContent = email;
+            if (el.tagName === 'A') el.href = `mailto:${email}`;
         }
     });
 
     const supportPhoneElements = document.querySelectorAll(".contact-phone-val, #footer-support-phone");
     supportPhoneElements.forEach(el => {
-        if (APP_CONFIG.support_phone) {
-            el.textContent = APP_CONFIG.support_phone;
-            if (el.tagName === 'A') el.href = `tel:${APP_CONFIG.support_phone.replace(/\s+/g, '')}`;
+        const phone = fs.phone || APP_CONFIG.support_phone;
+        if (phone) {
+            el.textContent = phone;
+            if (el.tagName === 'A') el.href = `tel:${phone.replace(/\s+/g, '')}`;
         }
     });
 
@@ -653,7 +715,33 @@ function renderSiteFooterAndContactFromConfig() {
     supportAddrElements.forEach(el => {
         if (APP_CONFIG.support_address) el.textContent = APP_CONFIG.support_address;
     });
+
+    if (window.lucide && window.lucide.createIcons) {
+        window.lucide.createIcons();
+    }
 }
+
+function renderContactPageFromConfig() {
+    if (!APP_CONFIG || !APP_CONFIG.contact_settings) return;
+    const cs = APP_CONFIG.contact_settings;
+
+    const hqEl = document.getElementById("contact-hq-text");
+    if (hqEl && cs.hq) hqEl.innerHTML = cs.hq.replace(/\n/g, '<br>');
+
+    const labEl = document.getElementById("contact-lab-text");
+    if (labEl && cs.lab) labEl.innerHTML = cs.lab.replace(/\n/g, '<br>');
+
+    const emailsEl = document.getElementById("contact-emails-text");
+    if (emailsEl && cs.emails) emailsEl.innerHTML = cs.emails.replace(/\n/g, '<br>');
+
+    const phoneEl = document.getElementById("contact-phone-text");
+    if (phoneEl) {
+        const phone = cs.phone || APP_CONFIG.support_phone || "+91 76001 75193";
+        const hours = cs.hours || "Mon - Sat, 10:00 AM - 6:00 PM IST";
+        phoneEl.innerHTML = `${phone}<br>${hours}`;
+    }
+}
+
 
 function getApiBase() {
     if (!APP_CONFIG || !APP_CONFIG.backend_port) return "";
@@ -707,6 +795,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             renderBlogFromConfig();
             renderSingleArticleView();
             renderSiteFooterAndContactFromConfig();
+        renderContactPageFromConfig();
         } catch (e) {
             console.error("Error loading cached config", e);
         }
