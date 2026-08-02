@@ -1650,15 +1650,20 @@ document.addEventListener("DOMContentLoaded", async () => {
                             }
                         };
 
-                        if (window.Razorpay) {
+                        const isRealRazorpayKey = rzpOrderData.key_id && !rzpOrderData.key_id.includes("SampleKey123") && rzpOrderData.key_id.length > 15;
+
+                        if (window.Razorpay && isRealRazorpayKey) {
                             const rzpInstance = new window.Razorpay(options);
                             rzpInstance.open();
                         } else {
-                            options.handler({
-                                razorpay_order_id: rzpOrderData.razorpay_order_id,
-                                razorpay_payment_id: `pay_sim_${Date.now()}`,
-                                razorpay_signature: "simulated_sig"
-                            });
+                            showToast("Razorpay Test Mode", "Processing test payment authorization...");
+                            setTimeout(() => {
+                                options.handler({
+                                    razorpay_order_id: rzpOrderData.razorpay_order_id,
+                                    razorpay_payment_id: `pay_sim_${Date.now()}`,
+                                    razorpay_signature: "simulated_sig"
+                                });
+                            }, 800);
                         }
                         return;
                     }
@@ -1698,18 +1703,17 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
-    // "Buy Now" Button Actions
-    const buyNowButtons = document.querySelectorAll(".buy-now-btn");
-    buyNowButtons.forEach(btn => {
-        if (btn.dataset.eventBound === "true") return;
-        btn.dataset.eventBound = "true";
-        btn.addEventListener("click", (e) => {
+    // Global Event Delegation for "Buy Now" and "Add to Cart" Actions Across All Pages
+    document.addEventListener("click", (e) => {
+        const buyNowBtn = e.target.closest(".buy-now-btn");
+        if (buyNowBtn) {
+            e.preventDefault();
             e.stopPropagation();
-            const name = btn.getAttribute("data-name");
-            const price = parseInt(btn.getAttribute("data-price"));
-            const img = btn.getAttribute("data-img");
-            
-            // Add item to cart state, save cart, and redirect to checkout page instantly!
+
+            const name = buyNowBtn.getAttribute("data-name") || "Wellness Product";
+            const price = parseInt(buyNowBtn.getAttribute("data-price") || "999");
+            const img = buyNowBtn.getAttribute("data-img") || "assets/images/hero-combo.jpg";
+
             const existingItem = cart.find(item => item.name === name);
             if (existingItem) {
                 existingItem.quantity += 1;
@@ -1717,11 +1721,31 @@ document.addEventListener("DOMContentLoaded", async () => {
                 cart.push({ name, price, img, quantity: 1 });
             }
             saveCart();
-            window.location.href = "checkout.html";
-        });
+            renderCart();
+
+            showToast("Buy Now", `Added ${name} to your order. Redirecting to checkout...`);
+            setTimeout(() => {
+                window.location.href = "checkout.html";
+            }, 400);
+            return;
+        }
+
+        const addToCartBtn = e.target.closest(".add-to-cart-btn");
+        if (addToCartBtn) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const name = addToCartBtn.getAttribute("data-name") || "Wellness Product";
+            const price = parseInt(addToCartBtn.getAttribute("data-price") || "999");
+            const img = addToCartBtn.getAttribute("data-img") || "assets/images/hero-combo.jpg";
+
+            addItemToCart(name, price, img);
+            return;
+        }
     });
+
     // Catalog Page: Filtering, Sorting, and Search logic
-    if (window.location.pathname.includes("shop.html")) {
+    if (window.location.pathname.includes("shop") || document.getElementById("catalog-grid")) {
         const filterBtns = document.querySelectorAll(".filter-tab-btn");
         const searchInput = document.getElementById("catalog-search-input");
         const sortSelect = document.getElementById("catalog-sort-select");
@@ -1735,9 +1759,28 @@ document.addEventListener("DOMContentLoaded", async () => {
         const updateCatalog = () => {
             if (!catalogGrid) return;
 
-            const activeFilter = document.querySelector(".filter-tab-btn.active")?.getAttribute("data-filter") || "all";
-            const searchQuery = searchInput?.value.toLowerCase().trim() || "";
-            const currentSort = sortSelect?.value || "default";
+            const activeBtn = document.querySelector(".filter-tab-btn.active") || filterBtns[0];
+            const activeFilter = activeBtn ? activeBtn.getAttribute("data-filter") : "all";
+            const searchQuery = searchInput ? searchInput.value.toLowerCase().trim() : "";
+            const currentSort = sortSelect ? sortSelect.value : "default";
+
+            // Update Tab Button Highlight Styles visually
+            filterBtns.forEach(btn => {
+                const isCurrentActive = btn === activeBtn || btn.getAttribute("data-filter") === activeFilter;
+                if (isCurrentActive) {
+                    btn.classList.add("active");
+                    btn.style.backgroundColor = "var(--color-gold)";
+                    btn.style.color = "#121212";
+                    btn.style.borderColor = "var(--color-gold)";
+                    btn.style.fontWeight = "700";
+                } else {
+                    btn.classList.remove("active");
+                    btn.style.backgroundColor = "rgba(255, 255, 255, 0.03)";
+                    btn.style.color = "#FFFFFF";
+                    btn.style.borderColor = "rgba(255, 255, 255, 0.1)";
+                    btn.style.fontWeight = "normal";
+                }
+            });
 
             // Get cards list
             let cards = [...originalCardsOrder];
@@ -1758,26 +1801,37 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             // 3. Sort cards
             if (currentSort === "price-low") {
-                cards.sort((a, b) => parseInt(a.getAttribute("data-price")) - parseInt(b.getAttribute("data-price")));
+                cards.sort((a, b) => parseInt(a.getAttribute("data-price") || "0") - parseInt(b.getAttribute("data-price") || "0"));
             } else if (currentSort === "price-high") {
-                cards.sort((a, b) => parseInt(b.getAttribute("data-price")) - parseInt(a.getAttribute("data-price")));
+                cards.sort((a, b) => parseInt(b.getAttribute("data-price") || "0") - parseInt(a.getAttribute("data-price") || "0"));
             }
 
             // 4. Render back to grid
             catalogGrid.innerHTML = "";
+            if (cards.length === 0) {
+                catalogGrid.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: var(--text-on-dark-muted);">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#C9A227" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 12px; display: inline-block;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                        <p style="font-size: 16px; color: #FFFFFF; margin-bottom: 8px;">No products match your search or filter criteria.</p>
+                        <p style="font-size: 13.5px;">Try adjusting your filter tabs or search keywords.</p>
+                    </div>
+                `;
+                return;
+            }
+
             cards.forEach(card => {
-                // Ensure card remains visible/hidden correctly
                 card.style.display = "flex";
                 catalogGrid.appendChild(card);
             });
 
-            // Re-bind actions for newly arranged/rendered cards
-            bindProductCatalogEvents();
+            // Card click redirect for details
+            bindProductCardEvents(catalogGrid);
         };
 
         // Event listener bindings
         filterBtns.forEach(btn => {
-            btn.addEventListener("click", () => {
+            btn.addEventListener("click", (e) => {
+                e.preventDefault();
                 filterBtns.forEach(b => b.classList.remove("active"));
                 btn.classList.add("active");
                 updateCatalog();
@@ -1792,50 +1846,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             sortSelect.addEventListener("change", updateCatalog);
         }
 
-        // Re-bind cart & buy now actions for dynamically ordered items
-        const bindProductCatalogEvents = () => {
-            const addToCartBtns = catalogGrid.querySelectorAll(".add-to-cart-btn");
-            addToCartBtns.forEach(btn => {
-                if (btn.dataset.eventBound === "true") return;
-                btn.dataset.eventBound = "true";
-                
-                btn.addEventListener("click", (e) => {
-                    e.stopPropagation();
-                    const name = btn.getAttribute("data-name");
-                    const price = parseInt(btn.getAttribute("data-price"));
-                    const img = btn.getAttribute("data-img");
-                    addItemToCart(name, price, img);
-                });
-            });
-
-            const buyNowBtns = catalogGrid.querySelectorAll(".buy-now-btn");
-            buyNowBtns.forEach(btn => {
-                if (btn.dataset.eventBound === "true") return;
-                btn.dataset.eventBound = "true";
-                
-                btn.addEventListener("click", (e) => {
-                    e.stopPropagation();
-                    const name = btn.getAttribute("data-name");
-                    const price = parseInt(btn.getAttribute("data-price"));
-                    const img = btn.getAttribute("data-img");
-
-                    const existingItem = cart.find(item => item.name === name);
-                    if (existingItem) {
-                        existingItem.quantity += 1;
-                    } else {
-                        cart.push({ name, price, img, quantity: 1 });
-                    }
-                    saveCart();
-                    window.location.href = "checkout.html";
-                });
-            });
-
-            // Tap/click card to redirect or open combo details modal
-            bindProductCardEvents(catalogGrid);
-        };
-
-        // Initialize grid events on load
-        bindProductCatalogEvents();
+        // Initial setup run
+        updateCatalog();
     }
 
     // Reviews Carousel Logic
