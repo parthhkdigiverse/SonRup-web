@@ -51,9 +51,115 @@ async function loadAppConfig() {
             }
             banner.textContent = APP_CONFIG.announcement_banner_text;
         }
+
+        // Render dynamic Hero Section & Trust Badges from config on home page
+        renderHeroSectionFromConfig();
+        renderTrustBadgesFromConfig();
     } catch (err) {
         console.warn("Could not load app config, using defaults.", err);
         APP_CONFIG = { backend_port: 8010 };
+    }
+}
+
+function renderHeroSectionFromConfig() {
+    const heroSec = document.querySelector(".hero-section");
+    if (!heroSec || !APP_CONFIG) return;
+
+    // 1. Promo Badge
+    const badgeSpan = heroSec.querySelector(".promo-badge span");
+    if (badgeSpan && APP_CONFIG.hero_badge_text) {
+        badgeSpan.textContent = APP_CONFIG.hero_badge_text;
+    }
+
+    // 2. Title / Headline
+    const heroTitle = heroSec.querySelector(".hero-title");
+    if (heroTitle && APP_CONFIG.hero_title) {
+        heroTitle.innerHTML = APP_CONFIG.hero_title;
+    }
+
+    // 3. Subtitle / Description
+    const heroSubtitle = heroSec.querySelector(".hero-subtitle");
+    if (heroSubtitle && APP_CONFIG.hero_subtitle) {
+        heroSubtitle.textContent = APP_CONFIG.hero_subtitle;
+    }
+
+    // 4. Primary CTA Button
+    const heroCtaBtn = heroSec.querySelector("#hero-cta-btn");
+    if (heroCtaBtn) {
+        const ctaSpan = heroCtaBtn.querySelector("span");
+        if (ctaSpan && APP_CONFIG.hero_cta_text) ctaSpan.textContent = APP_CONFIG.hero_cta_text;
+        if (APP_CONFIG.hero_cta_link) heroCtaBtn.setAttribute("href", APP_CONFIG.hero_cta_link);
+    }
+
+    // 5. Sub-Trust Points
+    const trustSpans = heroSec.querySelectorAll(".hero-trust span");
+    if (trustSpans && trustSpans.length >= 2) {
+        if (APP_CONFIG.hero_trust_1) {
+            trustSpans[0].innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C9A227" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gold" style="vertical-align: middle; margin-right: 4px;"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.8 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg> ${APP_CONFIG.hero_trust_1}`;
+        }
+        if (APP_CONFIG.hero_trust_2) {
+            trustSpans[1].innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px;"><rect width="1" height="1"/><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.62l-3.23-4.11a1 1 0 0 0-.77-.37H15"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg> ${APP_CONFIG.hero_trust_2}`;
+        }
+    }
+
+    // 6. Hero Image
+    const heroImg = heroSec.querySelector("#hero-image");
+    if (heroImg && APP_CONFIG.hero_image_path) {
+        heroImg.src = APP_CONFIG.hero_image_path;
+    }
+
+    // 7. Floating Badges
+    const badgeShilajit = heroSec.querySelector(".shilajit-badge");
+    if (badgeShilajit && APP_CONFIG.hero_float_badge_1) {
+        badgeShilajit.innerHTML = `<span class="dot gold-dot"></span> ${APP_CONFIG.hero_float_badge_1}`;
+    }
+
+    const badgeBiotin = heroSec.querySelector(".biotin-badge");
+    if (badgeBiotin && APP_CONFIG.hero_float_badge_2) {
+        badgeBiotin.innerHTML = `<span class="dot orange-dot"></span> ${APP_CONFIG.hero_float_badge_2}`;
+    }
+
+    const badgeKids = heroSec.querySelector(".kids-badge");
+    if (badgeKids && APP_CONFIG.hero_float_badge_3) {
+        badgeKids.innerHTML = `<span class="dot blue-dot"></span> ${APP_CONFIG.hero_float_badge_3}`;
+    }
+}
+
+function renderTrustBadgesFromConfig() {
+    const trustStrip = document.getElementById("trust-strip");
+    if (!trustStrip || !APP_CONFIG) return;
+
+    const trustContainer = trustStrip.querySelector(".trust-container");
+    if (!trustContainer) return;
+
+    const badges = (APP_CONFIG.trust_badges && APP_CONFIG.trust_badges.length > 0) ? APP_CONFIG.trust_badges : [
+        { icon: "ban", title: "Sugar Free", subtitle: "No Added Sugar" },
+        { icon: "droplet-off", title: "No Artificial Color", subtitle: "100% Safe Formulas" },
+        { icon: "apple", title: "Natural Fruit Flavor", subtitle: "Imli, Citrus & Mixed Fruit" },
+        { icon: "shield-check", title: "FSSAI Licensed", subtitle: "Regulated Quality" },
+        { icon: "calendar", title: "36-Month Shelf Life", subtitle: "Long-Lasting Freshness" },
+        { icon: "map-pin", title: "Made in India", subtitle: "Kellen Healthcare" }
+    ];
+
+    trustContainer.innerHTML = badges.map(b => {
+        let iconMarkup = `<i data-lucide="${b.icon || 'shield-check'}"></i>`;
+        if (b.title && b.title.toUpperCase().includes("FSSAI")) {
+            iconMarkup = `<span class="badge-text">FSSAI</span>`;
+        }
+
+        return `
+            <div class="trust-item">
+                <div class="trust-icon">${iconMarkup}</div>
+                <div class="trust-text">
+                    <h4>${b.title || ''}</h4>
+                    <p>${b.subtitle || ''}</p>
+                </div>
+            </div>
+        `;
+    }).join("");
+
+    if (window.lucide) {
+        window.lucide.createIcons();
     }
 }
 
@@ -1620,8 +1726,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             window.location.href = "checkout.html";
         });
     });
-    // Catalog Page: Filtering, Sorting, and Search logic
-    if (window.location.pathname.includes("shop.html")) {
+    // Catalog Page: Dynamic API Product Sync, Filtering, Sorting, and Search logic
+    if (window.location.pathname.includes("shop") || document.getElementById("catalog-grid")) {
         const filterBtns = document.querySelectorAll(".filter-tab-btn");
         const searchInput = document.getElementById("catalog-search-input");
         const sortSelect = document.getElementById("catalog-sort-select");
@@ -1635,16 +1741,45 @@ document.addEventListener("DOMContentLoaded", async () => {
         const updateCatalog = () => {
             if (!catalogGrid) return;
 
-            const activeFilter = document.querySelector(".filter-tab-btn.active")?.getAttribute("data-filter") || "all";
-            const searchQuery = searchInput?.value.toLowerCase().trim() || "";
-            const currentSort = sortSelect?.value || "default";
+            const activeBtn = document.querySelector(".filter-tab-btn.active") || filterBtns[0];
+            const activeFilter = activeBtn ? (activeBtn.getAttribute("data-filter") || "all") : "all";
+            const searchQuery = searchInput ? searchInput.value.toLowerCase().trim() : "";
+            const currentSort = sortSelect ? sortSelect.value : "default";
+
+            // Update Tab Button Highlight Styles visually
+            filterBtns.forEach(btn => {
+                const filterVal = btn.getAttribute("data-filter");
+                const isCurrentActive = btn === activeBtn || filterVal === activeFilter;
+                if (isCurrentActive) {
+                    btn.classList.add("active");
+                    btn.style.backgroundColor = "var(--color-gold)";
+                    btn.style.color = "#121212";
+                    btn.style.borderColor = "var(--color-gold)";
+                    btn.style.fontWeight = "700";
+                } else {
+                    btn.classList.remove("active");
+                    btn.style.backgroundColor = "rgba(255, 255, 255, 0.03)";
+                    btn.style.color = "#FFFFFF";
+                    btn.style.borderColor = "rgba(255, 255, 255, 0.1)";
+                    btn.style.fontWeight = "normal";
+                }
+            });
 
             // Get cards list
             let cards = [...originalCardsOrder];
 
-            // 1. Filter by category
+            // 1. Filter by category (handles "singles"/"single" & "combos"/"combo")
             if (activeFilter !== "all") {
-                cards = cards.filter(card => card.getAttribute("data-type") === activeFilter);
+                cards = cards.filter(card => {
+                    const cardType = (card.getAttribute("data-type") || "").toLowerCase();
+                    if (activeFilter === "singles") {
+                        return cardType === "singles" || cardType === "single";
+                    }
+                    if (activeFilter === "combos") {
+                        return cardType === "combos" || cardType === "combo";
+                    }
+                    return cardType === activeFilter;
+                });
             }
 
             // 2. Filter by search query
@@ -1658,26 +1793,37 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             // 3. Sort cards
             if (currentSort === "price-low") {
-                cards.sort((a, b) => parseInt(a.getAttribute("data-price")) - parseInt(b.getAttribute("data-price")));
+                cards.sort((a, b) => parseInt(a.getAttribute("data-price") || "0") - parseInt(b.getAttribute("data-price") || "0"));
             } else if (currentSort === "price-high") {
-                cards.sort((a, b) => parseInt(b.getAttribute("data-price")) - parseInt(a.getAttribute("data-price")));
+                cards.sort((a, b) => parseInt(b.getAttribute("data-price") || "0") - parseInt(a.getAttribute("data-price") || "0"));
             }
 
             // 4. Render back to grid
             catalogGrid.innerHTML = "";
+            if (cards.length === 0) {
+                catalogGrid.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: var(--text-on-dark-muted);">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#C9A227" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 12px; display: inline-block;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                        <p style="font-size: 16px; color: #FFFFFF; margin-bottom: 8px;">No products match your search or filter criteria.</p>
+                        <p style="font-size: 13.5px;">Try adjusting your filter tabs or search keywords.</p>
+                    </div>
+                `;
+                return;
+            }
+
             cards.forEach(card => {
-                // Ensure card remains visible/hidden correctly
                 card.style.display = "flex";
                 catalogGrid.appendChild(card);
             });
 
-            // Re-bind actions for newly arranged/rendered cards
-            bindProductCatalogEvents();
+            // Card click redirect for details
+            bindProductCardEvents(catalogGrid);
         };
 
         // Event listener bindings
         filterBtns.forEach(btn => {
-            btn.addEventListener("click", () => {
+            btn.addEventListener("click", (e) => {
+                e.preventDefault();
                 filterBtns.forEach(b => b.classList.remove("active"));
                 btn.classList.add("active");
                 updateCatalog();
@@ -1692,50 +1838,71 @@ document.addEventListener("DOMContentLoaded", async () => {
             sortSelect.addEventListener("change", updateCatalog);
         }
 
-        // Re-bind cart & buy now actions for dynamically ordered items
-        const bindProductCatalogEvents = () => {
-            const addToCartBtns = catalogGrid.querySelectorAll(".add-to-cart-btn");
-            addToCartBtns.forEach(btn => {
-                if (btn.dataset.eventBound === "true") return;
-                btn.dataset.eventBound = "true";
-                
-                btn.addEventListener("click", (e) => {
-                    e.stopPropagation();
-                    const name = btn.getAttribute("data-name");
-                    const price = parseInt(btn.getAttribute("data-price"));
-                    const img = btn.getAttribute("data-img");
-                    addItemToCart(name, price, img);
-                });
-            });
+        // Fetch products directly from API matching Admin Panel CRUD and render live
+        const loadCatalogFromApi = async () => {
+            try {
+                const res = await fetch(`${getApiBase()}/api/products`);
+                if (!res.ok) return;
+                const apiProducts = await res.json();
 
-            const buyNowBtns = catalogGrid.querySelectorAll(".buy-now-btn");
-            buyNowBtns.forEach(btn => {
-                if (btn.dataset.eventBound === "true") return;
-                btn.dataset.eventBound = "true";
-                
-                btn.addEventListener("click", (e) => {
-                    e.stopPropagation();
-                    const name = btn.getAttribute("data-name");
-                    const price = parseInt(btn.getAttribute("data-price"));
-                    const img = btn.getAttribute("data-img");
+                if (apiProducts && apiProducts.length > 0) {
+                    catalogGrid.innerHTML = "";
 
-                    const existingItem = cart.find(item => item.name === name);
-                    if (existingItem) {
-                        existingItem.quantity += 1;
-                    } else {
-                        cart.push({ name, price, img, quantity: 1 });
-                    }
-                    saveCart();
-                    window.location.href = "checkout.html";
-                });
-            });
+                    apiProducts.forEach(prod => {
+                        const card = document.createElement("div");
+                        const pType = (prod.product_type === "single" || prod.product_type === "singles") ? "singles" : "combos";
+                        const img = (prod.images && prod.images.length > 0) ? prod.images[0] : "assets/images/hero-combo.jpg";
+                        const tagClass = prod.tag_class || (pType === "combos" ? "tag-combo" : "tag-him");
 
-            // Tap/click card to redirect or open combo details modal
-            bindProductCardEvents(catalogGrid);
+                        card.className = `product-card ${pType === "combos" ? "card-combo" : ("card-" + prod.slug)}`;
+                        card.setAttribute("data-type", pType);
+                        card.setAttribute("data-price", prod.price);
+                        card.setAttribute("data-name", prod.name);
+                        card.style.display = "flex";
+                        card.style.flexDirection = "column";
+
+                        const benefitsHtml = (prod.benefits || []).slice(0, 3).map(b => `
+                            <li><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C9A227" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gold" style="vertical-align: middle; margin-right: 6px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> ${b}</li>
+                        `).join("");
+
+                        card.innerHTML = `
+                            <div class="card-accent-line"></div>
+                            <div class="product-img-holder">
+                                <img src="${img}" alt="${prod.name}">
+                                <span class="product-tag ${tagClass}">${prod.tag || 'Wellness'}</span>
+                            </div>
+                            <div class="product-card-body" style="display: flex; flex-direction: column; flex-grow: 1; padding: 24px; height: 100%;">
+                                <h3>${prod.name}</h3>
+                                <p class="flavor-info"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> ${prod.flavor || 'Natural Flavor'}</p>
+                                <p class="product-summary">${prod.description || ''}</p>
+                                <ul class="benefit-bullets" style="margin-bottom: 20px;">
+                                    ${benefitsHtml}
+                                </ul>
+                                <div class="product-card-footer" style="display: flex; flex-direction: column; gap: 10px; border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 16px; margin-top: auto; width: 100%;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                                        <span class="qty-info">60 Gummies</span>
+                                        <span class="price-info" style="font-family: var(--font-heading); font-weight: 700; color: #FFFFFF; font-size: 18px;">₹${prod.price.toLocaleString('en-IN')}</span>
+                                    </div>
+                                    <div style="display: flex; gap: 8px; width: 100%;">
+                                        <button class="btn-secondary add-to-cart-btn" data-name="${prod.name}" data-price="${prod.price}" data-img="${img}" style="flex: 1; padding: 8px; font-size: 11px; justify-content: center;">Add to Cart</button>
+                                        <button class="btn-primary buy-now-btn" data-name="${prod.name}" data-price="${prod.price}" data-img="${img}" style="flex: 1.2; padding: 8px; font-size: 11px; justify-content: center;">Buy Now</button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+
+                        catalogGrid.appendChild(card);
+                    });
+
+                    originalCardsOrder = Array.from(catalogGrid.querySelectorAll(".product-card"));
+                    updateCatalog();
+                }
+            } catch (e) {
+                console.error("Error loading products from API:", e);
+            }
         };
 
-        // Initialize grid events on load
-        bindProductCatalogEvents();
+        loadCatalogFromApi();
     }
 
     // Reviews Carousel Logic

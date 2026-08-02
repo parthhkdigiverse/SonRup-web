@@ -26,16 +26,23 @@ document.addEventListener("DOMContentLoaded", async () => {
         window.lucide.createIcons();
     }
 
-    // 3. Authenticate & Verify Admin Status
+    // 3. Setup Listeners & INSTANTLY Restore Active Page before network requests!
+    setupEventListeners();
+    restoreActiveTab();
+
+    // 4. Authenticate & Verify Admin Status
     const token = localStorage.getItem("sonrup_token") || localStorage.getItem("access_token") || localStorage.getItem("auth_token") || localStorage.getItem("token");
     if (!token) {
         showAdminLoginScreen();
-        setupEventListeners();
         return;
     }
 
     await initDashboard();
-    setupEventListeners();
+});
+
+// Also listen for browser back/forward navigation or hash changes
+window.addEventListener("hashchange", () => {
+    restoreActiveTab();
 });
 
 
@@ -53,24 +60,56 @@ function getHeaders(isJson = true) {
 
 
 /**
- * Toast Notification Popup
+ * Toast Notification Popup (Fixed Simple Top-Right Corner)
  */
 function showToast(message, isError = false) {
-    const toast = document.getElementById("admin-toast");
-    const icon = document.getElementById("toast-icon");
-    const msg = document.getElementById("toast-msg");
+    let toast = document.getElementById("admin-toast");
+    if (!toast) {
+        toast = document.createElement("div");
+        toast.id = "admin-toast";
+        toast.style.position = "fixed";
+        toast.style.top = "24px";
+        toast.style.right = "24px";
+        toast.style.left = "auto";
+        toast.style.bottom = "auto";
+        toast.style.zIndex = "999999";
+        toast.style.background = "rgba(18, 18, 18, 0.95)";
+        toast.style.color = "#ffffff";
+        toast.style.padding = "14px 22px";
+        toast.style.borderRadius = "10px";
+        toast.style.border = "1px solid rgba(201, 162, 39, 0.4)";
+        toast.style.borderLeft = `4px solid ${isError ? "#ef4444" : "#C9A227"}`;
+        toast.style.boxShadow = "0 10px 30px rgba(0, 0, 0, 0.5), 0 0 12px rgba(201, 162, 39, 0.25)";
+        toast.style.fontFamily = "'Outfit', sans-serif";
+        toast.style.fontSize = "13.5px";
+        toast.style.fontWeight = "600";
+        toast.style.display = "flex";
+        toast.style.alignItems = "center";
+        toast.style.gap = "10px";
+        toast.style.backdropFilter = "blur(10px)";
+        toast.style.transition = "all 0.35s cubic-bezier(0.16, 1, 0.3, 1)";
+        toast.style.opacity = "0";
+        toast.style.transform = "translateX(40px)";
+        
+        toast.innerHTML = `<i data-lucide="${isError ? 'alert-circle' : 'check-circle'}" style="width: 18px; height: 18px; color: ${isError ? '#ef4444' : '#C9A227'}; flex-shrink: 0;"></i><span id="toast-msg"></span>`;
+        document.body.appendChild(toast);
+    }
 
+    const msg = toast.querySelector("#toast-msg") || toast;
     msg.textContent = message;
     toast.style.borderLeftColor = isError ? "#ef4444" : "#C9A227";
-    toast.classList.add("show");
+    toast.style.opacity = "1";
+    toast.style.transform = "translateX(0)";
 
     if (window.lucide) {
         window.lucide.createIcons();
     }
 
-    setTimeout(() => {
-        toast.classList.remove("show");
-    }, 3800);
+    if (window.toastTimeout) clearTimeout(window.toastTimeout);
+    window.toastTimeout = setTimeout(() => {
+        toast.style.opacity = "0";
+        toast.style.transform = "translateX(40px)";
+    }, 3200);
 }
 
 
@@ -89,6 +128,10 @@ async function initDashboard() {
         loadUsers(),
         loadCoupons()
     ]);
+    
+    // Restore exact active tab & step on refresh
+    restoreActiveTab();
+
     showToast("✅ Admin Dashboard fully synchronized.");
 }
 
@@ -184,10 +227,7 @@ window.openEditModal = (slug) => {
     document.getElementById("prod-price").value = prod.price;
     document.getElementById("prod-flavor").value = prod.flavor || "";
     document.getElementById("prod-tag").value = prod.tag || "Adult Performance";
-    document.getElementById("prod-tag-class").value = prod.tag_class || "tag-shilajit";
     document.getElementById("prod-description").value = prod.description || "";
-    const variantLines = (prod.variants || []).map(v => `${v.name} - ${v.price}`).join("\n");
-    document.getElementById("prod-variants").value = variantLines;
     document.getElementById("prod-benefits").value = (prod.benefits || []).join("\n");
     document.getElementById("prod-image-path").value = (prod.images && prod.images[0]) ? prod.images[0] : "assets/images/hero-combo.jpg";
     document.getElementById("prod-image-file").value = "";
@@ -326,19 +366,130 @@ async function loadSettings() {
         document.getElementById("setting-razorpay-key-id").value = data.razorpay_key_id || "";
         document.getElementById("setting-razorpay-key-secret").value = data.razorpay_key_secret || "";
         
-        // Delhivery
-        document.getElementById("setting-delhivery-enabled").value = data.delhivery_enabled === true ? "true" : "false";
-        document.getElementById("setting-delhivery-environment").value = data.delhivery_environment || "staging";
-        document.getElementById("setting-delhivery-api-token").value = data.delhivery_api_token || "";
-        document.getElementById("setting-delhivery-warehouse-name").value = data.delhivery_warehouse_name || "";
-        document.getElementById("setting-delhivery-warehouse-address").value = data.delhivery_warehouse_address || "";
-        document.getElementById("setting-delhivery-warehouse-city").value = data.delhivery_warehouse_city || "";
-        document.getElementById("setting-delhivery-warehouse-state").value = data.delhivery_warehouse_state || "";
-        document.getElementById("setting-delhivery-warehouse-pincode").value = data.delhivery_warehouse_pincode || "";
-        document.getElementById("setting-delhivery-warehouse-phone").value = data.delhivery_warehouse_phone || "";
+        // Hero Section
+        document.getElementById("setting-hero-badge").value = data.hero_badge_text || "PREMIUM NATURAL WELLNESS";
+        
+        // Clean Plain Text Titles (No raw HTML tags in inputs)
+        const mainTitle = data.hero_title_main || "Premium Gummies for";
+        const goldTitle = data.hero_title_gold || "Active Health & Beauty.";
+        document.getElementById("setting-hero-title-main").value = mainTitle;
+        document.getElementById("setting-hero-title-gold").value = goldTitle;
+        
+        document.getElementById("setting-hero-subtitle").value = data.hero_subtitle || "Sugar-free, clinical-grade formulations crafted to fuel adult performance, daily glow, and kids' active growth. Experience modern Ayurveda and advanced science combined.";
+        document.getElementById("setting-hero-cta-text").value = data.hero_cta_text || "Explore Collection";
+        document.getElementById("setting-hero-cta-link").value = data.hero_cta_link || "/shop";
+        document.getElementById("setting-hero-trust1").value = data.hero_trust_1 || "100% Sugar-Free & Safe";
+        document.getElementById("setting-hero-trust2").value = data.hero_trust_2 || "Free Shipping India-Wide";
+        document.getElementById("setting-hero-float1").value = data.hero_float_badge_1 || "Adult Performance";
+        document.getElementById("setting-hero-float2").value = data.hero_float_badge_2 || "Beauty & Energy";
+        document.getElementById("setting-hero-float3").value = data.hero_float_badge_3 || "Kids' Immunity";
+        
+        const imgPath = data.hero_image_path || "assets/images/hero-combo.jpg";
+        document.getElementById("setting-hero-image-path").value = imgPath;
+        const previewImg = document.getElementById("setting-hero-image-preview");
+        if (previewImg) previewImg.src = imgPath;
+
+        // Dynamic Trust Badges Section
+        currentTrustBadges = (data.trust_badges && data.trust_badges.length > 0) ? data.trust_badges : [
+            { id: "tb_1", icon: "ban", title: "Sugar Free", subtitle: "No Added Sugar" },
+            { id: "tb_2", icon: "droplet-off", title: "No Artificial Color", subtitle: "100% Safe Formulas" },
+            { id: "tb_3", icon: "apple", title: "Natural Fruit Flavor", subtitle: "Imli, Citrus & Mixed Fruit" },
+            { id: "tb_4", icon: "shield-check", title: "FSSAI Licensed", subtitle: "Regulated Quality" },
+            { id: "tb_5", icon: "calendar", title: "36-Month Shelf Life", subtitle: "Long-Lasting Freshness" },
+            { id: "tb_6", icon: "map-pin", title: "Made in India", subtitle: "Kellen Healthcare" }
+        ];
+        renderTrustBadgesCRUD();
     } catch (e) {
         console.error("Error loading settings:", e);
     }
+}
+
+let currentTrustBadges = [];
+
+/**
+ * Render Dynamic Trust Badges CRUD Items
+ */
+function renderTrustBadgesCRUD() {
+    const container = document.getElementById("trust-badges-list-container");
+    if (!container) return;
+
+    if (!currentTrustBadges || currentTrustBadges.length === 0) {
+        container.innerHTML = `
+            <div style="text-align: center; padding: 30px; background: rgba(255,255,255,0.02); border: 1px dashed rgba(255,255,255,0.1); border-radius: 10px; color: #94a3b8;">
+                <p style="margin: 0; font-size: 14px;">No trust badges currently configured. Click <strong>+ Add New Trust Badge</strong> to create one.</p>
+            </div>
+        `;
+        return;
+    }
+
+    const availableIcons = [
+        { value: "ban", label: "🚫 Ban / Sugar-Free" },
+        { value: "droplet-off", label: "💧 Droplet-Off / No Color" },
+        { value: "apple", label: "🍎 Apple / Fruit Flavor" },
+        { value: "shield-check", label: "🛡️ Shield / FSSAI Quality" },
+        { value: "calendar", label: "📅 Calendar / Shelf Life" },
+        { value: "map-pin", label: "📍 Map Pin / Made in India" },
+        { value: "truck", label: "🚚 Truck / Express Delivery" },
+        { value: "award", label: "🏆 Award / Certified" },
+        { value: "heart", label: "❤️ Heart / Wellness" },
+        { value: "zap", label: "⚡ Zap / Energy" },
+        { value: "check-circle", label: "✅ Checkmark / Approved" },
+        { value: "sparkles", label: "✨ Sparkles / Premium" },
+        { value: "leaf", label: "🌿 Leaf / 100% Herbal" }
+    ];
+
+    container.innerHTML = currentTrustBadges.map((badge, idx) => {
+        const iconOptionsHTML = availableIcons.map(ic => 
+            `<option value="${ic.value}" ${ic.value === (badge.icon || 'shield-check') ? 'selected' : ''}>${ic.label}</option>`
+        ).join("");
+
+        return `
+            <div class="glass-panel trust-badge-item-card" data-badge-id="${badge.id || ('tb_' + idx)}" style="padding: 18px 20px; border: 1px solid rgba(201,162,39,0.25); border-radius: 12px; background: rgba(20, 24, 32, 0.6); display: flex; flex-direction: column; gap: 14px; position: relative;">
+                <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 10px;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span style="width: 28px; height: 28px; border-radius: 50%; background: rgba(201,162,39,0.15); border: 1px solid #C9A227; color: #E5C365; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800;">${idx + 1}</span>
+                        <h4 style="margin: 0; font-family: 'Outfit', sans-serif; font-size: 15px; color: #fff; font-weight: 600;">Trust Indicator #${idx + 1}</h4>
+                    </div>
+                    <button type="button" class="btn-action btn-danger delete-trust-badge-btn" data-index="${idx}" title="Delete Trust Badge" style="padding: 7px 10px; font-size: 12px; border-radius: 8px; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); color: #f87171; cursor: pointer; display: inline-flex; align-items: center; justify-content: center;">
+                        <i data-lucide="trash-2" style="width: 16px; height: 16px;"></i>
+                    </button>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1.5fr 1.5fr; gap: 16px; align-items: center;">
+                    <div class="form-group" style="margin: 0;">
+                        <label class="form-label" style="font-size: 11px; color: #94a3b8; text-transform: uppercase;">Select Icon</label>
+                        <select class="form-input trust-badge-icon-input" data-index="${idx}" style="padding: 9px 12px; font-size: 13px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15); color: #fff; border-radius: 8px; cursor: pointer;">
+                            ${iconOptionsHTML}
+                        </select>
+                    </div>
+
+                    <div class="form-group" style="margin: 0;">
+                        <label class="form-label" style="font-size: 11px; color: #94a3b8; text-transform: uppercase;">Headline Title</label>
+                        <input type="text" class="form-input trust-badge-title-input" data-index="${idx}" value="${(badge.title || '').replace(/"/g, '&quot;')}" placeholder="e.g. SUGAR FREE" style="padding: 9px 12px; font-size: 13px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15); color: #fff; border-radius: 8px;">
+                    </div>
+
+                    <div class="form-group" style="margin: 0;">
+                        <label class="form-label" style="font-size: 11px; color: #94a3b8; text-transform: uppercase;">Subtitle Copy</label>
+                        <input type="text" class="form-input trust-badge-sub-input" data-index="${idx}" value="${(badge.subtitle || '').replace(/"/g, '&quot;')}" placeholder="e.g. No Added Sugar" style="padding: 9px 12px; font-size: 13px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15); color: #fff; border-radius: 8px;">
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join("");
+
+    if (window.lucide) window.lucide.createIcons();
+
+    // Attach Delete Event Listeners
+    container.querySelectorAll(".delete-trust-badge-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const idx = parseInt(btn.dataset.index);
+            if (confirm(`Delete trust badge #${idx + 1}?`)) {
+                currentTrustBadges.splice(idx, 1);
+                renderTrustBadgesCRUD();
+                showToast("🗑️ Trust badge deleted from list.");
+            }
+        });
+    });
 }
 
 
@@ -501,6 +652,96 @@ window.toggleUserRole = async (userId, makeAdmin) => {
 
 
 /**
+ * Tab & Step Navigation State Persister (Remembers tab instantly on page refresh)
+ */
+function activateAdminTab(targetId, stepNum = null) {
+    if (!targetId || !document.getElementById(targetId)) return;
+
+    localStorage.setItem("sonrup_admin_active_tab", targetId);
+    sessionStorage.setItem("sonrup_admin_active_tab", targetId);
+    if (stepNum) {
+        localStorage.setItem("sonrup_admin_active_step", stepNum);
+        sessionStorage.setItem("sonrup_admin_active_step", stepNum);
+    }
+
+    const hashVal = stepNum ? `${targetId}?step=${stepNum}` : targetId;
+    if (window.history && window.history.replaceState) {
+        window.history.replaceState(null, "", `#${hashVal}`);
+    } else {
+        window.location.hash = hashVal;
+    }
+
+    document.querySelectorAll(".admin-section").forEach(sec => sec.classList.remove("active"));
+    document.getElementById(targetId)?.classList.add("active");
+
+    document.querySelectorAll(".sidebar-tab").forEach(t => t.classList.remove("active"));
+
+    if (targetId === "section-site-builder") {
+        const toggleSettingsBtn = document.getElementById("toggle-site-settings-menu");
+        const settingsSubmenu = document.getElementById("site-settings-submenu");
+        const settingsArrow = document.getElementById("site-settings-arrow");
+
+        toggleSettingsBtn?.classList.add("active");
+        if (settingsSubmenu) settingsSubmenu.style.display = "block";
+        if (settingsArrow) settingsArrow.style.transform = "rotate(180deg)";
+
+        const activeStep = stepNum || localStorage.getItem("sonrup_admin_active_step") || sessionStorage.getItem("sonrup_admin_active_step") || "2";
+        document.querySelectorAll(".builder-step-btn").forEach(b => {
+            const isTarget = b.dataset.step === activeStep;
+            b.classList.toggle("active", isTarget);
+            b.style.background = isTarget ? "rgba(201,162,39,0.12)" : "none";
+            b.style.border = isTarget ? "1px solid rgba(201,162,39,0.3)" : "none";
+            b.style.color = isTarget ? "#ffffff" : "#94a3b8";
+            b.style.fontWeight = isTarget ? "700" : "400";
+
+            const circle = b.querySelector(".subtab-step-num");
+            if (circle) {
+                circle.style.background = isTarget ? "#2b231c" : "#1a1a1a";
+                circle.style.borderColor = isTarget ? "#C9A227" : "rgba(255, 255, 255, 0.2)";
+                circle.style.color = isTarget ? "#E5C365" : "#94a3b8";
+                circle.style.boxShadow = isTarget ? "0 0 8px rgba(201,162,39,0.4)" : "none";
+            }
+        });
+
+        document.querySelectorAll(".builder-step-panel").forEach(p => p.style.display = "none");
+        const targetPanel = document.getElementById(`builder-step-${activeStep}`);
+        if (targetPanel) targetPanel.style.display = "block";
+    } else {
+        const activeTabBtn = document.querySelector(`.sidebar-tab[data-target="${targetId}"]`);
+        activeTabBtn?.classList.add("active");
+    }
+
+    // Clean up pre-render instant style after activating classes
+    const tempStyle = document.getElementById("instant-tab-style");
+    if (tempStyle) tempStyle.remove();
+}
+
+function restoreActiveTab() {
+    let targetTab = null;
+    let targetStep = null;
+
+    if (window.location.hash) {
+        const rawHash = window.location.hash.replace("#", "");
+        if (rawHash.includes("?step=")) {
+            const parts = rawHash.split("?step=");
+            targetTab = parts[0];
+            targetStep = parts[1];
+        } else {
+            targetTab = rawHash;
+        }
+    }
+
+    if (!targetTab || !document.getElementById(targetTab)) {
+        targetTab = localStorage.getItem("sonrup_admin_active_tab") || sessionStorage.getItem("sonrup_admin_active_tab") || "section-overview";
+    }
+    if (!targetStep) {
+        targetStep = localStorage.getItem("sonrup_admin_active_step") || sessionStorage.getItem("sonrup_admin_active_step") || "2";
+    }
+
+    activateAdminTab(targetTab, targetStep);
+}
+
+/**
  * Event Listeners & Interactive Modals Setup
  */
 function setupEventListeners() {
@@ -508,12 +749,10 @@ function setupEventListeners() {
     const tabs = document.querySelectorAll(".sidebar-tab");
     tabs.forEach(tab => {
         tab.addEventListener("click", () => {
-            tabs.forEach(t => t.classList.remove("active"));
-            tab.classList.add("active");
-
             const targetId = tab.getAttribute("data-target");
-            document.querySelectorAll(".admin-section").forEach(sec => sec.classList.remove("active"));
-            document.getElementById(targetId).classList.add("active");
+            if (targetId) {
+                activateAdminTab(targetId);
+            }
         });
     });
 
@@ -620,22 +859,6 @@ function setupEventListeners() {
         const benefitsText = document.getElementById("prod-benefits").value.trim();
         const benefitsArray = benefitsText ? benefitsText.split("\n").map(line => line.trim()).filter(Boolean) : [];
 
-        // Parse Variants Textarea
-        const variantsText = (document.getElementById("prod-variants")?.value || "").trim();
-        const variantsArray = [];
-        if (variantsText) {
-            variantsText.split("\n").forEach(line => {
-                const parts = line.split(/[-:]/);
-                if (parts.length >= 2) {
-                    const vName = parts[0].trim();
-                    const vPrice = parseInt(parts[1].trim()) || 0;
-                    if (vName && vPrice > 0) {
-                        variantsArray.push({ name: vName, price: vPrice, sku: "", in_stock: true });
-                    }
-                }
-            });
-        }
-
         const payload = {
             name: document.getElementById("prod-name").value.trim(),
             tag: document.getElementById("prod-tag").value.trim(),
@@ -643,10 +866,10 @@ function setupEventListeners() {
             price: parseInt(document.getElementById("prod-price").value) || 999,
             description: document.getElementById("prod-description").value.trim(),
             benefits: benefitsArray,
-            variants: variantsArray,
+            variants: [],
             images: [imagePath],
-            tag_class: document.getElementById("prod-tag-class").value,
-            product_type: "single"
+            tag_class: "tag-shilajit",
+            product_type: document.getElementById("prod-type") ? document.getElementById("prod-type").value : "singles"
         };
 
         try {
@@ -718,6 +941,183 @@ function setupEventListeners() {
             showToast("🌟 Website Configuration successfully published across the live site!");
         } catch (err) {
             showToast("Failed to save website settings.", true);
+        }
+    });
+
+    // Collapsible Site Settings Submenu Toggle Handler
+    const toggleSettingsBtn = document.getElementById("toggle-site-settings-menu");
+    const settingsSubmenu = document.getElementById("site-settings-submenu");
+    const settingsArrow = document.getElementById("site-settings-arrow");
+
+    if (toggleSettingsBtn && settingsSubmenu) {
+        toggleSettingsBtn.addEventListener("click", () => {
+            const isHidden = settingsSubmenu.style.display === "none";
+            settingsSubmenu.style.display = isHidden ? "block" : "none";
+            if (settingsArrow) {
+                settingsArrow.style.transform = isHidden ? "rotate(180deg)" : "rotate(0deg)";
+            }
+            activateAdminTab("section-site-builder", "2");
+        });
+    }
+
+    // Builder Steps Sub-tab Switching inside Sidebar
+    document.querySelectorAll(".builder-step-btn").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            activateAdminTab("section-site-builder", btn.dataset.step);
+        });
+    });
+
+    // Live Hero Image File Selection Preview
+    document.getElementById("setting-hero-image-file")?.addEventListener("change", (e) => {
+        if (e.target.files && e.target.files[0]) {
+            const previewImg = document.getElementById("setting-hero-image-preview");
+            if (previewImg) previewImg.src = URL.createObjectURL(e.target.files[0]);
+        }
+    });
+
+    // Hero Builder Form Submit Handler
+    document.getElementById("hero-builder-form")?.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        let heroImagePath = document.getElementById("setting-hero-image-path").value.trim() || "assets/images/hero-combo.jpg";
+        const heroFile = document.getElementById("setting-hero-image-file");
+
+        if (heroFile && heroFile.files && heroFile.files[0]) {
+            showToast("Uploading selected banner photo...");
+            const formData = new FormData();
+            formData.append("file", heroFile.files[0]);
+            try {
+                const uploadRes = await fetch(`${API_BASE_URL}/admin/upload-image`, {
+                    method: "POST",
+                    headers: { "Authorization": `Bearer ${localStorage.getItem("sonrup_token") || localStorage.getItem("access_token") || localStorage.getItem("auth_token") || localStorage.getItem("token")}` },
+                    body: formData
+                });
+                if (uploadRes.ok) {
+                    const uploadData = await uploadRes.json();
+                    heroImagePath = uploadData.image_path;
+                    document.getElementById("setting-hero-image-path").value = heroImagePath;
+                    const previewImg = document.getElementById("setting-hero-image-preview");
+                    if (previewImg) previewImg.src = heroImagePath;
+                }
+            } catch (err) {
+                console.error("Hero upload error:", err);
+            }
+        }
+
+        let currentSettings = {};
+        try {
+            const res = await fetch(`${API_BASE_URL}/admin/settings`, { headers: getHeaders() });
+            if (res.ok) currentSettings = await res.json();
+        } catch (e) {}
+
+        const titleMain = document.getElementById("setting-hero-title-main").value.trim() || "Premium Gummies for";
+        const titleGold = document.getElementById("setting-hero-title-gold").value.trim() || "Active Health & Beauty.";
+        const combinedTitle = `${titleMain}<br><span class="text-gold">${titleGold}</span>`;
+
+        const payload = {
+            ...currentSettings,
+            hero_badge_text: document.getElementById("setting-hero-badge").value.trim(),
+            hero_title_main: titleMain,
+            hero_title_gold: titleGold,
+            hero_title: combinedTitle,
+            hero_subtitle: document.getElementById("setting-hero-subtitle").value.trim(),
+            hero_cta_text: document.getElementById("setting-hero-cta-text").value.trim(),
+            hero_cta_link: document.getElementById("setting-hero-cta-link").value.trim(),
+            hero_trust_1: document.getElementById("setting-hero-trust1").value.trim(),
+            hero_trust_2: document.getElementById("setting-hero-trust2").value.trim(),
+            hero_float_badge_1: document.getElementById("setting-hero-float1").value.trim(),
+            hero_float_badge_2: document.getElementById("setting-hero-float2").value.trim(),
+            hero_float_badge_3: document.getElementById("setting-hero-float3").value.trim(),
+            hero_image_path: heroImagePath
+        };
+
+        try {
+            const res = await fetch(`${API_BASE_URL}/admin/settings`, {
+                method: "PUT",
+                headers: getHeaders(true),
+                body: JSON.stringify(payload)
+            });
+            if (!res.ok) throw new Error("Could not save hero settings");
+
+            showToast("🌟 Hero Section updated & live on homepage!");
+        } catch (err) {
+            showToast("Failed to save hero section.", true);
+        }
+    });
+
+    // Add Trust Badge Button Handler
+    document.getElementById("btn-add-trust-badge")?.addEventListener("click", () => {
+        const newBadgeId = `tb_${Date.now()}`;
+        currentTrustBadges.push({
+            id: newBadgeId,
+            icon: "check-circle",
+            title: "",
+            subtitle: ""
+        });
+        renderTrustBadgesCRUD();
+        showToast("✨ New trust badge added! Fill in details below.");
+
+        setTimeout(() => {
+            const newCard = document.querySelector(`.trust-badge-item-card[data-badge-id="${newBadgeId}"]`);
+            if (newCard) {
+                newCard.scrollIntoView({ behavior: "smooth", block: "center" });
+                newCard.style.outline = "2px solid #C9A227";
+                newCard.style.boxShadow = "0 0 20px rgba(201, 162, 39, 0.45)";
+                const titleInput = newCard.querySelector(".trust-badge-title-input");
+                if (titleInput) titleInput.focus();
+                setTimeout(() => {
+                    newCard.style.outline = "none";
+                    newCard.style.boxShadow = "none";
+                }, 2200);
+            }
+        }, 120);
+    });
+
+    // Trust Badges Builder Form Submit Handler
+    document.getElementById("trust-builder-form")?.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const container = document.getElementById("trust-badges-list-container");
+        if (container) {
+            const updatedBadges = [];
+            const cards = container.querySelectorAll(".trust-badge-item-card");
+            cards.forEach((card, idx) => {
+                const iconVal = card.querySelector(".trust-badge-icon-input")?.value || "shield-check";
+                const titleVal = card.querySelector(".trust-badge-title-input")?.value.trim() || "";
+                const subVal = card.querySelector(".trust-badge-sub-input")?.value.trim() || "";
+                updatedBadges.push({
+                    id: currentTrustBadges[idx]?.id || `tb_${Date.now()}_${idx}`,
+                    icon: iconVal,
+                    title: titleVal,
+                    subtitle: subVal
+                });
+            });
+            currentTrustBadges = updatedBadges;
+        }
+
+        let currentSettings = {};
+        try {
+            const res = await fetch(`${API_BASE_URL}/admin/settings`, { headers: getHeaders() });
+            if (res.ok) currentSettings = await res.json();
+        } catch (e) {}
+
+        const payload = {
+            ...currentSettings,
+            trust_badges: currentTrustBadges
+        };
+
+        try {
+            const res = await fetch(`${API_BASE_URL}/admin/settings`, {
+                method: "PUT",
+                headers: getHeaders(true),
+                body: JSON.stringify(payload)
+            });
+            if (!res.ok) throw new Error("Could not save trust badges");
+
+            showToast("🌟 All Trust Badges updated & live on homepage!");
+        } catch (err) {
+            showToast("Failed to save trust badges.", true);
         }
     });
 

@@ -11,6 +11,22 @@
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
     <!-- Base Stylesheet -->
     <link rel="stylesheet" href="style.css">
+    <!-- Immediate Tab Restore script (Prevents Dashboard flicker on refresh) -->
+    <script>
+        (function() {
+            try {
+                var hash = window.location.hash.replace('#', '').split('?')[0];
+                var savedTab = localStorage.getItem("sonrup_admin_active_tab") || sessionStorage.getItem("sonrup_admin_active_tab");
+                var validTabs = ["section-overview","section-products","section-orders","section-settings","section-site-builder","section-users","section-coupons"];
+                var activeTab = (hash && validTabs.indexOf(hash) !== -1) ? hash : (savedTab || "section-overview");
+                
+                var style = document.createElement("style");
+                style.id = "instant-tab-style";
+                style.innerHTML = "#" + activeTab + " { display: block !important; opacity: 1 !important; visibility: visible !important; } .admin-section:not(#" + activeTab + ") { display: none !important; }";
+                document.head.appendChild(style);
+            } catch(e){}
+        })();
+    </script>
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -505,6 +521,27 @@
             <button class="sidebar-tab" data-target="section-settings">
                 <i data-lucide="settings"></i> Website Settings
             </button>
+            
+            <!-- Collapsible Site Settings Submenu -->
+            <div class="sidebar-dropdown-group">
+                <button class="sidebar-tab dropdown-toggle-btn" id="toggle-site-settings-menu" style="width: 100%; display: flex; align-items: center; justify-content: space-between;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <i data-lucide="sliders"></i> <span>Site Settings</span>
+                    </div>
+                    <i data-lucide="chevron-down" id="site-settings-arrow" style="transition: transform 0.3s ease; width: 14px;"></i>
+                </button>
+
+                <div class="sidebar-submenu-container" id="site-settings-submenu" style="display: none; padding-left: 10px; margin-top: 6px; margin-bottom: 8px; position: relative;">
+                    <button class="sidebar-subtab-btn builder-step-btn active" data-step="2" style="display: flex; align-items: center; gap: 10px; width: 100%; background: rgba(201,162,39,0.12); border: 1px solid rgba(201,162,39,0.3); color: #ffffff; font-weight: 700; padding: 7px 8px; border-radius: 6px; cursor: pointer; text-align: left; position: relative; z-index: 2; margin-bottom: 4px;">
+                        <div class="subtab-step-num" style="width: 24px; height: 24px; border-radius: 50%; background: #2b231c; border: 1.5px solid #C9A227; color: #E5C365; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; box-shadow: 0 0 8px rgba(201,162,39,0.4);">1</div>
+                        <span class="subtab-label" style="font-family: 'Outfit', sans-serif; font-size: 11px; letter-spacing: 0.8px; text-transform: uppercase;">HERO SECTION</span>
+                    </button>
+                    <button class="sidebar-subtab-btn builder-step-btn" data-step="3" style="display: flex; align-items: center; gap: 10px; width: 100%; background: none; border: none; color: #94a3b8; font-weight: 400; padding: 7px 8px; border-radius: 6px; cursor: pointer; text-align: left; position: relative; z-index: 2;">
+                        <div class="subtab-step-num" style="width: 24px; height: 24px; border-radius: 50%; background: #1a1a1a; border: 1.5px solid rgba(255, 255, 255, 0.2); color: #94a3b8; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0;">2</div>
+                        <span class="subtab-label" style="font-family: 'Outfit', sans-serif; font-size: 11px; letter-spacing: 0.8px; text-transform: uppercase;">TRUST BADGES</span>
+                    </button>
+                </div>
+            </div>
             <button class="sidebar-tab" data-target="section-users">
                 <i data-lucide="users"></i> Registered Users
             </button>
@@ -517,7 +554,7 @@
         <main class="admin-content">
 
             <!-- 1. DASHBOARD OVERVIEW SECTION -->
-            <section id="section-overview" class="admin-section active">
+            <section id="section-overview" class="admin-section">
                 <div class="section-header">
                     <div>
                         <h1 class="section-title">Operational Overview</h1>
@@ -742,10 +779,133 @@
                         <input type="text" class="form-input" id="setting-delhivery-warehouse-pincode" placeholder="395010">
                     </div>
 
-                    <div class="form-group full-width" style="display: flex; justify-content: flex-end; margin-top: 16px;">
-                        <button type="submit" class="btn-action btn-gold" style="padding: 14px 32px; font-size: 15px;"><i data-lucide="save"></i> Save Website Configuration</button>
+                    <div class="form-group full-width" style="display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: flex-start !important; margin-top: 24px !important; padding-top: 20px !important; border-top: 1px solid rgba(255,255,255,0.08) !important; width: 100% !important; grid-column: 1 / -1 !important;">
+                        <button type="submit" class="btn-action btn-gold" style="padding: 12px 28px; font-size: 14px; border-radius: 8px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap;">
+                            <i data-lucide="save"></i> Save Website Configuration
+                        </button>
                     </div>
                 </form>
+            </section>
+
+            <!-- 4.5 SITE SETTINGS & SECTIONS BUILDER -->
+            <section id="section-site-builder" class="admin-section">
+                <div class="section-header">
+                    <div>
+                        <h1 class="section-title">Site Settings & Sections Builder</h1>
+                        <p class="section-subtitle">Manage homepage content sections, hero sliders, trust badges, and brand copy in real time.</p>
+                    </div>
+                </div>
+
+                <div class="site-builder-content-panel">
+                        <!-- Step 2 Panel: HERO SECTION CRUD -->
+                        <div class="builder-step-panel active" id="builder-step-2">
+                            <form id="hero-builder-form" class="glass-panel form-grid">
+                                <div class="form-group full-width" style="border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 16px; margin-bottom: 12px;">
+                                    <h3 style="font-family: 'Outfit', sans-serif; font-size: 18px; color: #fff; margin: 0 0 4px 0; display: flex; align-items: center; gap: 8px;">
+                                        <i data-lucide="sparkles" class="text-gold"></i> <span>2. HERO SECTION CRUD (Live Homepage Sync)</span>
+                                    </h3>
+                                    <p style="font-size: 12.5px; color: #94a3b8; margin: 0;">Manage main headline, sub-heading, button labels, trust indicators, floating badges, and banner image displayed on the website home page.</p>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Promo Badge Text</label>
+                                    <input type="text" class="form-input" id="setting-hero-badge" placeholder="PREMIUM NATURAL WELLNESS">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Hero Headline (Main Text)</label>
+                                    <input type="text" class="form-input" id="setting-hero-title-main" placeholder="Premium Gummies for">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Hero Headline (Gold Highlighted Text)</label>
+                                    <input type="text" class="form-input" id="setting-hero-title-gold" placeholder="Active Health & Beauty.">
+                                </div>
+                                <div class="form-group full-width">
+                                    <label class="form-label">Hero Subtitle / Description Copy</label>
+                                    <textarea class="form-input" id="setting-hero-subtitle" rows="3" placeholder="Sugar-free, clinical-grade formulations crafted..."></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Primary CTA Button Text</label>
+                                    <input type="text" class="form-input" id="setting-hero-cta-text" placeholder="Explore Collection">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Primary CTA Link Target (Clean Route Path)</label>
+                                    <input type="text" class="form-input" id="setting-hero-cta-link" placeholder="/shop">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Sub-Trust Point #1</label>
+                                    <input type="text" class="form-input" id="setting-hero-trust1" placeholder="100% Sugar-Free & Safe">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Sub-Trust Point #2</label>
+                                    <input type="text" class="form-input" id="setting-hero-trust2" placeholder="Free Shipping India-Wide">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Floating Pill 1 (Top Left)</label>
+                                    <input type="text" class="form-input" id="setting-hero-float1" placeholder="Adult Performance">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Floating Pill 2 (Middle Right)</label>
+                                    <input type="text" class="form-input" id="setting-hero-float2" placeholder="Beauty & Energy">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Floating Pill 3 (Bottom Left)</label>
+                                    <input type="text" class="form-input" id="setting-hero-float3" placeholder="Kids' Immunity">
+                                </div>
+
+                                <!-- Manual Image Selection Block -->
+                                <input type="hidden" id="setting-hero-image-path">
+                                <div class="form-group full-width" style="margin-top: 10px; background: rgba(255,255,255,0.03); border: 1px dashed rgba(201,162,39,0.3); padding: 20px; border-radius: 12px;">
+                                    <label class="form-label" style="font-size: 14px; font-weight: 700; color: #E5C365; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+                                        <i data-lucide="image"></i> Select Hero Banner Image (Manual Photo Picker)
+                                    </label>
+                                    <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+                                        <div style="width: 100px; height: 100px; border-radius: 10px; overflow: hidden; border: 2px solid #C9A227; background: #000; flex-shrink: 0;">
+                                            <img id="setting-hero-image-preview" src="assets/images/hero-combo.jpg" alt="Hero Image Preview" style="width: 100%; height: 100%; object-fit: cover;">
+                                        </div>
+                                        <div style="flex: 1;">
+                                            <p style="font-size: 12.5px; color: #94a3b8; margin: 0 0 10px 0;">Choose a custom photo from your computer to set as the main homepage banner image.</p>
+                                            <input type="file" class="form-input" id="setting-hero-image-file" accept="image/*" style="padding: 8px; cursor: pointer;">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group full-width" style="display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: flex-start !important; margin-top: 24px !important; padding-top: 20px !important; border-top: 1px solid rgba(255,255,255,0.08) !important; width: 100% !important; grid-column: 1 / -1 !important;">
+                                    <button type="submit" class="btn-action btn-gold" style="padding: 12px 28px; font-size: 14px; border-radius: 8px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap;">
+                                        <i data-lucide="save"></i> Save & Publish Hero Section
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Step 3 Panel: TRUST BADGES DYNAMIC CRUD -->
+                        <div class="builder-step-panel" id="builder-step-3" style="display: none;">
+                            <div class="glass-panel" style="padding: 28px;">
+                                <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 16px; margin-bottom: 24px; flex-wrap: wrap; gap: 12px;">
+                                    <div>
+                                        <h3 style="font-family: 'Outfit', sans-serif; font-size: 20px; color: #fff; margin: 0 0 6px 0;">2. TRUST BADGES DYNAMIC CRUD</h3>
+                                        <p style="font-size: 13px; color: #94a3b8; margin: 0;">Add, Edit, or Remove trust indicators displayed on the live homepage.</p>
+                                    </div>
+                                    <button type="button" id="btn-add-trust-badge" class="btn-action btn-gold" style="padding: 10px 20px; font-size: 13.5px; border-radius: 8px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
+                                        <i data-lucide="plus"></i> Add New Trust Badge
+                                    </button>
+                                </div>
+
+                                <form id="trust-builder-form">
+                                    <div id="trust-badges-list-container" style="display: flex; flex-direction: column; gap: 16px;">
+                                        <!-- Dynamic Trust Badge Items rendered by admin.js -->
+                                    </div>
+
+                                    <div class="form-group full-width" style="display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: flex-start !important; margin-top: 24px !important; padding-top: 20px !important; border-top: 1px solid rgba(255,255,255,0.08) !important; width: 100% !important;">
+                                        <button type="submit" class="btn-action btn-gold" style="padding: 12px 28px; font-size: 14px; border-radius: 8px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap;">
+                                            <i data-lucide="save"></i> Save & Publish All Trust Badges
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
             </section>
 
             <!-- 5. REGISTERED USERS SECTION -->
@@ -836,15 +996,6 @@
                     <label class="form-label">Product Tag / Badge</label>
                     <input type="text" class="form-input" id="prod-tag" placeholder="e.g. Adult Performance" required>
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Tag Class Color</label>
-                    <select class="form-input" id="prod-tag-class">
-                        <option value="tag-shilajit">Shilajit Gold</option>
-                        <option value="tag-biotin">Biotin Rose</option>
-                        <option value="tag-kids">Kids Emerald</option>
-                        <option value="tag-combo">Combo Purple</option>
-                    </select>
-                </div>
                 <div class="form-group full-width">
                     <label class="form-label">Description / Wellness Story</label>
                     <textarea class="form-input" id="prod-description" rows="3" placeholder="Explain health benefits and herbal composition..." required></textarea>
@@ -852,10 +1003,6 @@
                 <div class="form-group full-width">
                     <label class="form-label">Key Benefit Bullet Points (One per line)</label>
                     <textarea class="form-input" id="prod-benefits" rows="3" placeholder="Boosts Daily Energy & Stamina&#10;100% Sugar-Free Formulation&#10;Ayurvedic Restorative" required></textarea>
-                </div>
-                <div class="form-group full-width">
-                    <label class="form-label">Product Variants & Pack Options (Format: Variant Name - Price, one per line)</label>
-                    <textarea class="form-input" id="prod-variants" rows="3" placeholder="1 Month Pack (30 Gummies) - 999&#10;2 Month Pack (60 Gummies) - 1799&#10;3 Month Family Bundle - 2499"></textarea>
                 </div>
                 <div class="form-group full-width">
                     <label class="form-label">Image Path / URL (or Upload Below)</label>

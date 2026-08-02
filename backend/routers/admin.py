@@ -44,6 +44,34 @@ class WebsiteSettingsIn(BaseModel):
     delhivery_warehouse_pincode: str = ""
     delhivery_warehouse_phone: str = ""
     delhivery_environment: str = "staging"
+    # Hero Section Fields
+    hero_badge_text: str = "PREMIUM NATURAL WELLNESS"
+    hero_title: str = 'Premium Gummies for<br><span class="text-gold">Active Health & Beauty.</span>'
+    hero_title_main: str = "Premium Gummies for"
+    hero_title_gold: str = "Active Health & Beauty."
+    hero_subtitle: str = "Sugar-free, clinical-grade formulations crafted to fuel adult performance, daily glow, and kids' active growth. Experience modern Ayurveda and advanced science combined."
+    hero_cta_text: str = "Explore Collection"
+    hero_cta_link: str = "/shop"
+    hero_trust_1: str = "100% Sugar-Free & Safe"
+    hero_trust_2: str = "Free Shipping India-Wide"
+    hero_image_path: str = "assets/images/hero-combo.jpg"
+    hero_float_badge_1: str = "Adult Performance"
+    hero_float_badge_2: str = "Beauty & Energy"
+    hero_float_badge_3: str = "Kids' Immunity"
+    # Trust Badges Section Fields
+    trust_badge_1_title: str = "Sugar Free"
+    trust_badge_1_sub: str = "No Added Sugar"
+    trust_badge_2_title: str = "No Artificial Color"
+    trust_badge_2_sub: str = "100% Safe Formulas"
+    trust_badge_3_title: str = "Natural Fruit Flavor"
+    trust_badge_3_sub: str = "Imli, Citrus & Mixed Fruit"
+    trust_badge_4_title: str = "FSSAI Licensed"
+    trust_badge_4_sub: str = "Regulated Quality"
+    trust_badge_5_title: str = "36-Month Shelf Life"
+    trust_badge_5_sub: str = "Long-Lasting Freshness"
+    trust_badge_6_title: str = "Made in India"
+    trust_badge_6_sub: str = "Kellen Healthcare"
+    trust_badges: list[dict] = []
 
 class ProductIn(BaseModel):
     slug: str
@@ -156,10 +184,44 @@ async def get_website_settings():
         ("delhivery_warehouse_state", "Gujarat"),
         ("delhivery_warehouse_pincode", "395010"),
         ("delhivery_warehouse_phone", "+91 76001 75193"),
-        ("delhivery_environment", "staging")
+        ("delhivery_environment", "staging"),
+        # Hero Section fields
+        ("hero_badge_text", "PREMIUM NATURAL WELLNESS"),
+        ("hero_title", 'Premium Gummies for<br><span class="text-gold">Active Health & Beauty.</span>'),
+        ("hero_title_main", "Premium Gummies for"),
+        ("hero_title_gold", "Active Health & Beauty."),
+        ("hero_subtitle", "Sugar-free, clinical-grade formulations crafted to fuel adult performance, daily glow, and kids' active growth. Experience modern Ayurveda and advanced science combined."),
+        ("hero_cta_text", "Explore Collection"),
+        ("hero_cta_link", "/shop"),
+        ("hero_trust_1", "100% Sugar-Free & Safe"),
+        ("hero_trust_2", "Free Shipping India-Wide"),
+        ("hero_float_badge_3", "Kids' Immunity"),
+        # Trust Badges Section Defaults
+        ("trust_badge_1_title", "Sugar Free"),
+        ("trust_badge_1_sub", "No Added Sugar"),
+        ("trust_badge_2_title", "No Artificial Color"),
+        ("trust_badge_2_sub", "100% Safe Formulas"),
+        ("trust_badge_3_title", "Natural Fruit Flavor"),
+        ("trust_badge_3_sub", "Imli, Citrus & Mixed Fruit"),
+        ("trust_badge_4_title", "FSSAI Licensed"),
+        ("trust_badge_4_sub", "Regulated Quality"),
+        ("trust_badge_5_title", "36-Month Shelf Life"),
+        ("trust_badge_5_sub", "Long-Lasting Freshness"),
+        ("trust_badge_6_title", "Made in India"),
+        ("trust_badge_6_sub", "Kellen Healthcare")
     ]:
         if field not in settings:
             settings[field] = default
+
+    if "trust_badges" not in settings or not settings["trust_badges"]:
+        settings["trust_badges"] = [
+            {"id": "tb_1", "icon": "ban", "title": "Sugar Free", "subtitle": "No Added Sugar"},
+            {"id": "tb_2", "icon": "droplet-off", "title": "No Artificial Color", "subtitle": "100% Safe Formulas"},
+            {"id": "tb_3", "icon": "apple", "title": "Natural Fruit Flavor", "subtitle": "Imli, Citrus & Mixed Fruit"},
+            {"id": "tb_4", "icon": "shield-check", "title": "FSSAI Licensed", "subtitle": "Regulated Quality"},
+            {"id": "tb_5", "icon": "calendar", "title": "36-Month Shelf Life", "subtitle": "Long-Lasting Freshness"},
+            {"id": "tb_6", "icon": "map-pin", "title": "Made in India", "subtitle": "Kellen Healthcare"}
+        ]
 
     return settings
 
