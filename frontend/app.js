@@ -77,6 +77,7 @@ async function loadAppConfig() {
         renderSingleArticleView();
         renderSiteFooterAndContactFromConfig();
         renderContactPageFromConfig();
+        renderShopPageFromConfig();
     } catch (err) {
         console.warn("Could not load app config, using defaults.", err);
         APP_CONFIG = { backend_port: 8010 };
@@ -742,6 +743,21 @@ function renderContactPageFromConfig() {
     }
 }
 
+function renderShopPageFromConfig() {
+    if (!APP_CONFIG || !APP_CONFIG.shop_settings) return;
+    const shop = APP_CONFIG.shop_settings;
+
+    const headingEl = document.getElementById("shop-page-heading");
+    if (headingEl && shop.heading) headingEl.textContent = shop.heading;
+
+    const titleEl = document.getElementById("shop-page-title");
+    if (titleEl && shop.title) titleEl.textContent = shop.title;
+
+    const descEl = document.getElementById("shop-page-desc");
+    if (descEl && shop.desc) descEl.innerHTML = shop.desc.replace(/\n/g, '<br>');
+}
+
+
 
 function getApiBase() {
     if (!APP_CONFIG || !APP_CONFIG.backend_port) return "";
@@ -796,6 +812,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             renderSingleArticleView();
             renderSiteFooterAndContactFromConfig();
         renderContactPageFromConfig();
+        renderShopPageFromConfig();
         } catch (e) {
             console.error("Error loading cached config", e);
         }
@@ -2684,3 +2701,152 @@ window.trackDelhivery = async (waybill) => {
 window.closeTrackingModal = () => {
     document.getElementById("delhivery-tracking-modal").style.display = "none";
 };
+
+
+async function renderProductPage() {
+    const slug = document.body.getAttribute("data-product-slug");
+    if (!slug) return;
+
+    try {
+        const res = await fetch(`${API_BASE_URL}/products`);
+        if (!res.ok) return;
+        const products = await res.json();
+        const product = products.find(p => p.slug === slug);
+        if (!product) return;
+
+        // Update basic text
+        if (document.getElementById("dynamic-product-name")) document.getElementById("dynamic-product-name").textContent = product.name;
+        if (document.getElementById("dynamic-product-flavor")) {
+            const iconColor = product.tag_class === "tag-kids" ? "text-blue" : (product.tag_class === "tag-biotin" ? "text-orange" : "text-gold");
+            document.getElementById("dynamic-product-flavor").innerHTML = `<i data-lucide="leaf" class="${iconColor}"></i> ${product.flavor || 'Regular Flavor'}`;
+        }
+        if (document.getElementById("dynamic-product-description")) document.getElementById("dynamic-product-description").textContent = product.description;
+        if (document.getElementById("dynamic-product-price")) document.getElementById("dynamic-product-price").textContent = `₹${product.price}`;
+        
+        if (document.getElementById("dynamic-product-tag")) {
+            const tagEl = document.getElementById("dynamic-product-tag");
+            tagEl.className = `product-tag ${product.tag_class || 'tag-shilajit'}`;
+            tagEl.textContent = product.tag || 'Wellness';
+        }
+
+        // Update Benefits
+        const benefitsUl = document.getElementById("dynamic-product-benefits");
+        if (benefitsUl && product.benefits) {
+            const iconColor = product.tag_class === "tag-kids" ? "text-blue" : (product.tag_class === "tag-biotin" ? "text-orange" : "text-gold");
+            benefitsUl.innerHTML = "";
+            product.benefits.forEach(b => {
+                const li = document.createElement("li");
+                li.innerHTML = `<i data-lucide="check-circle" class="${iconColor}"></i> ${b}`;
+                benefitsUl.appendChild(li);
+            });
+        }
+
+        // Update Button Data
+        const addBtn = document.getElementById("dynamic-add-to-cart");
+        if (addBtn) {
+            addBtn.setAttribute("data-name", product.name);
+            addBtn.setAttribute("data-price", product.price);
+            addBtn.setAttribute("data-img", product.images[0] || 'assets/images/hero-combo.jpg');
+        }
+
+        // Update Image Gallery
+        const mainImg = document.getElementById("main-product-image");
+        if (mainImg && product.images && product.images.length > 0) {
+            mainImg.src = product.images[0];
+        }
+
+        const thumbsContainer = document.getElementById("dynamic-product-thumbs");
+        if (thumbsContainer && product.images && product.images.length > 0) {
+            thumbsContainer.innerHTML = "";
+            product.images.forEach((imgSrc, idx) => {
+                const div = document.createElement("div");
+                div.className = "gallery-thumb";
+                if (idx === 0) div.classList.add("active");
+                div.style = "border: 1.5px solid rgba(255,255,255,0.05); border-radius: 8px; overflow: hidden; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; background-color: var(--bg-dark-card); cursor: pointer; padding: 6px;";
+                div.innerHTML = `<img src="${imgSrc}" style="max-height: 100%; object-fit: contain;">`;
+                
+                div.addEventListener("click", () => {
+                    if (mainImg) mainImg.src = imgSrc;
+                    document.querySelectorAll("#dynamic-product-thumbs .gallery-thumb").forEach(t => {
+                        t.classList.remove("active");
+                        t.style.borderColor = "rgba(255,255,255,0.05)";
+                    });
+                    div.classList.add("active");
+                    div.style.borderColor = "var(--color-gold)";
+                });
+                
+                thumbsContainer.appendChild(div);
+            });
+        }
+
+        if (window.lucide) window.lucide.createIcons();
+    } catch (e) {
+        console.error("Error dynamically rendering product page:", e);
+    }
+}
+
+
+function renderShopCards(products) {
+    const grid = document.getElementById("catalog-grid");
+    if (!grid) return;
+    
+    grid.innerHTML = "";
+    
+    if (!products || products.length === 0) {
+        grid.innerHTML = "<p style='color: white; grid-column: 1 / -1; text-align: center;'>No products found in the catalog.</p>";
+        return;
+    }
+    
+    products.forEach(prod => {
+        // Build benefits HTML (limit to 3 for the card)
+        const benefitsHtml = (prod.benefits || []).slice(0, 3).map(b => {
+            return `<li><i data-lucide="check-circle" style="color: #E5C365; width: 16px; margin-right: 8px;"></i> ${b}</li>`;
+        }).join("");
+        
+        // Define tag text based on tag_class
+        let tagText = prod.tag || "Wellness";
+        let iconHtml = `<i data-lucide="zap"></i>`;
+        if (prod.tag_class === "tag-biotin") iconHtml = `<i data-lucide="chevrons-right"></i>`;
+        
+        // Generate the card
+        const cardHtml = `
+            <div class="product-card card-${prod.slug}" data-type="${prod.product_type}s" data-price="${prod.price}" data-name="${prod.name}" style="display: flex; flex-direction: column;">
+                <div class="card-accent-line"></div>
+                <div class="product-img-holder">
+                    <img src="${prod.images && prod.images.length > 0 ? prod.images[0] : 'assets/images/hero-combo.jpg'}" alt="${prod.name}">
+                    <span class="product-tag ${prod.tag_class || 'tag-shilajit'}">${tagText}</span>
+                </div>
+                <div class="product-card-body" style="display: flex; flex-direction: column; flex-grow: 1; padding: 24px; height: 100%;">
+                    <h3>${prod.name}</h3>
+                    <p class="flavor-info">${iconHtml} ${prod.flavor || ''}</p>
+                    <p class="product-summary">${(prod.description || '').substring(0, 130)}...</p>
+                    <ul class="benefit-bullets" style="margin-bottom: 20px;">
+                        ${benefitsHtml}
+                    </ul>
+                    <div class="product-card-footer" style="display: flex; flex-direction: column; gap: 10px; border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 16px; margin-top: auto; width: 100%;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                            <span class="qty-info">60 Gummies</span>
+                            <span class="price-info" style="font-family: var(--font-heading); font-weight: 700; color: #FFFFFF; font-size: 18px;">₹${prod.price}</span>
+                        </div>
+                        <div style="display: flex; gap: 8px; width: 100%;">
+                            <button class="btn-secondary add-to-cart-btn" data-name="${prod.name}" data-price="${prod.price}" data-img="${prod.images && prod.images.length > 0 ? prod.images[0] : ''}" style="flex: 1; padding: 8px; font-size: 11px; justify-content: center;">Add to Cart</button>
+                            <a href="${prod.slug}.html" class="btn-primary" style="flex: 1.2; padding: 8px; font-size: 11px; display: flex; align-items: center; justify-content: center; text-decoration: none; color: black; font-weight: 600; border-radius: 6px;">Buy Now</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        grid.innerHTML += cardHtml;
+    });
+    
+    // Re-initialize Lucide icons for dynamically added elements
+    if (window.lucide) {
+        window.lucide.createIcons();
+    }
+    
+    // Re-bind Add to Cart buttons
+    if (window.bindCartButtons) {
+        window.bindCartButtons();
+    }
+}

@@ -215,6 +215,101 @@ async function loadProducts() {
     }
 }
 
+
+window.renderImagePreviews = () => {
+    const previewContainer = document.getElementById("prod-images-preview");
+    const textArea = document.getElementById("prod-all-images");
+    if (!previewContainer || !textArea) return;
+
+    const urls = textArea.value.split("\n").map(l => l.trim()).filter(Boolean);
+    previewContainer.innerHTML = "";
+
+    if (urls.length === 0) {
+        previewContainer.innerHTML = '<span style="color: #94a3b8; font-size: 13px; align-self: center; width: 100%; text-align: center;">No images added yet.</span>';
+        return;
+    }
+
+    urls.forEach((url, idx) => {
+        const imgDiv = document.createElement("div");
+        imgDiv.style.position = "relative";
+        imgDiv.style.width = "64px";
+        imgDiv.style.height = "64px";
+        imgDiv.style.borderRadius = "8px";
+        imgDiv.style.border = idx === 0 ? "2px solid #E5C365" : "1px solid rgba(255,255,255,0.2)";
+        
+        const img = document.createElement("img");
+        img.src = url;
+        img.style.width = "100%";
+        img.style.height = "100%";
+        img.style.objectFit = "cover";
+        img.style.borderRadius = "6px";
+        
+        const deleteBtn = document.createElement("button");
+        deleteBtn.innerHTML = "×";
+        deleteBtn.style.position = "absolute";
+        deleteBtn.style.top = "-5px";
+        deleteBtn.style.right = "-5px";
+        deleteBtn.style.width = "20px";
+        deleteBtn.style.height = "20px";
+        deleteBtn.style.borderRadius = "50%";
+        deleteBtn.style.background = "#ef4444";
+        deleteBtn.style.color = "white";
+        deleteBtn.style.border = "none";
+        deleteBtn.style.cursor = "pointer";
+        deleteBtn.style.display = "flex";
+        deleteBtn.style.alignItems = "center";
+        deleteBtn.style.justifyContent = "center";
+        deleteBtn.style.fontSize = "14px";
+        deleteBtn.style.fontWeight = "bold";
+        deleteBtn.style.boxShadow = "0 2px 4px rgba(0,0,0,0.4)";
+        
+        deleteBtn.onclick = (e) => {
+            e.preventDefault();
+            const newUrls = [...urls];
+            newUrls.splice(idx, 1);
+            textArea.value = newUrls.join("\n");
+            window.renderImagePreviews();
+        };
+        
+        imgDiv.appendChild(img);
+        imgDiv.appendChild(deleteBtn);
+        previewContainer.appendChild(imgDiv);
+    });
+};
+
+document.getElementById("prod-all-images")?.addEventListener("input", window.renderImagePreviews);
+
+document.getElementById("prod-image-file")?.addEventListener("change", async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    showToast("Uploading image...");
+    const formData = new FormData();
+    formData.append("file", file);
+    try {
+        const uploadRes = await fetch(`${API_BASE_URL}/admin/upload-image`, {
+            method: "POST",
+            headers: { "Authorization": `Bearer ${localStorage.getItem("sonrup_token") || localStorage.getItem("access_token") || localStorage.getItem("auth_token") || localStorage.getItem("token")}` },
+            body: formData
+        });
+        if (uploadRes.ok) {
+            const uploadData = await uploadRes.json();
+            const textArea = document.getElementById("prod-all-images");
+            if (textArea) {
+                const current = textArea.value.trim();
+                textArea.value = current ? current + "\n" + uploadData.image_path : uploadData.image_path;
+                window.renderImagePreviews();
+            }
+            showToast("✅ Image uploaded and added to gallery.");
+        } else {
+            showToast("Warning: Image upload failed.", true);
+        }
+    } catch (err) {
+        console.error("Image upload error:", err);
+    }
+    e.target.value = ""; // Reset file input
+});
+
 window.openEditModal = (slug) => {
     const prod = currentProducts.find(p => p.slug === slug);
     if (!prod) return;
@@ -229,8 +324,11 @@ window.openEditModal = (slug) => {
     document.getElementById("prod-tag").value = prod.tag || "Adult Performance";
     document.getElementById("prod-description").value = prod.description || "";
     document.getElementById("prod-benefits").value = (prod.benefits || []).join("\n");
-    document.getElementById("prod-image-path").value = (prod.images && prod.images[0]) ? prod.images[0] : "assets/images/hero-combo.jpg";
+    document.getElementById("prod-type").value = prod.product_type || "single";
+    document.getElementById("prod-tag-class").value = prod.tag_class || "tag-shilajit";
+    document.getElementById("prod-all-images").value = (prod.images && prod.images.length) ? prod.images.join("\n") : "assets/images/hero-combo.jpg";
     document.getElementById("prod-image-file").value = "";
+    if (window.renderImagePreviews) window.renderImagePreviews();
 
     document.getElementById("product-modal").classList.add("active");
 };
@@ -358,6 +456,13 @@ async function loadSettings() {
         const data = await res.json();
 
         
+        
+        
+        // Shop Page Settings
+        const shop = data.shop_settings || {};
+        if (document.getElementById("setting-shop-heading")) document.getElementById("setting-shop-heading").value = shop.heading || "SONRUP WELLNESS SHELF";
+        if (document.getElementById("setting-shop-title")) document.getElementById("setting-shop-title").value = shop.title || "PREMIUM GUMMIES & BUNDLES";
+        if (document.getElementById("setting-shop-desc")) document.getElementById("setting-shop-desc").value = shop.desc || "Sugar-free, clinical-grade formulations crafted to elevate active health, glow, and immunity for your entire household.";
         
         // Contact Page Settings
         const cs = data.contact_settings || {};
@@ -1669,7 +1774,12 @@ function setupEventListeners() {
             document.getElementById("prod-original-slug").value = "";
             document.getElementById("prod-slug").disabled = false;
             document.getElementById("product-form").reset();
-            document.getElementById("prod-image-path").value = "assets/images/hero-combo.jpg";
+
+            document.getElementById("prod-type").value = "single";
+            document.getElementById("prod-tag-class").value = "tag-shilajit";
+            document.getElementById("prod-all-images").value = "assets/images/hero-combo.jpg";
+            document.getElementById("prod-image-file").value = "";
+            if (window.renderImagePreviews) window.renderImagePreviews();
             document.getElementById("product-modal").classList.add("active");
         });
     }
@@ -1736,33 +1846,12 @@ function setupEventListeners() {
         const originalSlug = document.getElementById("prod-original-slug").value;
         const isEdit = !!originalSlug;
 
-        let imagePath = document.getElementById("prod-image-path").value.trim();
-        const fileInput = document.getElementById("prod-image-file");
-
-        // Handle File Upload if provided
-        if (fileInput && fileInput.files && fileInput.files[0]) {
-            showToast("Uploading product photo...");
-            const formData = new FormData();
-            formData.append("file", fileInput.files[0]);
-            try {
-                const uploadRes = await fetch(`${API_BASE_URL}/admin/upload-image`, {
-                    method: "POST",
-                    headers: { "Authorization": `Bearer ${localStorage.getItem("sonrup_token") || localStorage.getItem("access_token") || localStorage.getItem("auth_token") || localStorage.getItem("token")}` },
-                    body: formData
-                });
-                if (uploadRes.ok) {
-                    const uploadData = await uploadRes.json();
-                    imagePath = uploadData.image_path;
-                } else {
-                    showToast("Warning: Image upload failed, defaulting to provided path.", true);
-                }
-            } catch (err) {
-                console.error("Image upload error:", err);
-            }
-        }
 
         const benefitsText = document.getElementById("prod-benefits").value.trim();
-        const benefitsArray = benefitsText ? benefitsText.split("\n").map(line => line.trim()).filter(Boolean) : [];
+        const benefitsArray = benefitsText ? benefitsText.split("\\n").map(line => line.trim()).filter(Boolean) : [];
+        
+        const allImagesText = document.getElementById("prod-all-images").value.trim();
+        const allImagesArray = allImagesText ? allImagesText.split("\n").map(l => l.trim()).filter(Boolean) : ["assets/images/hero-combo.jpg"];
 
         const payload = {
             name: document.getElementById("prod-name").value.trim(),
@@ -1772,9 +1861,9 @@ function setupEventListeners() {
             description: document.getElementById("prod-description").value.trim(),
             benefits: benefitsArray,
             variants: [],
-            images: [imagePath],
-            tag_class: "tag-shilajit",
-            product_type: document.getElementById("prod-type") ? document.getElementById("prod-type").value : "singles"
+            images: allImagesArray,
+            tag_class: document.getElementById("prod-tag-class") ? document.getElementById("prod-tag-class").value : "tag-shilajit",
+            product_type: document.getElementById("prod-type") ? document.getElementById("prod-type").value : "single"
         };
 
         try {
@@ -2946,5 +3035,40 @@ window.saveContactPageSettingsToDB = async function() {
         }
     } catch (err) {
         showToast("Failed to save contact settings.", true);
+    }
+};
+
+
+window.saveShopSettingsToDB = async function() {
+    try {
+        const btn = document.querySelector("#form-shop-settings button[type='submit']");
+        if(btn) btn.innerHTML = '<i data-lucide="loader" class="spin"></i> Saving...';
+        
+        const getRes = await fetch(`${API_BASE_URL}/admin/settings?_t=${Date.now()}`, { headers: getHeaders() });
+        const existingData = getRes.ok ? await getRes.json() : {};
+
+        const payload = {
+            ...existingData,
+            shop_settings: {
+                heading: document.getElementById("setting-shop-heading")?.value.trim(),
+                title: document.getElementById("setting-shop-title")?.value.trim(),
+                desc: document.getElementById("setting-shop-desc")?.value.trim()
+            }
+        };
+
+        const res = await fetch(`${API_BASE_URL}/admin/settings`, {
+            method: "PUT",
+            headers: getHeaders(true),
+            body: JSON.stringify(payload)
+        });
+        if (!res.ok) throw new Error("Could not save settings");
+        
+        showToast("🌟 Shop Page Text successfully published!");
+        if(btn) {
+            btn.innerHTML = '<i data-lucide="check"></i> Saved';
+            setTimeout(() => { btn.innerHTML = '<i data-lucide="save"></i> Save Shop Text'; lucide.createIcons(); }, 2000);
+        }
+    } catch (err) {
+        showToast("Failed to save shop settings.", true);
     }
 };

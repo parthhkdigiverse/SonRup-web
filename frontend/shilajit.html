@@ -14,7 +14,7 @@
     <!-- Lucide Icons CDN -->
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
-<body class="product-page">
+<body data-product-slug="shilajit" class="product-page">
 
     <!-- Sticky Header -->
     <header class="site-header scrolled" id="main-header">
@@ -76,13 +76,13 @@
             <!-- Right: Details -->
             <div class="product-info-block" style="display: flex; flex-direction: column; justify-content: space-between;">
                 <div>
-                    <span class="product-tag tag-shilajit" style="position: static; display: inline-block; margin-bottom: 15px;">Adult Performance</span>
-                    <h1 style="font-size: 42px; line-height: 1.2; margin-bottom: 10px; color: #FFFFFF;">Himalayan Shilajit Gummies</h1>
-                    <p class="flavor-info" style="font-size: 14px; margin-bottom: 24px; color: var(--text-on-dark-muted);"><i data-lucide="leaf" class="text-gold"></i> Imli (Tamarind) Flavour</p>
-                    <p style="font-size: 15.5px; color: var(--text-on-dark-muted); margin-bottom: 30px; line-height: 1.7;">Formulated for adult performance, daily energy, and strength. Packed with purified Himalayan shilajit resin containing 75% Fulvic Acid and Ashwagandha to elevate your body’s potential naturally. Enjoy traditional Ayurvedic benefits in a delicious, sugar-free chewable form.</p>
+                    <span class="product-tag tag-shilajit" id="dynamic-product-tag" style="position: static; display: inline-block; margin-bottom: 15px;">Adult Performance</span>
+                    <h1 style="font-size: 42px; line-height: 1.2; margin-bottom: 10px; color: #FFFFFF;" id="dynamic-product-name">Himalayan Shilajit Gummies</h1>
+                    <p class="flavor-info" style="font-size: 14px; margin-bottom: 24px; color: var(--text-on-dark-muted);" id="dynamic-product-flavor"><i data-lucide="leaf" class="text-gold"></i> Imli (Tamarind) Flavour</p>
+                    <p style="font-size: 15.5px; color: var(--text-on-dark-muted); margin-bottom: 30px; line-height: 1.7;" id="dynamic-product-description">Formulated for adult performance, daily energy, and strength. Packed with purified Himalayan shilajit resin containing 75% Fulvic Acid and Ashwagandha to elevate your body’s potential naturally. Enjoy traditional Ayurvedic benefits in a delicious, sugar-free chewable form.</p>
                     
                     <h3 style="font-size: 15px; text-transform: uppercase; color: #FFFFFF; margin-bottom: 12px; font-weight: 600;">Key Benefits:</h3>
-                    <ul class="benefit-bullets" style="gap: 12px; margin-bottom: 30px;">
+                    <ul class="benefit-bullets" style="gap: 12px; margin-bottom: 30px;" id="dynamic-product-benefits">
                         <li><i data-lucide="check-circle" class="text-gold"></i> Boosts Daily Energy & Stamina</li>
                         <li><i data-lucide="check-circle" class="text-gold"></i> Premium Ashwagandha for Strength</li>
                         <li><i data-lucide="check-circle" class="text-gold"></i> Purified 75% Fulvic Acid Shilajit Resin</li>
@@ -93,10 +93,10 @@
                 <div style="border-top: 1px solid rgba(255,255,255,0.06); padding-top: 24px; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap;">
                     <div>
                         <span style="font-size: 11px; text-transform: uppercase; color: var(--text-on-dark-muted); display: block; margin-bottom: 4px;">Price (60 Gummies Bottle)</span>
-                        <span style="font-size: 32px; font-family: var(--font-heading); color: #FFFFFF; font-weight: 700;">₹999</span>
+                        <span style="font-size: 32px; font-family: var(--font-heading); color: #FFFFFF; font-weight: 700;" id="dynamic-product-price">₹999</span>
                     </div>
                     <div style="display: flex; gap: 12px;">
-                        <button class="btn-secondary btn-lg add-to-cart-btn" data-name="Himalayan Shilajit Gummies (Single)" data-price="999" data-img="assets/images/shilajit-bottle.jpg" style="padding: 14px 24px;">
+                        <button class="btn-secondary btn-lg add-to-cart-btn" data-name="Himalayan Shilajit Gummies (Single)" data-price="999" data-img="assets/images/shilajit-bottle.jpg" style="padding: 14px 24px;" id="dynamic-add-to-cart">
                             Add to Cart
                         </button>
                         <button class="btn-primary btn-lg buy-now-btn" data-name="Himalayan Shilajit Gummies (Single)" data-price="999" data-img="assets/images/shilajit-bottle.jpg" style="padding: 14px 28px;">

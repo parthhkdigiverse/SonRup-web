@@ -549,7 +549,7 @@
             
             <!-- Collapsible Site Settings Submenu -->
             <div class="sidebar-dropdown-group">
-                <button class="sidebar-tab dropdown-toggle-btn" id="toggle-site-settings-menu" style="width: 100%; display: flex; align-items: center; justify-content: space-between;">
+                <button class="sidebar-tab dropdown-toggle-btn" data-target="section-site-builder" id="toggle-site-settings-menu" style="width: 100%; display: flex; align-items: center; justify-content: space-between;">
                     <div style="display: flex; align-items: center; gap: 10px;">
                         <i data-lucide="sliders"></i> <span>Site Settings</span>
                     </div>
@@ -656,6 +656,32 @@
                     <button class="btn-action btn-gold" id="btn-open-add-product"><i data-lucide="plus-circle" width="16"></i> Add New Product</button>
                 </div>
 
+
+                <div class="glass-panel" style="margin-bottom: 24px;">
+                    <h2 style="font-family: 'Outfit', sans-serif; font-size: 20px; margin-top: 0; margin-bottom: 16px; color: #ffffff;">Shop Page Header Text</h2>
+                    <form id="form-shop-settings" onsubmit="event.preventDefault(); window.saveShopSettingsToDB();">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Overline Heading</label>
+                                <input type="text" id="setting-shop-heading" class="form-input" placeholder="SONRUP WELLNESS SHELF">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Main Title</label>
+                                <input type="text" id="setting-shop-title" class="form-input" placeholder="PREMIUM GUMMIES & BUNDLES">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group full-width">
+                                <label class="form-label">Subtitle / Description</label>
+                                <textarea id="setting-shop-desc" class="form-input" rows="2" placeholder="Sugar-free, clinical-grade formulations crafted to elevate active health..."></textarea>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-action btn-gold" style="padding: 10px 20px; font-size: 13px; border-radius: 6px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                            <i data-lucide="save"></i> Save Shop Text
+                        </button>
+                    </form>
+                </div>
+
                 <div class="glass-panel">
                     <table class="admin-table">
                         <thead>
@@ -681,6 +707,32 @@
                         <h1 class="section-title">Global Customer Orders</h1>
                         <p class="section-subtitle">Monitor shipments and update delivery status across India.</p>
                     </div>
+                </div>
+
+
+                <div class="glass-panel" style="margin-bottom: 24px;">
+                    <h2 style="font-family: 'Outfit', sans-serif; font-size: 20px; margin-top: 0; margin-bottom: 16px; color: #ffffff;">Shop Page Header Text</h2>
+                    <form id="form-shop-settings" onsubmit="event.preventDefault(); window.saveShopSettingsToDB();">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Overline Heading</label>
+                                <input type="text" id="setting-shop-heading" class="form-input" placeholder="SONRUP WELLNESS SHELF">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Main Title</label>
+                                <input type="text" id="setting-shop-title" class="form-input" placeholder="PREMIUM GUMMIES & BUNDLES">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group full-width">
+                                <label class="form-label">Subtitle / Description</label>
+                                <textarea id="setting-shop-desc" class="form-input" rows="2" placeholder="Sugar-free, clinical-grade formulations crafted to elevate active health..."></textarea>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-action btn-gold" style="padding: 10px 20px; font-size: 13px; border-radius: 6px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                            <i data-lucide="save"></i> Save Shop Text
+                        </button>
+                    </form>
                 </div>
 
                 <div class="glass-panel">
@@ -1503,6 +1555,32 @@
                     </div>
                 </div>
 
+
+                <div class="glass-panel" style="margin-bottom: 24px;">
+                    <h2 style="font-family: 'Outfit', sans-serif; font-size: 20px; margin-top: 0; margin-bottom: 16px; color: #ffffff;">Shop Page Header Text</h2>
+                    <form id="form-shop-settings" onsubmit="event.preventDefault(); window.saveShopSettingsToDB();">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Overline Heading</label>
+                                <input type="text" id="setting-shop-heading" class="form-input" placeholder="SONRUP WELLNESS SHELF">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Main Title</label>
+                                <input type="text" id="setting-shop-title" class="form-input" placeholder="PREMIUM GUMMIES & BUNDLES">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group full-width">
+                                <label class="form-label">Subtitle / Description</label>
+                                <textarea id="setting-shop-desc" class="form-input" rows="2" placeholder="Sugar-free, clinical-grade formulations crafted to elevate active health..."></textarea>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-action btn-gold" style="padding: 10px 20px; font-size: 13px; border-radius: 6px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                            <i data-lucide="save"></i> Save Shop Text
+                        </button>
+                    </form>
+                </div>
+
                 <div class="glass-panel">
                     <table class="admin-table">
                         <thead>
@@ -1529,6 +1607,32 @@
                         <p class="section-subtitle">Manage promotional discount codes usable by customers at checkout.</p>
                     </div>
                     <button class="btn-action btn-gold" id="btn-open-add-coupon"><i data-lucide="plus-circle" width="16"></i> Create New Coupon</button>
+                </div>
+
+
+                <div class="glass-panel" style="margin-bottom: 24px;">
+                    <h2 style="font-family: 'Outfit', sans-serif; font-size: 20px; margin-top: 0; margin-bottom: 16px; color: #ffffff;">Shop Page Header Text</h2>
+                    <form id="form-shop-settings" onsubmit="event.preventDefault(); window.saveShopSettingsToDB();">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Overline Heading</label>
+                                <input type="text" id="setting-shop-heading" class="form-input" placeholder="SONRUP WELLNESS SHELF">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Main Title</label>
+                                <input type="text" id="setting-shop-title" class="form-input" placeholder="PREMIUM GUMMIES & BUNDLES">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group full-width">
+                                <label class="form-label">Subtitle / Description</label>
+                                <textarea id="setting-shop-desc" class="form-input" rows="2" placeholder="Sugar-free, clinical-grade formulations crafted to elevate active health..."></textarea>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-action btn-gold" style="padding: 10px 20px; font-size: 13px; border-radius: 6px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                            <i data-lucide="save"></i> Save Shop Text
+                        </button>
+                    </form>
                 </div>
 
                 <div class="glass-panel">
@@ -1582,6 +1686,22 @@
                     <label class="form-label">Product Tag / Badge</label>
                     <input type="text" class="form-input" id="prod-tag" placeholder="e.g. Adult Performance" required>
                 </div>
+                <div class="form-group">
+                    <label class="form-label">Product Type</label>
+                    <select class="form-input" id="prod-type" required>
+                        <option value="single">Single Product</option>
+                        <option value="combo">Combo Bundle</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Tag Style Class</label>
+                    <select class="form-input" id="prod-tag-class" required>
+                        <option value="tag-shilajit">Shilajit Style (Gold)</option>
+                        <option value="tag-biotin">Biotin Style (Orange)</option>
+                        <option value="tag-kids">Kids Style (Blue)</option>
+                        <option value="tag-combo">Combo Style (Dark Gold)</option>
+                    </select>
+                </div>
                 <div class="form-group full-width">
                     <label class="form-label">Description / Wellness Story</label>
                     <textarea class="form-input" id="prod-description" rows="3" placeholder="Explain health benefits and herbal composition..." required></textarea>
@@ -1591,11 +1711,14 @@
                     <textarea class="form-input" id="prod-benefits" rows="3" placeholder="Boosts Daily Energy & Stamina&#10;100% Sugar-Free Formulation&#10;Ayurvedic Restorative" required></textarea>
                 </div>
                 <div class="form-group full-width">
-                    <label class="form-label">Image Path / URL (or Upload Below)</label>
-                    <input type="text" class="form-input" id="prod-image-path" placeholder="assets/images/shilajit-bottle.jpg" required>
+                    <label class="form-label">Product Image Gallery (First is Cover)</label>
+                    <div id="prod-images-preview" style="display: flex; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; min-height: 80px; padding: 12px; background: rgba(0,0,0,0.2); border-radius: 8px; border: 1px dashed rgba(255,255,255,0.1);">
+                        <span style="color: #94a3b8; font-size: 13px; align-self: center; width: 100%; text-align: center;">No images added yet.</span>
+                    </div>
+                    <textarea class="form-input" id="prod-all-images" rows="4" placeholder="assets/images/shilajit-bottle.jpg&#10;assets/images/detail1.jpg" required style="display: none;"></textarea>
                 </div>
                 <div class="form-group full-width">
-                    <label class="form-label">Upload New Product Image (Optional Override)</label>
+                    <label class="form-label">Upload New Image (Appends to list automatically)</label>
                     <input type="file" class="form-input" id="prod-image-file" accept="image/*">
                 </div>
                 

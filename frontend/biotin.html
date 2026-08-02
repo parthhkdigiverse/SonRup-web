@@ -14,7 +14,7 @@
     <!-- Lucide Icons CDN -->
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
-<body class="product-page">
+<body data-product-slug="biotin" class="product-page">
 
     <!-- Sticky Header -->
     <header class="site-header scrolled" id="main-header">
@@ -76,13 +76,13 @@
             <!-- Right: Details -->
             <div class="product-info-block" style="display: flex; flex-direction: column; justify-content: space-between;">
                 <div>
-                    <span class="product-tag tag-biotin" style="position: static; display: inline-block; margin-bottom: 15px;">Adult Daily Wellness</span>
-                    <h1 style="font-size: 42px; line-height: 1.2; margin-bottom: 10px; color: #FFFFFF;">Biotin + Multivitamin Gummies</h1>
-                    <p class="flavor-info" style="font-size: 14px; margin-bottom: 24px; color: var(--text-on-dark-muted);"><i data-lucide="sparkles" class="text-orange"></i> Orange (Citrus) Flavour</p>
-                    <p style="font-size: 15.5px; color: var(--text-on-dark-muted); margin-bottom: 30px; line-height: 1.7;">Your daily beauty and vitality shield. Enriched with 10 essential vitamins and minerals, including high-potency Biotin, Zinc, and Vitamin C to support healthy skin, hair, and nails. Designed for the ultimate vitality, glowing skin, and strong hair roots.</p>
+                    <span class="product-tag tag-biotin" id="dynamic-product-tag" style="position: static; display: inline-block; margin-bottom: 15px;">Adult Daily Wellness</span>
+                    <h1 style="font-size: 42px; line-height: 1.2; margin-bottom: 10px; color: #FFFFFF;" id="dynamic-product-name">Biotin + Multivitamin Gummies</h1>
+                    <p class="flavor-info" style="font-size: 14px; margin-bottom: 24px; color: var(--text-on-dark-muted);" id="dynamic-product-flavor"><i data-lucide="sparkles" class="text-orange"></i> Orange (Citrus) Flavour</p>
+                    <p style="font-size: 15.5px; color: var(--text-on-dark-muted); margin-bottom: 30px; line-height: 1.7;" id="dynamic-product-description">Your daily beauty and vitality shield. Enriched with 10 essential vitamins and minerals, including high-potency Biotin, Zinc, and Vitamin C to support healthy skin, hair, and nails. Designed for the ultimate vitality, glowing skin, and strong hair roots.</p>
                     
                     <h3 style="font-size: 15px; text-transform: uppercase; color: #FFFFFF; margin-bottom: 12px; font-weight: 600;">Key Benefits:</h3>
-                    <ul class="benefit-bullets" style="gap: 12px; margin-bottom: 30px;">
+                    <ul class="benefit-bullets" style="gap: 12px; margin-bottom: 30px;" id="dynamic-product-benefits">
                         <li><i data-lucide="check-circle" class="text-orange"></i> Glow & Beauty (Hair, Skin & Nails)</li>
                         <li><i data-lucide="check-circle" class="text-orange"></i> Essential Daily Vitality & Immunity</li>
                         <li><i data-lucide="check-circle" class="text-orange"></i> 10 Vitamins & Minerals incl. Folic Acid</li>
@@ -93,10 +93,10 @@
                 <div style="border-top: 1px solid rgba(255,255,255,0.06); padding-top: 24px; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap;">
                     <div>
                         <span style="font-size: 11px; text-transform: uppercase; color: var(--text-on-dark-muted); display: block; margin-bottom: 4px;">Price (60 Gummies Bottle)</span>
-                        <span style="font-size: 32px; font-family: var(--font-heading); color: #FFFFFF; font-weight: 700;">₹999</span>
+                        <span style="font-size: 32px; font-family: var(--font-heading); color: #FFFFFF; font-weight: 700;" id="dynamic-product-price">₹999</span>
                     </div>
                     <div style="display: flex; gap: 12px;">
-                        <button class="btn-secondary btn-lg add-to-cart-btn" data-name="Biotin + Multivitamin Gummies (Single)" data-price="999" data-img="assets/images/biotin-bottle.jpg" style="padding: 14px 24px;">
+                        <button class="btn-secondary btn-lg add-to-cart-btn" data-name="Biotin + Multivitamin Gummies (Single)" data-price="999" data-img="assets/images/biotin-bottle.jpg" style="padding: 14px 24px;" id="dynamic-add-to-cart">
                             Add to Cart
                         </button>
                         <button class="btn-primary btn-lg buy-now-btn" data-name="Biotin + Multivitamin Gummies (Single)" data-price="999" data-img="assets/images/biotin-bottle.jpg" style="padding: 14px 28px;">

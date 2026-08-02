@@ -14,7 +14,7 @@
     <!-- Lucide Icons CDN -->
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
-<body class="shop-catalog-body">
+<body data-product-slug="dad-kid" class="shop-catalog-body">
 
     <!-- Sticky Header -->
     <header class="site-header scrolled" id="main-header">
@@ -76,13 +76,13 @@
             <!-- Right: Details -->
             <div class="product-info-block" style="display: flex; flex-direction: column; justify-content: space-between;">
                 <div>
-                    <span class="product-tag tag-him" style="position: static; display: inline-block; margin-bottom: 15px; background-color: var(--color-gold); color: #121212;">Dad & Kid Active Duo</span>
-                    <h1 style="font-size: 38px; line-height: 1.2; margin-bottom: 10px; color: #FFFFFF;">Dad & Kid Active</h1>
-                    <p class="flavor-info" style="font-size: 14px; margin-bottom: 24px; color: var(--text-on-dark-muted);"><i data-lucide="shield" class="text-gold"></i> Peak Performance & Growth (2 Bottles)</p>
-                    <p style="font-size: 15.5px; color: var(--text-on-dark-muted); margin-bottom: 30px; line-height: 1.7;">The ultimate active life duo. Himalayan Shilajit resin energy gummies paired with Children's Multivitamin and Immunity booster gummies for optimal bone, brain, and stamina support. 100% sugar-free, premium Ayurvedic care.</p>
+                    <span class="product-tag tag-him" id="dynamic-product-tag" style="position: static; display: inline-block; margin-bottom: 15px; background-color: var(--color-gold); color: #121212;">Dad & Kid Active Duo</span>
+                    <h1 style="font-size: 38px; line-height: 1.2; margin-bottom: 10px; color: #FFFFFF;" id="dynamic-product-name">Dad & Kid Active</h1>
+                    <p class="flavor-info" style="font-size: 14px; margin-bottom: 24px; color: var(--text-on-dark-muted);" id="dynamic-product-flavor"><i data-lucide="shield" class="text-gold"></i> Peak Performance & Growth (2 Bottles)</p>
+                    <p style="font-size: 15.5px; color: var(--text-on-dark-muted); margin-bottom: 30px; line-height: 1.7;" id="dynamic-product-description">The ultimate active life duo. Himalayan Shilajit resin energy gummies paired with Children's Multivitamin and Immunity booster gummies for optimal bone, brain, and stamina support. 100% sugar-free, premium Ayurvedic care.</p>
                     
                     <h3 style="font-size: 15px; text-transform: uppercase; color: #FFFFFF; margin-bottom: 12px; font-weight: 600;">What's Included:</h3>
-                    <ul class="benefit-bullets" style="gap: 12px; margin-bottom: 30px;">
+                    <ul class="benefit-bullets" style="gap: 12px; margin-bottom: 30px;" id="dynamic-product-benefits">
                         <li><i data-lucide="check-circle" class="text-gold"></i> 1x Himalayan Shilajit Gummies (Ashwagandha & stamina support)</li>
                         <li><i data-lucide="check-circle" class="text-gold"></i> 1x Kid's Immunity Multivitamin Gummies (Mixed Fruit daily nutrients)</li>
                         <li><i data-lucide="check-circle" class="text-gold"></i> Total 120 Sugar-Free Premium Gummies</li>
@@ -92,10 +92,10 @@
                 <div style="border-top: 1px solid rgba(255,255,255,0.06); padding-top: 24px; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap;">
                     <div>
                         <span style="font-size: 11px; text-transform: uppercase; color: var(--text-on-dark-muted); display: block; margin-bottom: 4px;">Price (2 Bottles Combo)</span>
-                        <span style="font-size: 32px; font-family: var(--font-heading); color: #FFFFFF; font-weight: 700;">₹1,399</span>
+                        <span style="font-size: 32px; font-family: var(--font-heading); color: #FFFFFF; font-weight: 700;" id="dynamic-product-price">₹1,399</span>
                     </div>
                     <div style="display: flex; gap: 12px;">
-                        <button class="btn-secondary btn-lg add-to-cart-btn" data-name="Sonrup Dad & Kid Active Combo" data-price="1399" data-img="assets/images/hero-combo.jpg" style="padding: 14px 24px;">
+                        <button class="btn-secondary btn-lg add-to-cart-btn" data-name="Sonrup Dad & Kid Active Combo" data-price="1399" data-img="assets/images/hero-combo.jpg" style="padding: 14px 24px;" id="dynamic-add-to-cart">
                             Add to Cart
                         </button>
                         <button class="btn-primary btn-lg buy-now-btn" data-name="Sonrup Dad & Kid Active Combo" data-price="1399" data-img="assets/images/hero-combo.jpg" style="padding: 14px 28px;">
