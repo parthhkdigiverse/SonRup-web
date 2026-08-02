@@ -132,15 +132,43 @@
         .faq-answer {
             max-height: 0;
             overflow: hidden;
-            transition: max-height 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            background-color: rgba(255,255,255,0.01);
+            transition: max-height 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+            opacity: 0;
+            background-color: rgba(255, 255, 255, 0.02);
         }
 
-        .faq-answer-content {
-            padding: 0 24px 24px 24px;
-            font-size: 13.5px;
-            color: var(--text-on-dark-muted);
-            line-height: 1.6;
+        .faq-answer p,
+        .faq-answer-text,
+        .faq-answer-content,
+        .faq-answer .faq-answer-content {
+            padding: 6px 24px 22px 24px !important;
+            font-size: 14.5px !important;
+            color: #E2E8F0 !important;
+            line-height: 1.7 !important;
+            margin: 0 !important;
+            display: block !important;
+            visibility: visible !important;
+        }
+
+        .faq-item.active {
+            border: 1px solid #C9A227 !important;
+            box-shadow: 0 0 20px rgba(201, 162, 39, 0.25) !important;
+            background-color: rgba(255, 255, 255, 0.03) !important;
+        }
+
+        .faq-item.active .faq-question {
+            color: #FFFFFF !important;
+        }
+
+        .faq-item.active .faq-question svg,
+        .faq-item.active .faq-question i {
+            transform: rotate(180deg) !important;
+            color: #C9A227 !important;
+        }
+
+        .faq-item.active .faq-answer {
+            max-height: 600px !important;
+            opacity: 1 !important;
         }
 
         @media (max-width: 992px) {
@@ -198,44 +226,7 @@
 
         <!-- Dietary Cards Grid -->
         <div class="guide-grid">
-            <!-- Shilajit Guide -->
-            <div class="guide-card card-him">
-                <div class="guide-icon-wrapper">
-                    <i data-lucide="zap"></i>
-                </div>
-                <h3>Himalayan Shilajit</h3>
-                <ul>
-                    <li><i data-lucide="clock" class="text-gold"></i> <strong>Timing:</strong> Best consumed in the morning after breakfast for sustained, clean day-long active stamina.</li>
-                    <li><i data-lucide="check" class="text-gold"></i> <strong>Daily Dosage:</strong> 1 Gummy daily. Do not exceed the recommended dose.</li>
-                    <li><i data-lucide="alert-triangle" class="text-gold"></i> <strong>Target User:</strong> Exclusively formulated for adults. Not recommended for children or pregnant mothers.</li>
-                </ul>
-            </div>
-
-            <!-- Biotin Guide -->
-            <div class="guide-card card-her">
-                <div class="guide-icon-wrapper">
-                    <i data-lucide="sparkles"></i>
-                </div>
-                <h3>Biotin & Multivitamin</h3>
-                <ul>
-                    <li><i data-lucide="clock" class="text-orange"></i> <strong>Timing:</strong> Can be consumed anytime. We recommend taking it after lunch or dinner as a healthy sugar-free dessert.</li>
-                    <li><i data-lucide="check" class="text-orange"></i> <strong>Daily Dosage:</strong> 1 Gummy daily. Supports skin hydration and nail/hair keratin vitality.</li>
-                    <li><i data-lucide="alert-triangle" class="text-orange"></i> <strong>Target User:</strong> Perfect for adults seeking glowing health.</li>
-                </ul>
-            </div>
-
-            <!-- Kids Guide -->
-            <div class="guide-card card-kids">
-                <div class="guide-icon-wrapper">
-                    <i data-lucide="smile"></i>
-                </div>
-                <h3>Kid's Immunity booster</h3>
-                <ul>
-                    <li><i data-lucide="clock" class="text-blue"></i> <strong>Timing:</strong> Take 1 gummy in the evening after playtime or school to replenish essential active micronutrients.</li>
-                    <li><i data-lucide="check" class="text-blue"></i> <strong>Daily Dosage:</strong> 1 Gummy daily. Carefully balanced with Iron, Zinc, and Choline.</li>
-                    <li><i data-lucide="alert-triangle" class="text-blue"></i> <strong>Target User:</strong> Formulated for active growing kids aged 5 to 16. Chew thoroughly before swallowing.</li>
-                </ul>
-            </div>
+            <!-- Dynamically rendered from Admin Panel / MongoDB -->
         </div>
 
         <!-- FAQ Header -->
@@ -246,70 +237,7 @@
 
         <!-- FAQ Accordion Grid -->
         <div class="faq-accordion-box">
-            <!-- FAQ 1 -->
-            <div class="faq-item">
-                <button class="faq-question">
-                    <span>What makes Sonrup™ gummies different from candy gummies?</span>
-                    <i data-lucide="chevron-down"></i>
-                </button>
-                <div class="faq-answer">
-                    <div class="faq-answer-content">
-                        Standard commercial gummies are manufactured using corn syrup, processed white sugars, artificial dyes, and animal gelatin. Sonrup™ gummies are 100% sugar-free, gelatin-free (made from plant pectin), ash-washed, and infused with certified organic raw Ayurvedic materials and daily multivitamins.
-                    </div>
-                </div>
-            </div>
-
-            <!-- FAQ 2 -->
-            <div class="faq-item">
-                <button class="faq-question">
-                    <span>How many gummies should my child take daily?</span>
-                    <i data-lucide="chevron-down"></i>
-                </button>
-                <div class="faq-answer">
-                    <div class="faq-answer-content">
-                        Growing children aged 5 to 16 should take exactly **1 Kid's Multivitamin Gummy daily**, preferably after a meal. Ensure the child chews the gummy thoroughly. Do not exceed the recommended dose of 1 gummy per day unless directed by a pediatrician.
-                    </div>
-                </div>
-            </div>
-
-            <!-- FAQ 3 -->
-            <div class="faq-item">
-                <button class="faq-question">
-                    <span>Should I take Shilajit in the morning or at night?</span>
-                    <i data-lucide="chevron-down"></i>
-                </button>
-                <div class="faq-answer">
-                    <div class="faq-answer-content">
-                        We highly recommend consuming your **Himalayan Shilajit Gummy in the morning** after breakfast. Since Shilajit boosts cellular energy production (ATP levels) and Ashwagandha aids active stamina, taking it in the morning gives you stable performance throughout the day. Taking it very late at night may keep you feeling too energized to sleep.
-                    </div>
-                </div>
-            </div>
-
-            <!-- FAQ 4 -->
-            <div class="faq-item">
-                <button class="faq-question">
-                    <span>Are there any artificial fillers or colors used?</span>
-                    <i data-lucide="chevron-down"></i>
-                </button>
-                <div class="faq-answer">
-                    <div class="faq-answer-content">
-                        No. We use only natural plant-based color extracts (like beetroot juice concentrate) and organic flavor compounds. Our gummies are free from gluten, soy, nuts, and dairy, making them completely allergen-safe.
-                    </div>
-                </div>
-            </div>
-
-            <!-- FAQ 5 -->
-            <div class="faq-item">
-                <button class="faq-question">
-                    <span>What is the shelf life of these gummies?</span>
-                    <i data-lucide="chevron-down"></i>
-                </button>
-                <div class="faq-answer">
-                    <div class="faq-answer-content">
-                        The shelf life of all Sonrup™ gummies is **18 months** from the date of manufacture. Store the bottle in a cool, dry place away from direct sunlight, and keep the container tightly closed to preserve moisture levels.
-                    </div>
-                </div>
-            </div>
+            <!-- Dynamically rendered from Admin Panel / MongoDB -->
         </div>
     </main>
 

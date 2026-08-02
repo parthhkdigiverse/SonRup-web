@@ -1173,56 +1173,79 @@ button {
 }
 
 .faq-item {
-    border: 1px solid rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     background-color: var(--bg-dark);
     border-radius: 10px;
     overflow: hidden;
-    transition: var(--transition-smooth);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    margin-bottom: 12px;
 }
 
 .faq-question {
     width: 100%;
     text-align: left;
-    padding: 22px 28px;
+    padding: 20px 24px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     color: #FFFFFF;
-    font-weight: 500;
+    font-weight: 600;
     font-size: 15.5px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
 }
 
-.faq-question svg {
+.faq-question svg,
+.faq-question i {
     width: 18px;
     height: 18px;
     color: var(--text-on-dark-muted);
-    transition: var(--transition-smooth);
+    transition: transform 0.3s ease, color 0.3s ease;
+    flex-shrink: 0;
 }
 
 .faq-answer {
     max-height: 0;
     overflow: hidden;
-    transition: var(--transition-smooth);
-    background-color: rgba(255, 255, 255, 0.01);
+    transition: max-height 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+    opacity: 0;
+    background-color: rgba(255, 255, 255, 0.02);
 }
 
-.faq-answer p {
-    padding: 0 28px 22px 28px;
-    font-size: 13.5px;
-    color: var(--text-on-dark-muted);
+.faq-answer p,
+.faq-answer-text,
+.faq-answer-content,
+.faq-answer .faq-answer-content {
+    padding: 6px 24px 22px 24px !important;
+    font-size: 14.5px !important;
+    color: #E2E8F0 !important;
+    line-height: 1.7 !important;
+    margin: 0 !important;
+    display: block !important;
+    visibility: visible !important;
 }
 
 .faq-item.active {
-    border-color: var(--border-dark);
+    border: 1px solid #C9A227 !important;
+    box-shadow: 0 0 20px rgba(201, 162, 39, 0.25) !important;
+    background-color: rgba(255, 255, 255, 0.03) !important;
 }
 
-.faq-item.active .faq-question svg {
-    transform: rotate(180deg);
-    color: var(--color-gold);
+.faq-item.active .faq-question {
+    color: #FFFFFF !important;
+}
+
+.faq-item.active .faq-question svg,
+.faq-item.active .faq-question i {
+    transform: rotate(180deg) !important;
+    color: #C9A227 !important;
 }
 
 .faq-item.active .faq-answer {
-    max-height: 200px;
+    max-height: 600px !important;
+    opacity: 1 !important;
 }
 
 /* Footer Section */

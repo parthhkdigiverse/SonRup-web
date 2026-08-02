@@ -72,6 +72,30 @@ class WebsiteSettingsIn(BaseModel):
     trust_badge_6_title: str = "Made in India"
     trust_badge_6_sub: str = "Kellen Healthcare"
     trust_badges: list[dict] = []
+    # Label Transparency Section Fields
+    transparency_subheading: str = "TRANSPARENCY"
+    transparency_title: str = "Amount Per Gummy & Label Details"
+    transparency_desc: str = "We believe in complete ingredient transparency. Here is the exact nutritional profile printed on our labels, tested for quality and purity."
+    transparency_tabs: list[dict] = []
+    # The Advantage Section Fields
+    advantage_subheading: str = "THE ADVANTAGE"
+    advantage_title: str = "Why The Family Wellness Combo?"
+    advantage_desc: str = "Why buy multiple packs from different brands when you can cover the daily nutrient requirements of the entire household with one premium bundle?"
+    advantage_cards: list[dict] = []
+    # Guidance Section Fields
+    guidance_subheading: str = "GUIDANCE"
+    guidance_title: str = "How & Who It's For"
+    guidance_desc: str = "Simple guidelines for the daily routine of each family member."
+    guidance_columns: list[dict] = []
+    # FAQ & Dietary Guide Section Fields
+    faq_subheading: str = "ANSWERS"
+    faq_title: str = "Frequently Asked Questions"
+    faq_desc: str = "Got questions about dosage, safety, or suitability? We've got you covered."
+    faq_items: list[dict] = []
+    dietary_guide_subheading: str = "DIETARY USER GUIDE"
+    dietary_guide_title: str = "Dosages & Usage Instructions"
+    dietary_guide_desc: str = "Follow our certified dietary guides to maximize the energy, vitality, and cellular protection benefits of your daily Sonrup gummies."
+    dietary_guide_cards: list[dict] = []
 
 class ProductIn(BaseModel):
     slug: str
@@ -221,6 +245,203 @@ async def get_website_settings():
             {"id": "tb_4", "icon": "shield-check", "title": "FSSAI Licensed", "subtitle": "Regulated Quality"},
             {"id": "tb_5", "icon": "calendar", "title": "36-Month Shelf Life", "subtitle": "Long-Lasting Freshness"},
             {"id": "tb_6", "icon": "map-pin", "title": "Made in India", "subtitle": "Kellen Healthcare"}
+        ]
+
+    if "transparency_subheading" not in settings: settings["transparency_subheading"] = "TRANSPARENCY"
+    if "transparency_title" not in settings: settings["transparency_title"] = "Amount Per Gummy & Label Details"
+    if "transparency_desc" not in settings: settings["transparency_desc"] = "We believe in complete ingredient transparency. Here is the exact nutritional profile printed on our labels, tested for quality and purity."
+
+    if "transparency_tabs" not in settings or not settings["transparency_tabs"] or len(settings["transparency_tabs"][2].get("rows", [])) < 5:
+        settings["transparency_tabs"] = [
+            {
+                "id": "tab_shilajit",
+                "name": "Himalayan Shilajit",
+                "suggested_usage": "Take 1 Gummy daily or as directed by a healthcare professional. Best consumed after a meal.",
+                "rows": [
+                    {"component": "Gummy Shilajit Resin", "feature": "75% Fulvic Acid Strength", "amount": "200 mg"},
+                    {"component": "Ashwagandha", "feature": "Withania somnifera", "amount": "25 mg"},
+                    {"component": "Flavour", "feature": "Imli (Tamarind)", "amount": "Natural Blend"},
+                    {"component": "Sugar", "feature": "Sugar-Free", "amount": "0g"}
+                ]
+            },
+            {
+                "id": "tab_biotin",
+                "name": "Biotin + Multivitamin",
+                "suggested_usage": "1 Gummy daily for adults. Chew thoroughly before swallowing.",
+                "rows": [
+                    {"component": "Vitamin C", "feature": "Ascorbic Acid", "amount": "30 mcg"},
+                    {"component": "Vitamin B6", "feature": "Pyridoxine Hcl", "amount": "0.25 Mg"},
+                    {"component": "Biotin", "feature": "Vitamin H / Hair Vitality", "amount": "30 Mcg"},
+                    {"component": "Vitamin E", "feature": "Dl-A-Tocopheryl Acetate", "amount": "5 Mg"},
+                    {"component": "Vitamin A", "feature": "Retinol Acetate", "amount": "500 Mcg"},
+                    {"component": "Vitamin B12", "feature": "Cyanocobalamin", "amount": "1.1 Mcg"},
+                    {"component": "Folic Acid", "feature": "Vitamin B9 / Folate", "amount": "169 Mcg"},
+                    {"component": "Vitamin K2-7", "feature": "Menaquinone", "amount": "22.7 Mcg"},
+                    {"component": "Zinc Citrate", "feature": "Immune Mineral", "amount": "3 Mg"},
+                    {"component": "Iodine", "feature": "Potassium Iodide", "amount": "35 Mcg"}
+                ]
+            },
+            {
+                "id": "tab_kids",
+                "name": "Kid's Multivitamin",
+                "suggested_usage": "1 Gummy daily for children above 4 years of age under adult supervision.",
+                "rows": [
+                    {"component": "Vitamin A", "feature": "Retinol Acetate", "amount": "500 Iu"},
+                    {"component": "Vitamin C", "feature": "Ascorbic Acid", "amount": "5 mg"},
+                    {"component": "Vitamin D", "feature": "Cholecalciferol", "amount": "200 Iu"},
+                    {"component": "Vitamin E", "feature": "Dl-A-Tocopherol", "amount": "0.5 Iu"},
+                    {"component": "Vitamin B6", "feature": "Pyridoxine Hcl", "amount": "0.6 Mg"},
+                    {"component": "Folic Acid", "feature": "Vitamin B9", "amount": "70 Mcg"},
+                    {"component": "Vitamin B12", "feature": "Cyanocobalamin", "amount": "3 Mcg"},
+                    {"component": "Biotin", "feature": "Vitamin H", "amount": "30 Mcg"},
+                    {"component": "Pantothenic Acid", "feature": "Vitamin B5", "amount": "0.6 Mg"},
+                    {"component": "Iodine", "feature": "Potassium Iodide", "amount": "21 Mcg"},
+                    {"component": "Zinc", "feature": "Zinc Citrate", "amount": "1.35 Mg"},
+                    {"component": "Choline", "feature": "Brain Development Support", "amount": "20 Mcg"},
+                    {"component": "Inositol", "feature": "Cellular Signal Transduction", "amount": "20 Mcg"},
+                    {"component": "Iron", "feature": "Ferrous Fumarate", "amount": "1 Mcg"}
+                ]
+            }
+        ]
+
+    if "advantage_subheading" not in settings: settings["advantage_subheading"] = "THE ADVANTAGE"
+    if "advantage_title" not in settings: settings["advantage_title"] = "Why The Family Wellness Combo?"
+    if "advantage_desc" not in settings: settings["advantage_desc"] = "Why buy multiple packs from different brands when you can cover the daily nutrient requirements of the entire household with one premium bundle?"
+
+    if "advantage_cards" not in settings or not settings["advantage_cards"]:
+        settings["advantage_cards"] = [
+            {
+                "id": "adv_1",
+                "icon": "zap",
+                "title": "Energy & Performance",
+                "description": "Himalayan Shilajit (75% Fulvic Acid) combined with Ashwagandha helps increase stamina, strength, and daily energy levels for active adults."
+            },
+            {
+                "id": "adv_2",
+                "icon": "sparkles",
+                "title": "Glowing Beauty & Health",
+                "description": "Essential Biotin and Folic Acid ensure healthy skin, strong nails, and glowing hair, while 10 vitamins regulate cellular health."
+            },
+            {
+                "id": "adv_3",
+                "icon": "shield-alert",
+                "title": "Shielded Kids' Immunity",
+                "description": "Loaded with Vitamin C, D, Zinc, and Iron, our kids' formula boosts immunity, builds strong bones, and supports memory growth."
+            },
+            {
+                "id": "adv_4",
+                "icon": "smile",
+                "title": "Delicious & Sugar Free",
+                "description": "Enjoyable fruit flavors without the guilt. Formulated entirely sugar-free, making it the perfect daily chewable supplement."
+            }
+        ]
+
+    if "guidance_subheading" not in settings: settings["guidance_subheading"] = "GUIDANCE"
+    if "guidance_title" not in settings: settings["guidance_title"] = "How & Who It's For"
+    if "guidance_desc" not in settings: settings["guidance_desc"] = "Simple guidelines for the daily routine of each family member."
+
+    if "guidance_columns" not in settings or not settings["guidance_columns"]:
+        settings["guidance_columns"] = [
+            {
+                "id": "col_him",
+                "icon": "user",
+                "title": "Him",
+                "subtitle": "Father / Adult Male",
+                "items": [
+                    {"product": "Himalayan Shilajit Gummies", "usage": "Take 1 Gummy daily after breakfast or dinner."},
+                    {"product": "Biotin + Multivitamin", "usage": "Take 1 Gummy daily for overall vitality and daily energy support."}
+                ],
+                "warning": ""
+            },
+            {
+                "id": "col_her",
+                "icon": "user-plus",
+                "title": "Her",
+                "subtitle": "Mother / Adult Female",
+                "items": [
+                    {"product": "Biotin + Multivitamin", "usage": "Take 1 Gummy daily in the morning to support hair, skin, nails, and energy."},
+                    {"product": "Himalayan Shilajit", "usage": "Take 1 Gummy daily for strength and stamina, if active or exercising."}
+                ],
+                "warning": ""
+            },
+            {
+                "id": "col_kids",
+                "icon": "users",
+                "title": "Kids",
+                "subtitle": "Children (Ages 4+)",
+                "items": [
+                    {"product": "Kid's Multivitamin", "usage": "Chew 1 Gummy daily after school or lunch under parental supervision."}
+                ],
+                "warning": "Not suitable for kids under 4 years of age."
+            }
+        ]
+
+    if "faq_subheading" not in settings: settings["faq_subheading"] = "ANSWERS"
+    if "faq_title" not in settings: settings["faq_title"] = "Frequently Asked Questions"
+    if "faq_desc" not in settings: settings["faq_desc"] = "Got questions about dosage, safety, or suitability? We've got you covered."
+
+    if "faq_items" not in settings or not settings["faq_items"]:
+        settings["faq_items"] = [
+            {
+                "id": "faq_1",
+                "question": "What is the recommended age suitability for the kids' gummies?",
+                "answer": "Our Kid's Multivitamin and Immunity Booster gummies are specifically formulated for kids aged 4 and above. We recommend 1 gummy daily under parental supervision. For children under 4, please consult your family pediatrician."
+            },
+            {
+                "id": "faq_2",
+                "question": "Are these gummies completely sugar-free?",
+                "answer": "Yes! All three gummies in the Sonrup Family Wellness Combo are completely sugar-free and contain no added sugars. They are sweetened with premium natural substitutes, making them delicious without raising blood sugar levels."
+            },
+            {
+                "id": "faq_3",
+                "question": "What is the shelf life of these products?",
+                "answer": "Each bottle has a shelf life of 36 months from the date of manufacture. Please store them in a cool, dry place away from direct sunlight, and keep the cap tightly sealed to maintain freshness."
+            },
+            {
+                "id": "faq_4",
+                "question": "How does the return policy work?",
+                "answer": "We stand behind the quality of our products. If you are not satisfied with your purchase, you can contact our customer support team within 30 days of delivery for a full replacement or refund. No questions asked."
+            },
+            {
+                "id": "faq_5",
+                "question": "Can both men and women take the Shilajit and Biotin gummies?",
+                "answer": "Absolutely. Both products are unisex. Shilajit gummies help improve stamina and strength for anyone, while Biotin + Multivitamin gummies support skin, hair, and nail health for all adults."
+            }
+        ]
+
+    if "dietary_guide_subheading" not in settings: settings["dietary_guide_subheading"] = "DIETARY USER GUIDE"
+    if "dietary_guide_title" not in settings: settings["dietary_guide_title"] = "Dosages & Usage Instructions"
+    if "dietary_guide_desc" not in settings: settings["dietary_guide_desc"] = "Follow our certified dietary guides to maximize the energy, vitality, and cellular protection benefits of your daily Sonrup gummies."
+
+    if "dietary_guide_cards" not in settings or not settings["dietary_guide_cards"]:
+        settings["dietary_guide_cards"] = [
+            {
+                "id": "dg_1",
+                "icon": "zap",
+                "title": "Himalayan Shilajit",
+                "card_type": "him",
+                "timing": "Best consumed in the morning after breakfast for sustained, clean day-long active stamina.",
+                "dosage": "1 Gummy daily. Do not exceed the recommended dose.",
+                "target": "Exclusively formulated for adults. Not recommended for children or pregnant mothers."
+            },
+            {
+                "id": "dg_2",
+                "icon": "sparkles",
+                "title": "Biotin & Multivitamin",
+                "card_type": "her",
+                "timing": "Can be consumed anytime. We recommend taking it after lunch or dinner as a healthy sugar-free dessert.",
+                "dosage": "1 Gummy daily. Supports skin hydration and nail/hair keratin vitality.",
+                "target": "Perfect for adults seeking glowing health."
+            },
+            {
+                "id": "dg_3",
+                "icon": "smile",
+                "title": "Kid's Immunity booster",
+                "card_type": "kids",
+                "timing": "Take 1 gummy in the evening after playtime or school to replenish essential active micronutrients.",
+                "dosage": "1 Gummy daily. Carefully balanced with Iron, Zinc, and Choline.",
+                "target": "Formulated for active growing kids aged 5 to 16. Chew thoroughly before swallowing."
+            }
         ]
 
     return settings

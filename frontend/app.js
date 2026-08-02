@@ -2,6 +2,12 @@
 let APP_CONFIG = {};
 let AUTH_TOKEN = localStorage.getItem("sonrup_token") || null;
 
+// Try instant pre-hydration from cached config to prevent FOUC / hardcoded text flash
+try {
+    const cached = localStorage.getItem("sonrup_app_config");
+    if (cached) APP_CONFIG = JSON.parse(cached);
+} catch (e) {}
+
 async function loadAppConfig() {
     try {
         // Try fetching from API directly (when served on backend port)
@@ -11,7 +17,8 @@ async function loadAppConfig() {
             res = await fetch("/config.json");
             if (!res.ok) res = await fetch("config.json");
         }
-        APP_CONFIG = await res.json();
+        const loadedConfig = await res.json();
+        APP_CONFIG = { ...APP_CONFIG, ...loadedConfig };
 
         // Fetch live MongoDB settings from backend server directly
         if (APP_CONFIG.backend_port && window.location.port != APP_CONFIG.backend_port) {
@@ -23,6 +30,11 @@ async function loadAppConfig() {
                 }
             } catch (e) { /* use cached config */ }
         }
+
+        // Cache live config for instant zero-latency pre-rendering on hard refresh
+        try {
+            localStorage.setItem("sonrup_app_config", JSON.stringify(APP_CONFIG));
+        } catch (e) {}
 
         // Inject Dynamic Announcement Top Bar if configured
         if (APP_CONFIG.announcement_banner_enabled && APP_CONFIG.announcement_banner_text) {
@@ -52,9 +64,15 @@ async function loadAppConfig() {
             banner.textContent = APP_CONFIG.announcement_banner_text;
         }
 
-        // Render dynamic Hero Section & Trust Badges from config on home page
+        // Render dynamic Hero Section, Trust Badges, Label Transparency, Advantage section, Guidance section, FAQ section, Dietary Guide & Footer details from config
         renderHeroSectionFromConfig();
         renderTrustBadgesFromConfig();
+        renderTransparencyFromConfig();
+        renderAdvantageFromConfig();
+        renderGuidanceFromConfig();
+        renderFaqFromConfig();
+        renderDietaryGuideFromConfig();
+        renderSiteFooterAndContactFromConfig();
     } catch (err) {
         console.warn("Could not load app config, using defaults.", err);
         APP_CONFIG = { backend_port: 8010 };
@@ -163,6 +181,315 @@ function renderTrustBadgesFromConfig() {
     }
 }
 
+function renderTransparencyFromConfig() {
+    const section = document.getElementById("ingredients-section");
+    if (!section || !APP_CONFIG) return;
+
+    const subHeading = section.querySelector(".sub-heading");
+    if (subHeading && APP_CONFIG.transparency_subheading) subHeading.textContent = APP_CONFIG.transparency_subheading;
+
+    const mainTitle = section.querySelector("h2");
+    if (mainTitle && APP_CONFIG.transparency_title) mainTitle.textContent = APP_CONFIG.transparency_title;
+
+    const desc = section.querySelector(".section-desc");
+    if (desc && APP_CONFIG.transparency_desc) desc.textContent = APP_CONFIG.transparency_desc;
+
+    const tabSystem = section.querySelector(".tab-system");
+    if (!tabSystem || !APP_CONFIG.transparency_tabs || APP_CONFIG.transparency_tabs.length === 0) return;
+
+    const tabs = APP_CONFIG.transparency_tabs;
+
+    const navHTML = tabs.map((t, idx) => `
+        <button class="tab-btn ${idx === 0 ? 'active' : ''}" data-tab="dynamic-transparency-tab-${idx}">${t.name || ('Tab ' + (idx + 1))}</button>
+    `).join("");
+
+    const contentsHTML = tabs.map((t, idx) => {
+        const rowsHTML = (t.rows || []).map(r => `
+            <tr>
+                <td><strong>${r.component || ''}</strong></td>
+                <td>${r.feature || ''}</td>
+                <td>${r.amount || ''}</td>
+            </tr>
+        `).join("");
+
+        return `
+            <div class="tab-content ${idx === 0 ? 'active' : ''}" id="dynamic-transparency-tab-${idx}">
+                <div class="label-table-wrapper">
+                    <table class="label-table">
+                        <thead>
+                            <tr>
+                                <th>Component</th>
+                                <th>Key Features / Source</th>
+                                <th>Unit Amount Per Gummy</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${rowsHTML}
+                        </tbody>
+                    </table>
+                    <div class="table-footnote">
+                        <p><i data-lucide="info"></i> Suggested Usage: ${t.suggested_usage || 'Take 1 Gummy daily or as directed by a healthcare professional.'}</p>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join("");
+
+    tabSystem.innerHTML = `
+        <div class="tab-nav">
+            ${navHTML}
+        </div>
+        ${contentsHTML}
+    `;
+
+    if (window.lucide) window.lucide.createIcons();
+
+    const tabButtons = tabSystem.querySelectorAll(".tab-btn");
+    const tabContents = tabSystem.querySelectorAll(".tab-content");
+
+    tabButtons.forEach(btn => {
+        btn.addEventListener("click", () => {
+            const targetTab = btn.getAttribute("data-tab");
+            tabButtons.forEach(b => b.classList.remove("active"));
+            tabContents.forEach(c => c.classList.remove("active"));
+
+            btn.classList.add("active");
+            const activeContent = document.getElementById(targetTab);
+            if (activeContent) activeContent.classList.add("active");
+        });
+    });
+}
+
+function renderAdvantageFromConfig() {
+    const section = document.getElementById("why-section");
+    if (!section || !APP_CONFIG) return;
+
+    const subHeading = section.querySelector(".sub-heading");
+    if (subHeading && APP_CONFIG.advantage_subheading) subHeading.textContent = APP_CONFIG.advantage_subheading;
+
+    const mainTitle = section.querySelector("h2");
+    if (mainTitle && APP_CONFIG.advantage_title) mainTitle.textContent = APP_CONFIG.advantage_title;
+
+    const desc = section.querySelector(".section-desc");
+    if (desc && APP_CONFIG.advantage_desc) desc.textContent = APP_CONFIG.advantage_desc;
+
+    const grid = section.querySelector(".why-grid");
+    if (!grid || !APP_CONFIG.advantage_cards || APP_CONFIG.advantage_cards.length === 0) return;
+
+    grid.innerHTML = APP_CONFIG.advantage_cards.map(c => `
+        <div class="why-card">
+            <div class="why-icon-container"><i data-lucide="${c.icon || 'zap'}"></i></div>
+            <h3>${c.title || ''}</h3>
+            <p>${c.description || ''}</p>
+        </div>
+    `).join("");
+
+    if (window.lucide) window.lucide.createIcons();
+}
+
+function renderGuidanceFromConfig() {
+    const section = document.getElementById("usage-section");
+    if (!section || !APP_CONFIG) return;
+
+    const subHeading = section.querySelector(".sub-heading");
+    if (subHeading && APP_CONFIG.guidance_subheading) subHeading.textContent = APP_CONFIG.guidance_subheading;
+
+    const mainTitle = section.querySelector("h2");
+    if (mainTitle && APP_CONFIG.guidance_title) mainTitle.textContent = APP_CONFIG.guidance_title;
+
+    const desc = section.querySelector(".section-desc");
+    if (desc && APP_CONFIG.guidance_desc) desc.textContent = APP_CONFIG.guidance_desc;
+
+    const grid = section.querySelector(".usage-grid");
+    if (!grid || !APP_CONFIG.guidance_columns || APP_CONFIG.guidance_columns.length === 0) return;
+
+    grid.innerHTML = APP_CONFIG.guidance_columns.map(col => {
+        const itemsHTML = (col.items || []).map(item => `
+            <h4>${item.product || ''}</h4>
+            <p>${item.usage || ''}</p>
+        `).join("");
+
+        const warningHTML = col.warning ? `<p class="kids-warning">${col.warning}</p>` : '';
+
+        return `
+            <div class="usage-column">
+                <div class="usage-header">
+                    <span class="avatar-icon"><i data-lucide="${col.icon || 'user'}"></i></span>
+                    <h3>${col.title || ''}</h3>
+                    <span class="target-desc">${col.subtitle || ''}</span>
+                </div>
+                <div class="usage-body">
+                    ${itemsHTML}
+                    ${warningHTML}
+                </div>
+            </div>
+        `;
+    }).join("");
+
+    if (window.lucide) window.lucide.createIcons();
+}
+
+function renderFaqFromConfig() {
+    if (!APP_CONFIG) return;
+
+    const faqItems = (APP_CONFIG.faq_items && APP_CONFIG.faq_items.length > 0) ? APP_CONFIG.faq_items : [
+        { question: "What is the recommended age suitability for the kids' gummies?", answer: "Our Kid's Multivitamin and Immunity Booster gummies are specifically formulated for kids aged 4 and above. We recommend 1 gummy daily under parental supervision. For children under 4, please consult your family pediatrician." },
+        { question: "Are these gummies completely sugar-free?", answer: "Yes! All three gummies in the Sonrup Family Wellness Combo are completely sugar-free and contain no added sugars. They are sweetened with premium natural substitutes, making them delicious without raising blood sugar levels." },
+        { question: "What is the shelf life of these products?", answer: "Each bottle has a shelf life of 36 months from the date of manufacture. Please store them in a cool, dry place away from direct sunlight, and keep the container tightly closed to preserve moisture levels." },
+        { question: "How does the return policy work?", answer: "We stand behind the quality of our products. If you are not satisfied with your purchase, you can contact our customer support team within 30 days of delivery for a full replacement or refund. No questions asked." },
+        { question: "Can both men and women take the Shilajit and Biotin gummies?", answer: "Absolutely. Both products are unisex. Shilajit gummies help improve stamina and strength for anyone, while Biotin + Multivitamin gummies support skin, hair, and nail health for all adults." }
+    ];
+
+    // Sub-heading update on both index.html & faq.html
+    document.querySelectorAll(".sub-heading").forEach(el => {
+        if (APP_CONFIG.faq_subheading && (el.textContent.includes("ANSWERS") || el.textContent.includes("FAQ"))) {
+            el.textContent = APP_CONFIG.faq_subheading;
+        }
+    });
+
+    // Main section title update on both index.html & faq.html
+    document.querySelectorAll("h2, h1").forEach(el => {
+        if (APP_CONFIG.faq_title && el.textContent.includes("Frequently Asked Questions")) {
+            el.textContent = APP_CONFIG.faq_title;
+        }
+    });
+
+    // Description paragraph update
+    document.querySelectorAll("#faq-section .section-desc, main .section-desc").forEach(el => {
+        if (APP_CONFIG.faq_desc && el.textContent.includes("Got questions")) {
+            el.textContent = APP_CONFIG.faq_desc;
+        }
+    });
+
+    const containers = document.querySelectorAll(".faq-accordion-container, .faq-accordion-box");
+    if (!containers || containers.length === 0) return;
+
+    containers.forEach(container => {
+        container.innerHTML = faqItems.map((item, idx) => `
+            <div class="faq-item ${idx === 0 ? 'active' : ''}">
+                <button class="faq-question" type="button">
+                    <span>${item.question || ''}</span>
+                    <i data-lucide="chevron-down"></i>
+                </button>
+                <div class="faq-answer">
+                    <div class="faq-answer-content">
+                        <p>${item.answer || ''}</p>
+                    </div>
+                </div>
+            </div>
+        `).join("");
+
+        // Single Event Delegation on Container — Zero Double Fire!
+        container.onclick = (e) => {
+            const faqHeader = e.target.closest(".faq-question") || e.target.closest(".faq-item");
+            if (!faqHeader) return;
+
+            const targetItem = faqHeader.closest(".faq-item");
+            if (!targetItem) return;
+
+            e.preventDefault();
+
+            const isAlreadyActive = targetItem.classList.contains("active");
+
+            // Close all items in this accordion container
+            container.querySelectorAll(".faq-item").forEach(el => el.classList.remove("active"));
+
+            // If it wasn't active before, open it!
+            if (!isAlreadyActive) {
+                targetItem.classList.add("active");
+            }
+        };
+    });
+
+    if (window.lucide) window.lucide.createIcons();
+}
+
+function renderDietaryGuideFromConfig() {
+    const guideGrid = document.querySelector(".guide-grid");
+    if (!guideGrid || !APP_CONFIG) return;
+
+    // Dynamic header texts on faq.html
+    const guideMain = guideGrid.closest("main");
+    if (guideMain) {
+        const subHead = guideMain.querySelector(".section-header .sub-heading");
+        if (subHead && APP_CONFIG.dietary_guide_subheading) subHead.textContent = APP_CONFIG.dietary_guide_subheading;
+
+        const mainTitle = guideMain.querySelector(".section-header h1, .section-header h2");
+        if (mainTitle && APP_CONFIG.dietary_guide_title) mainTitle.textContent = APP_CONFIG.dietary_guide_title;
+
+        const desc = guideMain.querySelector(".section-header .section-desc");
+        if (desc && APP_CONFIG.dietary_guide_desc) desc.textContent = APP_CONFIG.dietary_guide_desc;
+    }
+
+    if (!APP_CONFIG.dietary_guide_cards || APP_CONFIG.dietary_guide_cards.length === 0) return;
+
+    const cardTypes = ["card-him", "card-her", "card-kids"];
+    const textColors = ["text-gold", "text-orange", "text-blue"];
+
+    guideGrid.innerHTML = APP_CONFIG.dietary_guide_cards.map((card, idx) => {
+        const cClass = card.card_type ? `card-${card.card_type}` : cardTypes[idx % 3];
+        const tColor = textColors[idx % 3];
+
+        return `
+            <div class="guide-card ${cClass}">
+                <div class="guide-icon-wrapper">
+                    <i data-lucide="${card.icon || 'zap'}"></i>
+                </div>
+                <h3>${card.title || ''}</h3>
+                <ul>
+                    ${card.timing ? `<li><i data-lucide="clock" class="${tColor}"></i> <strong>Timing:</strong> ${card.timing}</li>` : ''}
+                    ${card.dosage ? `<li><i data-lucide="check" class="${tColor}"></i> <strong>Daily Dosage:</strong> ${card.dosage}</li>` : ''}
+                    ${card.target ? `<li><i data-lucide="alert-triangle" class="${tColor}"></i> <strong>Target User:</strong> ${card.target}</li>` : ''}
+                </ul>
+            </div>
+        `;
+    }).join("");
+
+    if (window.lucide) window.lucide.createIcons();
+}
+
+function renderSiteFooterAndContactFromConfig() {
+    if (!APP_CONFIG) return;
+
+    if (APP_CONFIG.site_name) {
+        document.querySelectorAll(".brand-name").forEach(el => el.textContent = APP_CONFIG.site_name.toLowerCase());
+        document.querySelectorAll(".site-title-name").forEach(el => el.textContent = APP_CONFIG.site_name);
+    }
+
+    const legalCol = document.querySelector(".footer-legal-col");
+    if (legalCol) {
+        if (APP_CONFIG.license_number) {
+            const licEl = legalCol.querySelector("p:nth-of-type(1)");
+            if (licEl) licEl.innerHTML = `<strong>Lic No:</strong> ${APP_CONFIG.license_number}`;
+        }
+        if (APP_CONFIG.fssai_number) {
+            const fssaiEl = legalCol.querySelector("p:nth-of-type(2)");
+            if (fssaiEl) fssaiEl.innerHTML = `<strong>FSSAI:</strong> ${APP_CONFIG.fssai_number}`;
+        }
+    }
+
+    const supportEmailElements = document.querySelectorAll(".contact-email-val, #footer-support-email");
+    supportEmailElements.forEach(el => {
+        if (APP_CONFIG.support_email) {
+            el.textContent = APP_CONFIG.support_email;
+            if (el.tagName === 'A') el.href = `mailto:${APP_CONFIG.support_email}`;
+        }
+    });
+
+    const supportPhoneElements = document.querySelectorAll(".contact-phone-val, #footer-support-phone");
+    supportPhoneElements.forEach(el => {
+        if (APP_CONFIG.support_phone) {
+            el.textContent = APP_CONFIG.support_phone;
+            if (el.tagName === 'A') el.href = `tel:${APP_CONFIG.support_phone.replace(/\s+/g, '')}`;
+        }
+    });
+
+    const supportAddrElements = document.querySelectorAll(".contact-address-val, #footer-support-address");
+    supportAddrElements.forEach(el => {
+        if (APP_CONFIG.support_address) el.textContent = APP_CONFIG.support_address;
+    });
+}
+
 function getApiBase() {
     if (!APP_CONFIG || !APP_CONFIG.backend_port) return "";
     // If browser port matches backend port, use clean relative URL
@@ -197,8 +524,26 @@ function isLoggedIn() {
     return !!AUTH_TOKEN;
 }
 
-// Initialize Lucide Icons
+// ─── DOMContentLoaded Initialization ───
 document.addEventListener("DOMContentLoaded", async () => {
+    // Render immediately from cached APP_CONFIG if available
+    const cachedConfig = localStorage.getItem("sonrup_config");
+    if (cachedConfig) {
+        try {
+            APP_CONFIG = JSON.parse(cachedConfig);
+            renderHeroSectionFromConfig();
+            renderTrustBadgesFromConfig();
+            renderTransparencyFromConfig();
+            renderAdvantageFromConfig();
+            renderGuidanceFromConfig();
+            renderFaqFromConfig();
+            renderDietaryGuideFromConfig();
+            renderSiteFooterAndContactFromConfig();
+        } catch (e) {
+            console.error("Error loading cached config", e);
+        }
+    }
+
     // Load frontend config from backend .env
     await loadAppConfig();
 

@@ -399,6 +399,167 @@ async function loadSettings() {
             { id: "tb_6", icon: "map-pin", title: "Made in India", subtitle: "Kellen Healthcare" }
         ];
         renderTrustBadgesCRUD();
+
+        // Dynamic Label Transparency Section
+        if (document.getElementById("setting-transparency-subheading")) document.getElementById("setting-transparency-subheading").value = data.transparency_subheading || "TRANSPARENCY";
+        if (document.getElementById("setting-transparency-title")) document.getElementById("setting-transparency-title").value = data.transparency_title || "Amount Per Gummy & Label Details";
+        if (document.getElementById("setting-transparency-desc")) document.getElementById("setting-transparency-desc").value = data.transparency_desc || "We believe in complete ingredient transparency. Here is the exact nutritional profile printed on our labels, tested for quality and purity.";
+
+        currentTransparencyTabs = (data.transparency_tabs && data.transparency_tabs.length > 0 && data.transparency_tabs[2]?.rows?.length >= 5) ? data.transparency_tabs : [
+            {
+                id: "tab_shilajit",
+                name: "Himalayan Shilajit",
+                suggested_usage: "Take 1 Gummy daily or as directed by a healthcare professional. Best consumed after a meal.",
+                rows: [
+                    { component: "Gummy Shilajit Resin", feature: "75% Fulvic Acid Strength", amount: "200 mg" },
+                    { component: "Ashwagandha", feature: "Withania somnifera", amount: "25 mg" },
+                    { component: "Flavour", feature: "Imli (Tamarind)", amount: "Natural Blend" },
+                    { component: "Sugar", feature: "Sugar-Free", amount: "0g" }
+                ]
+            },
+            {
+                id: "tab_biotin",
+                name: "Biotin + Multivitamin",
+                suggested_usage: "1 Gummy daily for adults. Chew thoroughly before swallowing.",
+                rows: [
+                    { component: "Vitamin C", feature: "Ascorbic Acid", amount: "30 mcg" },
+                    { component: "Vitamin B6", feature: "Pyridoxine Hcl", amount: "0.25 Mg" },
+                    { component: "Biotin", feature: "Vitamin H / Hair Vitality", amount: "30 Mcg" },
+                    { component: "Vitamin E", feature: "Dl-A-Tocopheryl Acetate", amount: "5 Mg" },
+                    { component: "Vitamin A", feature: "Retinol Acetate", amount: "500 Mcg" },
+                    { component: "Vitamin B12", feature: "Cyanocobalamin", amount: "1.1 Mcg" },
+                    { component: "Folic Acid", feature: "Vitamin B9 / Folate", amount: "169 Mcg" },
+                    { component: "Vitamin K2-7", feature: "Menaquinone", amount: "22.7 Mcg" },
+                    { component: "Zinc Citrate", feature: "Immune Mineral", amount: "3 Mg" },
+                    { component: "Iodine", feature: "Potassium Iodide", amount: "35 Mcg" }
+                ]
+            },
+            {
+                id: "tab_kids",
+                name: "Kid's Multivitamin",
+                suggested_usage: "1 Gummy daily for children above 4 years of age under adult supervision.",
+                rows: [
+                    { component: "Vitamin A", feature: "Retinol Acetate", amount: "500 Iu" },
+                    { component: "Vitamin C", feature: "Ascorbic Acid", amount: "5 mg" },
+                    { component: "Vitamin D", feature: "Cholecalciferol", amount: "200 Iu" },
+                    { component: "Vitamin E", feature: "Dl-A-Tocopherol", amount: "0.5 Iu" },
+                    { component: "Vitamin B6", feature: "Pyridoxine Hcl", amount: "0.6 Mg" },
+                    { component: "Folic Acid", feature: "Vitamin B9", amount: "70 Mcg" },
+                    { component: "Vitamin B12", feature: "Cyanocobalamin", amount: "3 Mcg" },
+                    { component: "Biotin", feature: "Vitamin H", amount: "30 Mcg" },
+                    { component: "Pantothenic Acid", feature: "Vitamin B5", amount: "0.6 Mg" },
+                    { component: "Iodine", feature: "Potassium Iodide", amount: "21 Mcg" },
+                    { component: "Zinc", feature: "Zinc Citrate", amount: "1.35 Mg" },
+                    { component: "Choline", feature: "Brain Development Support", amount: "20 Mcg" },
+                    { component: "Inositol", feature: "Cellular Signal Transduction", amount: "20 Mcg" },
+                    { component: "Iron", feature: "Ferrous Fumarate", amount: "1 Mcg" }
+                ]
+            }
+        ];
+        renderTransparencyCRUD();
+
+        // Dynamic The Advantage Section
+        if (document.getElementById("setting-advantage-subheading")) document.getElementById("setting-advantage-subheading").value = data.advantage_subheading || "THE ADVANTAGE";
+        if (document.getElementById("setting-advantage-title")) document.getElementById("setting-advantage-title").value = data.advantage_title || "Why The Family Wellness Combo?";
+        if (document.getElementById("setting-advantage-desc")) document.getElementById("setting-advantage-desc").value = data.advantage_desc || "Why buy multiple packs from different brands when you can cover the daily nutrient requirements of the entire household with one premium bundle?";
+
+        currentAdvantageCards = (data.advantage_cards && data.advantage_cards.length > 0) ? data.advantage_cards : [
+            { id: "adv_1", icon: "zap", title: "Energy & Performance", description: "Himalayan Shilajit (75% Fulvic Acid) combined with Ashwagandha helps increase stamina, strength, and daily energy levels for active adults." },
+            { id: "adv_2", icon: "sparkles", title: "Glowing Beauty & Health", description: "Essential Biotin and Folic Acid ensure healthy skin, strong nails, and glowing hair, while 10 vitamins regulate cellular health." },
+            { id: "adv_3", icon: "shield-alert", title: "Shielded Kids' Immunity", description: "Loaded with Vitamin C, D, Zinc, and Iron, our kids' formula boosts immunity, builds strong bones, and supports memory growth." },
+            { id: "adv_4", icon: "smile", title: "Delicious & Sugar Free", description: "Enjoyable fruit flavors without the guilt. Formulated entirely sugar-free, making it the perfect daily chewable supplement." }
+        ];
+        renderAdvantageCRUD();
+
+        // Dynamic Guidance Section
+        if (document.getElementById("setting-guidance-subheading")) document.getElementById("setting-guidance-subheading").value = data.guidance_subheading || "GUIDANCE";
+        if (document.getElementById("setting-guidance-title")) document.getElementById("setting-guidance-title").value = data.guidance_title || "How & Who It's For";
+        if (document.getElementById("setting-guidance-desc")) document.getElementById("setting-guidance-desc").value = data.guidance_desc || "Simple guidelines for the daily routine of each family member.";
+
+        currentGuidanceColumns = (data.guidance_columns && data.guidance_columns.length > 0) ? data.guidance_columns : [
+            {
+                id: "col_him",
+                icon: "user",
+                title: "Him",
+                subtitle: "Father / Adult Male",
+                items: [
+                    { product: "Himalayan Shilajit Gummies", usage: "Take 1 Gummy daily after breakfast or dinner." },
+                    { product: "Biotin + Multivitamin", usage: "Take 1 Gummy daily for overall vitality and daily energy support." }
+                ],
+                warning: ""
+            },
+            {
+                id: "col_her",
+                icon: "user-plus",
+                title: "Her",
+                subtitle: "Mother / Adult Female",
+                items: [
+                    { product: "Biotin + Multivitamin", usage: "Take 1 Gummy daily in the morning to support hair, skin, nails, and energy." },
+                    { product: "Himalayan Shilajit", usage: "Take 1 Gummy daily for strength and stamina, if active or exercising." }
+                ],
+                warning: ""
+            },
+            {
+                id: "col_kids",
+                icon: "users",
+                title: "Kids",
+                subtitle: "Children (Ages 4+)",
+                items: [
+                    { product: "Kid's Multivitamin", usage: "Chew 1 Gummy daily after school or lunch under parental supervision." }
+                ],
+                warning: "Not suitable for kids under 4 years of age."
+            }
+        ];
+        renderGuidanceCRUD();
+
+        // Dynamic FAQ Section & Dietary Guide Cards
+        if (document.getElementById("setting-faq-subheading")) document.getElementById("setting-faq-subheading").value = data.faq_subheading || "ANSWERS";
+        if (document.getElementById("setting-faq-title")) document.getElementById("setting-faq-title").value = data.faq_title || "Frequently Asked Questions";
+        if (document.getElementById("setting-faq-desc")) document.getElementById("setting-faq-desc").value = data.faq_desc || "Got questions about dosage, safety, or suitability? We've got you covered.";
+
+        if (document.getElementById("setting-dietary-subheading")) document.getElementById("setting-dietary-subheading").value = data.dietary_guide_subheading || "DIETARY USER GUIDE";
+        if (document.getElementById("setting-dietary-title")) document.getElementById("setting-dietary-title").value = data.dietary_guide_title || "Dosages & Usage Instructions";
+        if (document.getElementById("setting-dietary-desc")) document.getElementById("setting-dietary-desc").value = data.dietary_guide_desc || "Follow our certified dietary guides to maximize the energy, vitality, and cellular protection benefits of your daily Sonrup gummies.";
+
+        currentDietaryCards = (data.dietary_guide_cards && data.dietary_guide_cards.length > 0) ? data.dietary_guide_cards : [
+            {
+                id: "dg_1",
+                icon: "zap",
+                title: "Himalayan Shilajit",
+                card_type: "him",
+                timing: "Best consumed in the morning after breakfast for sustained, clean day-long active stamina.",
+                dosage: "1 Gummy daily. Do not exceed the recommended dose.",
+                target: "Exclusively formulated for adults. Not recommended for children or pregnant mothers."
+            },
+            {
+                id: "dg_2",
+                icon: "sparkles",
+                title: "Biotin & Multivitamin",
+                card_type: "her",
+                timing: "Can be consumed anytime. We recommend taking it after lunch or dinner as a healthy sugar-free dessert.",
+                dosage: "1 Gummy daily. Supports skin hydration and nail/hair keratin vitality.",
+                target: "Perfect for adults seeking glowing health."
+            },
+            {
+                id: "dg_3",
+                icon: "smile",
+                title: "Kid's Immunity booster",
+                card_type: "kids",
+                timing: "Take 1 gummy in the evening after playtime or school to replenish essential active micronutrients.",
+                dosage: "1 Gummy daily. Carefully balanced with Iron, Zinc, and Choline.",
+                target: "Formulated for active growing kids aged 5 to 16. Chew thoroughly before swallowing."
+            }
+        ];
+        renderDietaryCardsCRUD();
+
+        currentFaqItems = (data.faq_items && data.faq_items.length > 0) ? data.faq_items : [
+            { id: "faq_1", question: "What is the recommended age suitability for the kids' gummies?", answer: "Our Kid's Multivitamin and Immunity Booster gummies are specifically formulated for kids aged 4 and above. We recommend 1 gummy daily under parental supervision. For children under 4, please consult your family pediatrician." },
+            { id: "faq_2", question: "Are these gummies completely sugar-free?", answer: "Yes! All three gummies in the Sonrup Family Wellness Combo are completely sugar-free and contain no added sugars. They are sweetened with premium natural substitutes, making them delicious without raising blood sugar levels." },
+            { id: "faq_3", question: "What is the shelf life of these products?", answer: "Each bottle has a shelf life of 36 months from the date of manufacture. Please store them in a cool, dry place away from direct sunlight, and keep the container tightly closed to preserve moisture levels." },
+            { id: "faq_4", question: "How does the return policy work?", answer: "We stand behind the quality of our products. If you are not satisfied with your purchase, you can contact our customer support team within 30 days of delivery for a full replacement or refund. No questions asked." },
+            { id: "faq_5", question: "Can both men and women take the Shilajit and Biotin gummies?", answer: "Absolutely. Both products are unisex. Shilajit gummies help improve stamina and strength for anyone, while Biotin + Multivitamin gummies support skin, hair, and nail health for all adults." }
+        ];
+        renderFaqCRUD();
     } catch (e) {
         console.error("Error loading settings:", e);
     }
@@ -487,6 +648,499 @@ function renderTrustBadgesCRUD() {
                 currentTrustBadges.splice(idx, 1);
                 renderTrustBadgesCRUD();
                 showToast("🗑️ Trust badge deleted from list.");
+            }
+        });
+    });
+}
+
+let currentTransparencyTabs = [];
+
+/**
+ * Render Dynamic Label Transparency CRUD Items
+ */
+function renderTransparencyCRUD() {
+    const container = document.getElementById("transparency-tabs-list-container");
+    if (!container) return;
+
+    if (!currentTransparencyTabs || currentTransparencyTabs.length === 0) {
+        container.innerHTML = `
+            <div style="text-align: center; padding: 30px; background: rgba(255,255,255,0.02); border: 1px dashed rgba(255,255,255,0.1); border-radius: 10px; color: #94a3b8;">
+                <p style="margin: 0; font-size: 14px;">No product tabs configured yet. Click <strong>+ Add New Product Tab</strong> above to create one.</p>
+            </div>
+        `;
+        return;
+    }
+
+    container.innerHTML = currentTransparencyTabs.map((tab, tabIdx) => {
+        const rowsHTML = (tab.rows || []).map((row, rowIdx) => `
+            <tr class="transparency-row-item" data-tab-idx="${tabIdx}" data-row-idx="${rowIdx}">
+                <td style="padding: 8px;">
+                    <input type="text" class="form-input row-component-input" value="${(row.component || '').replace(/"/g, '&quot;')}" placeholder="e.g. Gummy Shilajit Resin" style="padding: 7px 10px; font-size: 13px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15); color: #fff; border-radius: 6px;">
+                </td>
+                <td style="padding: 8px;">
+                    <input type="text" class="form-input row-feature-input" value="${(row.feature || '').replace(/"/g, '&quot;')}" placeholder="e.g. 75% Fulvic Acid Strength" style="padding: 7px 10px; font-size: 13px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15); color: #fff; border-radius: 6px;">
+                </td>
+                <td style="padding: 8px;">
+                    <input type="text" class="form-input row-amount-input" value="${(row.amount || '').replace(/"/g, '&quot;')}" placeholder="e.g. 200 mg" style="padding: 7px 10px; font-size: 13px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15); color: #fff; border-radius: 6px;">
+                </td>
+                <td style="padding: 8px; text-align: center; width: 50px;">
+                    <button type="button" class="btn-action btn-danger delete-transparency-row-btn" data-tab-idx="${tabIdx}" data-row-idx="${rowIdx}" title="Delete Row" style="padding: 6px 8px; font-size: 11px; border-radius: 6px; background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.4); color: #f87171; cursor: pointer;">
+                        <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i>
+                    </button>
+                </td>
+            </tr>
+        `).join("");
+
+        return `
+            <div class="glass-panel transparency-tab-card" data-tab-id="${tab.id || ('tab_' + tabIdx)}" style="padding: 22px; border: 1px solid rgba(201,162,39,0.3); border-radius: 14px; background: rgba(22, 26, 35, 0.7); display: flex; flex-direction: column; gap: 16px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 12px; flex-wrap: wrap; gap: 12px;">
+                    <div style="display: flex; align-items: center; gap: 12px; flex: 1; max-width: 400px;">
+                        <span style="background: rgba(201,162,39,0.15); border: 1px solid #C9A227; color: #E5C365; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; flex-shrink: 0;">${tabIdx + 1}</span>
+                        <input type="text" class="form-input tab-name-input" data-tab-idx="${tabIdx}" value="${(tab.name || '').replace(/"/g, '&quot;')}" placeholder="e.g. HIMALAYAN SHILAJIT" style="padding: 8px 12px; font-size: 14px; font-weight: 700; background: rgba(0,0,0,0.6); border: 1px solid rgba(201,162,39,0.4); color: #fff; border-radius: 8px;">
+                    </div>
+                    <button type="button" class="btn-action btn-danger delete-transparency-tab-btn" data-tab-idx="${tabIdx}" title="Delete Product Tab" style="padding: 7px 12px; font-size: 12px; border-radius: 8px; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); color: #f87171; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                        <i data-lucide="trash-2" style="width: 15px; height: 15px;"></i> Delete Tab
+                    </button>
+                </div>
+
+                <!-- Nutritional Profile Table -->
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                        <thead>
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                                <th style="padding: 8px; font-size: 11px; color: #94a3b8; text-transform: uppercase;">Component</th>
+                                <th style="padding: 8px; font-size: 11px; color: #94a3b8; text-transform: uppercase;">Key Features / Source</th>
+                                <th style="padding: 8px; font-size: 11px; color: #94a3b8; text-transform: uppercase;">Unit Amount Per Gummy</th>
+                                <th style="padding: 8px; font-size: 11px; color: #94a3b8; text-transform: uppercase; text-align: center;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${rowsHTML}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 4px; flex-wrap: wrap;">
+                    <button type="button" class="btn-action add-row-to-tab-btn" data-tab-idx="${tabIdx}" style="padding: 6px 14px; font-size: 12px; border-radius: 6px; background: rgba(201,162,39,0.12); border: 1px solid rgba(201,162,39,0.3); color: #E5C365; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                        <i data-lucide="plus" style="width: 14px; height: 14px;"></i> Add Nutritional Row
+                    </button>
+
+                    <div style="flex: 1; min-width: 300px;">
+                        <label style="font-size: 11px; color: #94a3b8; text-transform: uppercase; display: block; margin-bottom: 4px;">Suggested Usage Note</label>
+                        <input type="text" class="form-input tab-usage-input" data-tab-idx="${tabIdx}" value="${(tab.suggested_usage || '').replace(/"/g, '&quot;')}" placeholder="e.g. Take 1 Gummy daily after meal." style="padding: 7px 10px; font-size: 12.5px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.12); color: #cbd5e1; border-radius: 6px; width: 100%;">
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join("");
+
+    if (window.lucide) window.lucide.createIcons();
+
+    // Attach Event Listeners
+    container.querySelectorAll(".delete-transparency-tab-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const idx = parseInt(btn.dataset.tabIdx);
+            if (confirm(`Delete product tab '${currentTransparencyTabs[idx]?.name || (idx+1)}'?`)) {
+                currentTransparencyTabs.splice(idx, 1);
+                renderTransparencyCRUD();
+                showToast("🗑️ Product tab deleted.");
+            }
+        });
+    });
+
+    container.querySelectorAll(".add-row-to-tab-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const tabIdx = parseInt(btn.dataset.tabIdx);
+            syncTransparencyInputsFromDOM();
+            if (currentTransparencyTabs[tabIdx]) {
+                if (!currentTransparencyTabs[tabIdx].rows) currentTransparencyTabs[tabIdx].rows = [];
+                currentTransparencyTabs[tabIdx].rows.push({ component: "", feature: "", amount: "" });
+                renderTransparencyCRUD();
+                showToast("➕ Nutritional row added.");
+            }
+        });
+    });
+
+    container.querySelectorAll(".delete-transparency-row-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const tabIdx = parseInt(btn.dataset.tabIdx);
+            const rowIdx = parseInt(btn.dataset.rowIdx);
+            syncTransparencyInputsFromDOM();
+            if (currentTransparencyTabs[tabIdx] && currentTransparencyTabs[tabIdx].rows) {
+                currentTransparencyTabs[tabIdx].rows.splice(rowIdx, 1);
+                renderTransparencyCRUD();
+                showToast("🗑️ Row removed.");
+            }
+        });
+    });
+}
+
+function syncTransparencyInputsFromDOM() {
+    const container = document.getElementById("transparency-tabs-list-container");
+    if (!container) return;
+
+    const cards = container.querySelectorAll(".transparency-tab-card");
+    cards.forEach((card, tabIdx) => {
+        if (!currentTransparencyTabs[tabIdx]) return;
+
+        const nameVal = card.querySelector(".tab-name-input")?.value.trim() || "";
+        const usageVal = card.querySelector(".tab-usage-input")?.value.trim() || "";
+
+        currentTransparencyTabs[tabIdx].name = nameVal;
+        currentTransparencyTabs[tabIdx].suggested_usage = usageVal;
+
+        const rowElements = card.querySelectorAll(".transparency-row-item");
+        const updatedRows = [];
+        rowElements.forEach(rowEl => {
+            const comp = rowEl.querySelector(".row-component-input")?.value.trim() || "";
+            const feat = rowEl.querySelector(".row-feature-input")?.value.trim() || "";
+            const amt = rowEl.querySelector(".row-amount-input")?.value.trim() || "";
+            updatedRows.push({ component: comp, feature: feat, amount: amt });
+        });
+        currentTransparencyTabs[tabIdx].rows = updatedRows;
+    });
+}
+
+let currentAdvantageCards = [];
+
+/**
+ * Render Dynamic The Advantage CRUD Items
+ */
+function renderAdvantageCRUD() {
+    const container = document.getElementById("advantage-cards-list-container");
+    if (!container) return;
+
+    if (!currentAdvantageCards || currentAdvantageCards.length === 0) {
+        container.innerHTML = `
+            <div style="text-align: center; padding: 30px; background: rgba(255,255,255,0.02); border: 1px dashed rgba(255,255,255,0.1); border-radius: 10px; color: #94a3b8;">
+                <p style="margin: 0; font-size: 14px;">No advantage cards configured yet. Click <strong>+ Add New Advantage Card</strong> above to create one.</p>
+            </div>
+        `;
+        return;
+    }
+
+    const availableIcons = ["zap", "sparkles", "shield-alert", "smile", "heart", "award", "star", "thumbs-up", "check-circle", "leaf", "package", "activity"];
+
+    container.innerHTML = currentAdvantageCards.map((card, idx) => {
+        const iconOptions = availableIcons.map(ic => `
+            <option value="${ic}" ${card.icon === ic ? 'selected' : ''}>${ic.toUpperCase()}</option>
+        `).join("");
+
+        return `
+            <div class="glass-panel advantage-card-item" data-id="${card.id || ('adv_' + idx)}" style="padding: 20px; border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; background: rgba(0,0,0,0.3); display: flex; flex-direction: column; gap: 14px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 10px; flex-wrap: wrap; gap: 10px;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span style="background: rgba(201,162,39,0.15); border: 1px solid #C9A227; color: #E5C365; width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800;">${idx + 1}</span>
+                        <h4 style="font-family: 'Outfit', sans-serif; font-size: 14px; color: #fff; margin: 0;">Advantage Feature #${idx + 1}</h4>
+                    </div>
+                    <button type="button" class="btn-action btn-danger delete-advantage-card-btn" data-index="${idx}" title="Delete Advantage Card" style="padding: 6px 10px; font-size: 12px; border-radius: 6px; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); color: #f87171; cursor: pointer; display: inline-flex; align-items: center;">
+                        <i data-lucide="trash-2" style="width: 15px; height: 15px;"></i>
+                    </button>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group" style="max-width: 220px;">
+                        <label class="form-label">Lucide Icon</label>
+                        <select class="form-input advantage-icon-input" data-index="${idx}" style="background: #181818; color: #fff; border: 1px solid rgba(255,255,255,0.15);">
+                            ${iconOptions}
+                        </select>
+                    </div>
+
+                    <div class="form-group" style="flex: 1;">
+                        <label class="form-label">Feature Card Title</label>
+                        <input type="text" class="form-input advantage-title-input" data-index="${idx}" value="${(card.title || '').replace(/"/g, '&quot;')}" placeholder="Title" style="background: rgba(0,0,0,0.5);">
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label class="form-label">Feature Description Copy</label>
+                        <textarea class="form-input advantage-desc-input" data-index="${idx}" rows="2" placeholder="Description" style="background: rgba(0,0,0,0.5);">${card.description || ''}</textarea>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join("");
+
+    if (window.lucide) window.lucide.createIcons();
+
+    // Attach Delete Card Handlers
+    container.querySelectorAll(".delete-advantage-card-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const idx = parseInt(btn.dataset.index);
+            if (confirm(`Delete advantage card #${idx + 1}?`)) {
+                currentAdvantageCards.splice(idx, 1);
+                renderAdvantageCRUD();
+                showToast("🗑️ Advantage card deleted.");
+            }
+        });
+    });
+}
+
+let currentGuidanceColumns = [];
+
+/**
+ * Render Dynamic Guidance Section CRUD Items
+ */
+function renderGuidanceCRUD() {
+    const container = document.getElementById("guidance-cols-list-container");
+    if (!container) return;
+
+    if (!currentGuidanceColumns || currentGuidanceColumns.length === 0) {
+        container.innerHTML = `
+            <div style="text-align: center; padding: 30px; background: rgba(255,255,255,0.02); border: 1px dashed rgba(255,255,255,0.1); border-radius: 10px; color: #94a3b8;">
+                <p style="margin: 0; font-size: 14px;">No guidance cards configured yet. Click <strong>+ Add New Guidance Card</strong> above to create one.</p>
+            </div>
+        `;
+        return;
+    }
+
+    const availableIcons = ["user", "user-plus", "users", "heart", "shield-check", "star", "sparkles", "zap", "smile", "check-circle"];
+
+    container.innerHTML = currentGuidanceColumns.map((col, colIdx) => {
+        const iconOptions = availableIcons.map(ic => `
+            <option value="${ic}" ${col.icon === ic ? 'selected' : ''}>${ic.toUpperCase()}</option>
+        `).join("");
+
+        const itemsHTML = (col.items || []).map((item, itemIdx) => `
+            <div class="guidance-item-row" data-col-idx="${colIdx}" data-item-idx="${itemIdx}" style="display: flex; gap: 10px; align-items: center; margin-bottom: 8px;">
+                <input type="text" class="form-input item-product-input" value="${(item.product || '').replace(/"/g, '&quot;')}" placeholder="Product Name (e.g. Himalayan Shilajit)" style="padding: 7px 10px; font-size: 13px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15); color: #fff; border-radius: 6px; flex: 1;">
+                <input type="text" class="form-input item-usage-input" value="${(item.usage || '').replace(/"/g, '&quot;')}" placeholder="Usage Instruction Line" style="padding: 7px 10px; font-size: 13px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15); color: #fff; border-radius: 6px; flex: 2;">
+                <button type="button" class="btn-action btn-danger delete-guidance-item-btn" data-col-idx="${colIdx}" data-item-idx="${itemIdx}" title="Delete Item" style="padding: 6px 8px; font-size: 11px; border-radius: 6px; background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.4); color: #f87171; cursor: pointer;">
+                    <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i>
+                </button>
+            </div>
+        `).join("");
+
+        return `
+            <div class="glass-panel guidance-col-card" data-id="${col.id || ('col_' + colIdx)}" style="padding: 22px; border: 1px solid rgba(201,162,39,0.3); border-radius: 14px; background: rgba(22, 26, 35, 0.7); display: flex; flex-direction: column; gap: 16px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 12px; flex-wrap: wrap; gap: 12px;">
+                    <div style="display: flex; align-items: center; gap: 12px; flex: 1; max-width: 400px;">
+                        <span style="background: rgba(201,162,39,0.15); border: 1px solid #C9A227; color: #E5C365; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; flex-shrink: 0;">${colIdx + 1}</span>
+                        <input type="text" class="form-input col-title-input" data-col-idx="${colIdx}" value="${(col.title || '').replace(/"/g, '&quot;')}" placeholder="Group Title (e.g. Him / Her / Kids)" style="padding: 8px 12px; font-size: 14px; font-weight: 700; background: rgba(0,0,0,0.6); border: 1px solid rgba(201,162,39,0.4); color: #fff; border-radius: 8px;">
+                    </div>
+                    <button type="button" class="btn-action btn-danger delete-guidance-col-btn" data-col-idx="${colIdx}" title="Delete Guidance Card" style="padding: 7px 12px; font-size: 12px; border-radius: 8px; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); color: #f87171; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                        <i data-lucide="trash-2" style="width: 15px; height: 15px;"></i> Delete Card
+                    </button>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group" style="max-width: 200px;">
+                        <label class="form-label">Avatar Icon</label>
+                        <select class="form-input col-icon-input" data-col-idx="${colIdx}" style="background: #181818; color: #fff; border: 1px solid rgba(255,255,255,0.15);">
+                            ${iconOptions}
+                        </select>
+                    </div>
+
+                    <div class="form-group" style="flex: 1;">
+                        <label class="form-label">Sub-Title / Target Description</label>
+                        <input type="text" class="form-input col-sub-input" data-col-idx="${colIdx}" value="${(col.subtitle || '').replace(/"/g, '&quot;')}" placeholder="e.g. Father / Adult Male" style="background: rgba(0,0,0,0.5);">
+                    </div>
+                </div>
+
+                <!-- Product Guidelines List -->
+                <div>
+                    <label style="font-size: 11px; color: #94a3b8; text-transform: uppercase; display: block; margin-bottom: 8px;">Product Guidelines List</label>
+                    <div class="guidance-items-container">
+                        ${itemsHTML}
+                    </div>
+                    <button type="button" class="btn-action add-item-to-guidance-btn" data-col-idx="${colIdx}" style="padding: 6px 12px; font-size: 12px; border-radius: 6px; background: rgba(201,162,39,0.12); border: 1px solid rgba(201,162,39,0.3); color: #E5C365; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; margin-top: 4px;">
+                        <i data-lucide="plus" style="width: 14px; height: 14px;"></i> + Add Instruction Line
+                    </button>
+                </div>
+
+                <div>
+                    <label style="font-size: 11px; color: #f87171; text-transform: uppercase; display: block; margin-bottom: 4px;">Warning Note (Optional)</label>
+                    <input type="text" class="form-input col-warning-input" data-col-idx="${colIdx}" value="${(col.warning || '').replace(/"/g, '&quot;')}" placeholder="e.g. Not suitable for kids under 4 years of age." style="padding: 7px 10px; font-size: 12.5px; background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2); color: #fca5a5; border-radius: 6px; width: 100%;">
+                </div>
+            </div>
+        `;
+    }).join("");
+
+    if (window.lucide) window.lucide.createIcons();
+
+    // Event Listeners
+    container.querySelectorAll(".delete-guidance-col-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const idx = parseInt(btn.dataset.colIdx);
+            if (confirm(`Delete guidance card '${currentGuidanceColumns[idx]?.title || (idx+1)}'?`)) {
+                currentGuidanceColumns.splice(idx, 1);
+                renderGuidanceCRUD();
+                showToast("🗑️ Guidance card deleted.");
+            }
+        });
+    });
+
+    container.querySelectorAll(".add-item-to-guidance-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const colIdx = parseInt(btn.dataset.colIdx);
+            syncGuidanceInputsFromDOM();
+            if (currentGuidanceColumns[colIdx]) {
+                if (!currentGuidanceColumns[colIdx].items) currentGuidanceColumns[colIdx].items = [];
+                currentGuidanceColumns[colIdx].items.push({ product: "", usage: "" });
+                renderGuidanceCRUD();
+                showToast("➕ Instruction line added.");
+            }
+        });
+    });
+
+    container.querySelectorAll(".delete-guidance-item-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const colIdx = parseInt(btn.dataset.colIdx);
+            const itemIdx = parseInt(btn.dataset.itemIdx);
+            syncGuidanceInputsFromDOM();
+            if (currentGuidanceColumns[colIdx] && currentGuidanceColumns[colIdx].items) {
+                currentGuidanceColumns[colIdx].items.splice(itemIdx, 1);
+                renderGuidanceCRUD();
+                showToast("🗑️ Instruction line removed.");
+            }
+        });
+    });
+}
+
+function syncGuidanceInputsFromDOM() {
+    const container = document.getElementById("guidance-cols-list-container");
+    if (!container) return;
+
+    const cards = container.querySelectorAll(".guidance-col-card");
+    cards.forEach((card, colIdx) => {
+        if (!currentGuidanceColumns[colIdx]) return;
+
+        currentGuidanceColumns[colIdx].title = card.querySelector(".col-title-input")?.value.trim() || "";
+        currentGuidanceColumns[colIdx].subtitle = card.querySelector(".col-sub-input")?.value.trim() || "";
+        currentGuidanceColumns[colIdx].icon = card.querySelector(".col-icon-input")?.value || "user";
+        currentGuidanceColumns[colIdx].warning = card.querySelector(".col-warning-input")?.value.trim() || "";
+
+        const itemRows = card.querySelectorAll(".guidance-item-row");
+        const updatedItems = [];
+        itemRows.forEach(rowEl => {
+            const prod = rowEl.querySelector(".item-product-input")?.value.trim() || "";
+            const usg = rowEl.querySelector(".item-usage-input")?.value.trim() || "";
+            updatedItems.push({ product: prod, usage: usg });
+        });
+        currentGuidanceColumns[colIdx].items = updatedItems;
+    });
+}
+
+let currentFaqItems = [];
+
+/**
+ * Render Dynamic FAQ Section CRUD Items
+ */
+function renderFaqCRUD() {
+    const container = document.getElementById("faq-items-list-container");
+    if (!container) return;
+
+    if (!currentFaqItems || currentFaqItems.length === 0) {
+        container.innerHTML = `
+            <div style="text-align: center; padding: 30px; background: rgba(255,255,255,0.02); border: 1px dashed rgba(255,255,255,0.1); border-radius: 10px; color: #94a3b8;">
+                <p style="margin: 0; font-size: 14px;">No FAQ questions configured yet. Click <strong>+ Add New FAQ Question</strong> above to create one.</p>
+            </div>
+        `;
+        return;
+    }
+
+    container.innerHTML = currentFaqItems.map((faq, idx) => `
+        <div class="glass-panel faq-item-card" data-id="${faq.id || ('faq_' + idx)}" style="padding: 14px 18px; border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; background: rgba(0,0,0,0.35); display: flex; flex-direction: column; gap: 8px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                <div style="display: flex; align-items: center; gap: 10px; flex: 1;">
+                    <span style="background: rgba(201,162,39,0.15); border: 1px solid #C9A227; color: #E5C365; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; flex-shrink: 0;">${idx + 1}</span>
+                    <input type="text" class="form-input faq-question-input" data-index="${idx}" value="${(faq.question || '').replace(/"/g, '&quot;')}" placeholder="Question Text" style="padding: 6px 10px; font-size: 13px; background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.15); color: #fff; border-radius: 6px; font-weight: 600; width: 100%;">
+                </div>
+                <button type="button" class="btn-action btn-danger delete-faq-item-btn" data-index="${idx}" title="Delete FAQ Item" style="padding: 5px 8px; font-size: 11px; border-radius: 6px; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); color: #f87171; cursor: pointer; display: inline-flex; align-items: center;">
+                    <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i>
+                </button>
+            </div>
+
+            <div>
+                <textarea class="form-input faq-answer-input" data-index="${idx}" rows="2" placeholder="Detailed Answer..." style="padding: 6px 10px; font-size: 12.5px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); color: #cbd5e1; border-radius: 6px; width: 100%;">${faq.answer || ''}</textarea>
+            </div>
+        </div>
+    `).join("");
+
+    if (window.lucide) window.lucide.createIcons();
+
+    // Attach Delete Handlers
+    container.querySelectorAll(".delete-faq-item-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const idx = parseInt(btn.dataset.index);
+            if (confirm(`Delete FAQ question #${idx + 1}?`)) {
+                currentFaqItems.splice(idx, 1);
+                renderFaqCRUD();
+                showToast("🗑️ FAQ question deleted.");
+            }
+        });
+    });
+}
+
+let currentDietaryCards = [];
+
+/**
+ * Render Dynamic Dietary Guide Cards CRUD Items
+ */
+function renderDietaryCardsCRUD() {
+    const container = document.getElementById("dietary-cards-list-container");
+    if (!container) return;
+
+    if (!currentDietaryCards || currentDietaryCards.length === 0) {
+        container.innerHTML = `
+            <div style="text-align: center; padding: 20px; background: rgba(255,255,255,0.02); border: 1px dashed rgba(255,255,255,0.1); border-radius: 8px; color: #94a3b8;">
+                <p style="margin: 0; font-size: 13px;">No dietary dosage cards configured. Click <strong>+ Add Dosage Card</strong> above.</p>
+            </div>
+        `;
+        return;
+    }
+
+    const availableIcons = ["zap", "sparkles", "smile", "heart", "shield-check", "star", "activity", "check-circle"];
+
+    container.innerHTML = currentDietaryCards.map((card, idx) => {
+        const iconOptions = availableIcons.map(ic => `
+            <option value="${ic}" ${card.icon === ic ? 'selected' : ''}>${ic.toUpperCase()}</option>
+        `).join("");
+
+        return `
+            <div class="glass-panel dietary-card-item" data-id="${card.id || ('dg_' + idx)}" style="padding: 14px 18px; border: 1px solid rgba(201,162,39,0.25); border-radius: 10px; background: rgba(0,0,0,0.35); display: flex; flex-direction: column; gap: 10px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 8px; gap: 10px; flex-wrap: wrap;">
+                    <div style="display: flex; align-items: center; gap: 10px; flex: 1;">
+                        <span style="background: rgba(201,162,39,0.15); border: 1px solid #C9A227; color: #E5C365; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; flex-shrink: 0;">${idx + 1}</span>
+                        <input type="text" class="form-input dietary-title-input" data-index="${idx}" value="${(card.title || '').replace(/"/g, '&quot;')}" placeholder="Card Title (e.g. Himalayan Shilajit)" style="padding: 6px 10px; font-size: 13.5px; font-weight: 700; background: rgba(0,0,0,0.6); border: 1px solid rgba(201,162,39,0.4); color: #fff; border-radius: 6px; max-width: 280px;">
+                        <select class="form-input dietary-icon-input" data-index="${idx}" style="background: #181818; color: #fff; border: 1px solid rgba(255,255,255,0.15); padding: 6px 10px; font-size: 12px; width: 120px;">
+                            ${iconOptions}
+                        </select>
+                    </div>
+                    <button type="button" class="btn-action btn-danger delete-dietary-card-btn" data-index="${idx}" title="Delete Dosage Card" style="padding: 5px 8px; font-size: 11px; border-radius: 6px; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); color: #f87171; cursor: pointer; display: inline-flex; align-items: center;">
+                        <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i>
+                    </button>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px;">
+                    <div>
+                        <label style="font-size: 10.5px; color: #94a3b8; text-transform: uppercase; display: block; margin-bottom: 3px;">Timing Line</label>
+                        <input type="text" class="form-input dietary-timing-input" data-index="${idx}" value="${(card.timing || '').replace(/"/g, '&quot;')}" placeholder="e.g. Best consumed in the morning..." style="padding: 6px 10px; font-size: 12px; background: rgba(0,0,0,0.5);">
+                    </div>
+
+                    <div>
+                        <label style="font-size: 10.5px; color: #94a3b8; text-transform: uppercase; display: block; margin-bottom: 3px;">Daily Dosage Line</label>
+                        <input type="text" class="form-input dietary-dosage-input" data-index="${idx}" value="${(card.dosage || '').replace(/"/g, '&quot;')}" placeholder="e.g. 1 Gummy daily..." style="padding: 6px 10px; font-size: 12px; background: rgba(0,0,0,0.5);">
+                    </div>
+
+                    <div>
+                        <label style="font-size: 10.5px; color: #94a3b8; text-transform: uppercase; display: block; margin-bottom: 3px;">Target User Line</label>
+                        <input type="text" class="form-input dietary-target-input" data-index="${idx}" value="${(card.target || '').replace(/"/g, '&quot;')}" placeholder="e.g. Formulated for adults." style="padding: 6px 10px; font-size: 12px; background: rgba(0,0,0,0.5);">
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join("");
+
+    if (window.lucide) window.lucide.createIcons();
+
+    // Attach Delete Handlers
+    container.querySelectorAll(".delete-dietary-card-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const idx = parseInt(btn.dataset.index);
+            if (confirm(`Delete dosage card #${idx + 1}?`)) {
+                currentDietaryCards.splice(idx, 1);
+                renderDietaryCardsCRUD();
+                showToast("🗑️ Dosage card deleted.");
             }
         });
     });
@@ -1074,26 +1728,197 @@ function setupEventListeners() {
         }, 120);
     });
 
-    // Trust Badges Builder Form Submit Handler
-    document.getElementById("trust-builder-form")?.addEventListener("submit", async (e) => {
+    // Add New Transparency Tab Handler
+    document.getElementById("btn-add-transparency-tab")?.addEventListener("click", () => {
+        syncTransparencyInputsFromDOM();
+        const newTabId = `tab_${Date.now()}`;
+        currentTransparencyTabs.push({
+            id: newTabId,
+            name: "",
+            suggested_usage: "",
+            rows: [
+                { component: "", feature: "", amount: "" }
+            ]
+        });
+        renderTransparencyCRUD();
+        showToast("✨ New product tab added! Fill in details below.");
+
+        setTimeout(() => {
+            const newCard = document.querySelector(`.transparency-tab-card[data-tab-id="${newTabId}"]`);
+            if (newCard) {
+                newCard.scrollIntoView({ behavior: "smooth", block: "center" });
+                newCard.style.outline = "2px solid #C9A227";
+                newCard.style.boxShadow = "0 0 20px rgba(201, 162, 39, 0.45)";
+                const nameInput = newCard.querySelector(".tab-name-input");
+                if (nameInput) nameInput.focus();
+                setTimeout(() => {
+                    newCard.style.outline = "none";
+                    newCard.style.boxShadow = "none";
+                }, 2200);
+            }
+        }, 120);
+    });
+
+    // Add New Advantage Card Handler
+    document.getElementById("btn-add-advantage-card")?.addEventListener("click", () => {
+        const newId = `adv_${Date.now()}`;
+        currentAdvantageCards.push({
+            id: newId,
+            icon: "zap",
+            title: "",
+            description: ""
+        });
+        renderAdvantageCRUD();
+        showToast("✨ New advantage card added!");
+
+        setTimeout(() => {
+            const newCard = document.querySelector(`.advantage-card-item[data-id="${newId}"]`);
+            if (newCard) {
+                newCard.scrollIntoView({ behavior: "smooth", block: "center" });
+                newCard.style.outline = "2px solid #C9A227";
+                newCard.style.boxShadow = "0 0 20px rgba(201, 162, 39, 0.45)";
+                const titleInput = newCard.querySelector(".advantage-title-input");
+                if (titleInput) titleInput.focus();
+                setTimeout(() => {
+                    newCard.style.outline = "none";
+                    newCard.style.boxShadow = "none";
+                }, 2200);
+            }
+        }, 120);
+    });
+
+    // Add New Guidance Card Handler
+    document.getElementById("btn-add-guidance-col")?.addEventListener("click", () => {
+        syncGuidanceInputsFromDOM();
+        const newColId = `col_${Date.now()}`;
+        currentGuidanceColumns.push({
+            id: newColId,
+            icon: "user",
+            title: "",
+            subtitle: "",
+            items: [
+                { product: "", usage: "" }
+            ],
+            warning: ""
+        });
+        renderGuidanceCRUD();
+        showToast("✨ New guidance card added! Fill in details below.");
+
+        setTimeout(() => {
+            const newCard = document.querySelector(`.guidance-col-card[data-id="${newColId}"]`);
+            if (newCard) {
+                newCard.scrollIntoView({ behavior: "smooth", block: "center" });
+                newCard.style.outline = "2px solid #C9A227";
+                newCard.style.boxShadow = "0 0 20px rgba(201, 162, 39, 0.45)";
+                const titleInput = newCard.querySelector(".col-title-input");
+                if (titleInput) titleInput.focus();
+                setTimeout(() => {
+                    newCard.style.outline = "none";
+                    newCard.style.boxShadow = "none";
+                }, 2200);
+            }
+        }, 120);
+    });
+
+    // Add New Dietary Card Handler
+    document.getElementById("btn-add-dietary-card")?.addEventListener("click", () => {
+        const newId = `dg_${Date.now()}`;
+        const cardTypes = ["him", "her", "kids"];
+        currentDietaryCards.push({
+            id: newId,
+            icon: "zap",
+            title: "",
+            card_type: cardTypes[currentDietaryCards.length % 3],
+            timing: "",
+            dosage: "",
+            target: ""
+        });
+        renderDietaryCardsCRUD();
+        showToast("✨ New dosage card added!");
+
+        setTimeout(() => {
+            const newCard = document.querySelector(`.dietary-card-item[data-id="${newId}"]`);
+            if (newCard) {
+                newCard.scrollIntoView({ behavior: "smooth", block: "center" });
+                newCard.style.outline = "2px solid #C9A227";
+                const titleInput = newCard.querySelector(".dietary-title-input");
+                if (titleInput) titleInput.focus();
+                setTimeout(() => { newCard.style.outline = "none"; }, 2200);
+            }
+        }, 120);
+    });
+
+    // Add New FAQ Item Handler
+    document.getElementById("btn-add-faq-item")?.addEventListener("click", () => {
+        const newId = `faq_${Date.now()}`;
+        currentFaqItems.push({
+            id: newId,
+            question: "",
+            answer: ""
+        });
+        renderFaqCRUD();
+        showToast("✨ New FAQ question added!");
+
+        setTimeout(() => {
+            const newCard = document.querySelector(`.faq-item-card[data-id="${newId}"]`);
+            if (newCard) {
+                newCard.scrollIntoView({ behavior: "smooth", block: "center" });
+                newCard.style.outline = "2px solid #C9A227";
+                newCard.style.boxShadow = "0 0 20px rgba(201, 162, 39, 0.45)";
+                const qInput = newCard.querySelector(".faq-question-input");
+                if (qInput) qInput.focus();
+                setTimeout(() => {
+                    newCard.style.outline = "none";
+                    newCard.style.boxShadow = "none";
+                }, 2200);
+            }
+        }, 120);
+    });
+
+    // FAQ Builder Form Submit Handler
+    document.getElementById("faq-builder-form")?.addEventListener("submit", async (e) => {
         e.preventDefault();
 
-        const container = document.getElementById("trust-badges-list-container");
-        if (container) {
-            const updatedBadges = [];
-            const cards = container.querySelectorAll(".trust-badge-item-card");
-            cards.forEach((card, idx) => {
-                const iconVal = card.querySelector(".trust-badge-icon-input")?.value || "shield-check";
-                const titleVal = card.querySelector(".trust-badge-title-input")?.value.trim() || "";
-                const subVal = card.querySelector(".trust-badge-sub-input")?.value.trim() || "";
-                updatedBadges.push({
-                    id: currentTrustBadges[idx]?.id || `tb_${Date.now()}_${idx}`,
+        // 1. Sync Dietary Cards
+        const dietaryContainer = document.getElementById("dietary-cards-list-container");
+        if (dietaryContainer) {
+            const updatedDietary = [];
+            const cards = dietaryContainer.querySelectorAll(".dietary-card-item");
+            const cardTypes = ["him", "her", "kids"];
+            cards.forEach((cardEl, idx) => {
+                const titleVal = cardEl.querySelector(".dietary-title-input")?.value.trim() || "";
+                const iconVal = cardEl.querySelector(".dietary-icon-input")?.value || "zap";
+                const timingVal = cardEl.querySelector(".dietary-timing-input")?.value.trim() || "";
+                const dosageVal = cardEl.querySelector(".dietary-dosage-input")?.value.trim() || "";
+                const targetVal = cardEl.querySelector(".dietary-target-input")?.value.trim() || "";
+                updatedDietary.push({
+                    id: currentDietaryCards[idx]?.id || `dg_${Date.now()}_${idx}`,
                     icon: iconVal,
                     title: titleVal,
-                    subtitle: subVal
+                    card_type: cardTypes[idx % 3],
+                    timing: timingVal,
+                    dosage: dosageVal,
+                    target: targetVal
                 });
             });
-            currentTrustBadges = updatedBadges;
+            currentDietaryCards = updatedDietary;
+        }
+
+        // 2. Sync FAQ Items
+        const container = document.getElementById("faq-items-list-container");
+        if (container) {
+            const updatedItems = [];
+            const cards = container.querySelectorAll(".faq-item-card");
+            cards.forEach((cardEl, idx) => {
+                const qVal = cardEl.querySelector(".faq-question-input")?.value.trim() || "";
+                const aVal = cardEl.querySelector(".faq-answer-input")?.value.trim() || "";
+                updatedItems.push({
+                    id: currentFaqItems[idx]?.id || `faq_${Date.now()}_${idx}`,
+                    question: qVal,
+                    answer: aVal
+                });
+            });
+            currentFaqItems = updatedItems;
         }
 
         let currentSettings = {};
@@ -1104,7 +1929,14 @@ function setupEventListeners() {
 
         const payload = {
             ...currentSettings,
-            trust_badges: currentTrustBadges
+            faq_subheading: document.getElementById("setting-faq-subheading").value.trim(),
+            faq_title: document.getElementById("setting-faq-title").value.trim(),
+            faq_desc: document.getElementById("setting-faq-desc").value.trim(),
+            dietary_guide_subheading: document.getElementById("setting-dietary-subheading")?.value.trim() || "DIETARY USER GUIDE",
+            dietary_guide_title: document.getElementById("setting-dietary-title")?.value.trim() || "Dosages & Usage Instructions",
+            dietary_guide_desc: document.getElementById("setting-dietary-desc")?.value.trim() || "Follow our certified dietary guides to maximize the energy, vitality, and cellular protection benefits of your daily Sonrup gummies.",
+            faq_items: currentFaqItems,
+            dietary_guide_cards: currentDietaryCards
         };
 
         try {
@@ -1113,11 +1945,11 @@ function setupEventListeners() {
                 headers: getHeaders(true),
                 body: JSON.stringify(payload)
             });
-            if (!res.ok) throw new Error("Could not save trust badges");
+            if (!res.ok) throw new Error("Could not save FAQ section");
 
-            showToast("🌟 All Trust Badges updated & live on homepage!");
+            showToast("🌟 FAQ & Dietary Guide updated & live on website!");
         } catch (err) {
-            showToast("Failed to save trust badges.", true);
+            showToast("Failed to save FAQ section.", true);
         }
     });
 
