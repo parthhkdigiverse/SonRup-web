@@ -25,6 +25,8 @@ def _product_to_out(product: dict) -> ProductOut:
         images=product["images"],
         tag_class=product["tag_class"],
         product_type=product["product_type"],
+        suggested_usage=product.get("suggested_usage", ""),
+        ingredients=product.get("ingredients", []),
     )
 
 

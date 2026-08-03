@@ -324,6 +324,12 @@ window.openEditModal = (slug) => {
     document.getElementById("prod-tag").value = prod.tag || "Adult Performance";
     document.getElementById("prod-description").value = prod.description || "";
     document.getElementById("prod-benefits").value = (prod.benefits || []).join("\n");
+    document.getElementById("prod-suggested-usage").value = prod.suggested_usage || "";
+    if (prod.ingredients && prod.ingredients.length > 0) {
+        document.getElementById("prod-ingredients").value = prod.ingredients.map(ing => `${ing.component} | ${ing.feature} | ${ing.amount}`).join("\n");
+    } else {
+        document.getElementById("prod-ingredients").value = "";
+    }
     document.getElementById("prod-type").value = prod.product_type || "single";
     document.getElementById("prod-tag-class").value = prod.tag_class || "tag-shilajit";
     document.getElementById("prod-all-images").value = (prod.images && prod.images.length) ? prod.images.join("\n") : "assets/images/hero-combo.jpg";
@@ -1851,10 +1857,25 @@ function setupEventListeners() {
 
 
         const benefitsText = document.getElementById("prod-benefits").value.trim();
-        const benefitsArray = benefitsText ? benefitsText.split("\\n").map(line => line.trim()).filter(Boolean) : [];
+        const benefitsArray = benefitsText ? benefitsText.split("\n").map(line => line.trim()).filter(Boolean) : [];
         
         const allImagesText = document.getElementById("prod-all-images").value.trim();
         const allImagesArray = allImagesText ? allImagesText.split("\n").map(l => l.trim()).filter(Boolean) : ["assets/images/hero-combo.jpg"];
+
+        const ingredientsText = document.getElementById("prod-ingredients").value.trim();
+        const ingredientsArray = [];
+        if (ingredientsText) {
+            ingredientsText.split("\n").forEach(line => {
+                const parts = line.split("|").map(p => p.trim());
+                if (parts.length > 0 && parts[0]) {
+                    ingredientsArray.push({
+                        component: parts[0],
+                        feature: parts[1] || "",
+                        amount: parts[2] || ""
+                    });
+                }
+            });
+        }
 
         const payload = {
             name: document.getElementById("prod-name").value.trim(),
@@ -1863,6 +1884,8 @@ function setupEventListeners() {
             price: parseInt(document.getElementById("prod-price").value) || 999,
             description: document.getElementById("prod-description").value.trim(),
             benefits: benefitsArray,
+            suggested_usage: document.getElementById("prod-suggested-usage").value.trim(),
+            ingredients: ingredientsArray,
             variants: [],
             images: allImagesArray,
             tag_class: document.getElementById("prod-tag-class") ? document.getElementById("prod-tag-class").value : "tag-shilajit",
@@ -3082,3 +3105,10 @@ window.saveShopSettingsToDB = async function() {
         showToast("Failed to save shop settings.", true);
     }
 };
+
+// --- Close Modals on Outside Click ---
+document.addEventListener("click", (e) => {
+    if (e.target.classList.contains("admin-modal")) {
+        e.target.classList.remove("active");
+    }
+});

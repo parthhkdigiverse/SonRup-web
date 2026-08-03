@@ -15,7 +15,7 @@ import uuid
 
 from database import get_db
 from auth_utils import get_current_admin_user
-from schemas.product import ProductOut, ProductVariant
+from schemas.product import ProductOut, ProductVariant, IngredientRow
 
 router = APIRouter(prefix="/admin", tags=["Admin Control Panel"], dependencies=[Depends(get_current_admin_user)])
 
@@ -121,6 +121,8 @@ class ProductIn(BaseModel):
     tag_class: str = "tag-default"
     product_type: str = "single"
     variants: Optional[List[ProductVariant]] = []
+    suggested_usage: Optional[str] = ""
+    ingredients: Optional[List[IngredientRow]] = []
 
 class ProductUpdateIn(BaseModel):
     name: Optional[str] = None
@@ -133,6 +135,8 @@ class ProductUpdateIn(BaseModel):
     tag_class: Optional[str] = None
     product_type: Optional[str] = None
     variants: Optional[List[ProductVariant]] = None
+    suggested_usage: Optional[str] = None
+    ingredients: Optional[List[IngredientRow]] = None
 
 class OrderStatusUpdateIn(BaseModel):
     status: str

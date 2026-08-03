@@ -793,8 +793,65 @@ function isLoggedIn() {
     return !!AUTH_TOKEN;
 }
 
+// Global helper to hydrate single product page to avoid FOUC
+function hydrateSingleProductDOM(products) {
+    const bodySlug = document.body.getAttribute('data-product-slug');
+    if (!bodySlug) return;
+    
+    const currentProduct = products.find(p => p.slug === bodySlug);
+    if (!currentProduct) return;
+    
+    const descEl = document.getElementById("dynamic-product-description");
+    if (descEl && currentProduct.description) {
+        descEl.textContent = currentProduct.description;
+    }
+    
+    const benefitsEl = document.getElementById("dynamic-product-benefits");
+    if (benefitsEl && currentProduct.benefits && currentProduct.benefits.length > 0) {
+        benefitsEl.innerHTML = "";
+        currentProduct.benefits.forEach(b => {
+            const li = document.createElement("li");
+            const iconColor = bodySlug === 'shilajit' ? 'text-gold' : bodySlug === 'biotin' ? 'text-orange' : 'text-blue';
+            li.innerHTML = `<i data-lucide="check-circle" class="${iconColor}" style="width: 16px; height: 16px; flex-shrink: 0; margin-top: 2px;"></i> <span style="flex: 1;">${b}</span>`;
+            li.style.display = "flex";
+            li.style.alignItems = "flex-start";
+            li.style.gap = "10px";
+            benefitsEl.appendChild(li);
+        });
+        if (window.lucide) window.lucide.createIcons();
+    }
+    
+    const suggestedEl = document.getElementById("dynamic-suggested-usage");
+    if (suggestedEl && currentProduct.suggested_usage) {
+        suggestedEl.textContent = `Suggested Usage: ${currentProduct.suggested_usage}`;
+    }
+    
+    const ingredientsTableEl = document.getElementById("dynamic-ingredients-table");
+    if (ingredientsTableEl && currentProduct.ingredients && currentProduct.ingredients.length > 0) {
+        ingredientsTableEl.innerHTML = "";
+        currentProduct.ingredients.forEach(ing => {
+            const tr = document.createElement("tr");
+            tr.style.borderBottom = "1px solid rgba(255, 255, 255, 0.03)";
+            tr.innerHTML = `
+                <td style="padding: 15px; color: #FFFFFF;"><strong>${ing.component}</strong></td>
+                <td style="padding: 15px; color: var(--text-on-dark-muted);">${ing.feature}</td>
+                <td style="padding: 15px; text-align: right; color: var(--color-gold); font-weight: 600;">${ing.amount}</td>
+            `;
+            ingredientsTableEl.appendChild(tr);
+        });
+    }
+}
+
 // ─── DOMContentLoaded Initialization ───
 document.addEventListener("DOMContentLoaded", async () => {
+    // Attempt instant render of single product data from cache to prevent FOUC
+    try {
+        const cachedProducts = localStorage.getItem("sonrup_products_cache");
+        if (cachedProducts) {
+            hydrateSingleProductDOM(JSON.parse(cachedProducts));
+        }
+    } catch(e) {}
+
     // Render immediately from cached APP_CONFIG if available
     const cachedConfig = localStorage.getItem("sonrup_config");
     if (cachedConfig) {
@@ -962,6 +1019,28 @@ document.addEventListener("DOMContentLoaded", async () => {
             tagClass: "tag-kids"
         }
     };
+
+    // Define rendering function to update product details in modal
+    const renderDynamicProducts = (products) => {
+        products.forEach(p => {
+            if (productDetailsDb[p.slug]) {
+                productDetailsDb[p.slug].desc = p.description || productDetailsDb[p.slug].desc;
+                productDetailsDb[p.slug].benefits = p.benefits && p.benefits.length > 0 ? p.benefits : productDetailsDb[p.slug].benefits;
+            }
+        });
+        // Also ensure single page is up-to-date with freshest data
+        hydrateSingleProductDOM(products);
+    };
+
+    // Dynamically load fresh product data from admin panel
+    fetch(`${getApiBase()}/api/products`).then(res => {
+        if (res.ok) {
+            res.json().then(products => {
+                localStorage.setItem("sonrup_products_cache", JSON.stringify(products));
+                renderDynamicProducts(products);
+            });
+        }
+    }).catch(e => console.error("Failed to load dynamic product data", e));
 
     let activeModalProduct = null;
 
