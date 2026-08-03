@@ -979,9 +979,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     // Profile Page Loader — fetches data from API
-    if (window.location.pathname.includes("profile.html")) {
+    if (window.location.pathname.includes("/profile")) {
         if (!isLoggedIn()) {
-            window.location.href = "login.html";
+            window.location.href = "/login";
         } else {
             // Fetch user profile from API
             try {
@@ -1410,6 +1410,24 @@ document.addEventListener("DOMContentLoaded", async () => {
         loadAvailableCoupons();
         loadPaymentConfig();
 
+    // Payment Method UI Selection
+    const paymentRadios = document.querySelectorAll('input[name="payment-method"]');
+    paymentRadios.forEach(radio => {
+        radio.addEventListener("change", (e) => {
+            document.querySelectorAll('.payment-option-card').forEach(card => {
+                card.classList.remove('active');
+                card.style.background = "rgba(255, 255, 255, 0.01)";
+                card.style.border = "1px solid var(--border-dark)";
+            });
+            const activeCard = e.target.closest('.payment-option-card');
+            if (activeCard) {
+                activeCard.classList.add('active');
+                activeCard.style.background = "rgba(201, 162, 39, 0.06)";
+                activeCard.style.border = "1px solid var(--color-gold)";
+            }
+        });
+    });
+
         // Upgrade button click
         if (checkoutPageUpgradeBtn) {
             checkoutPageUpgradeBtn.addEventListener("click", () => {
@@ -1426,16 +1444,37 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         // Place Order Form Submit — handles Razorpay & COD
         if (checkoutPageForm) {
+            // Helper for guest success popup
+            function showGuestSuccessPopup(orderId) {
+                const overlay = document.createElement("div");
+                overlay.style = "position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.8);z-index:9999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(5px);";
+                
+                const popup = document.createElement("div");
+                popup.style = "background:var(--bg-dark-card);border:1px solid var(--color-gold);padding:40px;border-radius:16px;text-align:center;max-width:400px;width:90%;box-shadow:0 10px 30px rgba(0,0,0,0.5);";
+                
+                popup.innerHTML = `
+                    <div style="font-size:48px;margin-bottom:16px;">🎉</div>
+                    <h2 style="color:#FFF;font-size:24px;margin-bottom:8px;">Order Successful!</h2>
+                    <p style="color:var(--text-on-dark-muted);margin-bottom:20px;">Thank you for your purchase.</p>
+                    <div style="background:rgba(255,255,255,0.05);padding:12px;border-radius:8px;margin-bottom:24px;">
+                        <p style="color:#FFF;font-size:14px;margin:0;">Order ID: <strong>${orderId}</strong></p>
+                    </div>
+                    <button id="success-popup-btn" class="btn-primary btn-block" style="padding:14px;width:100%;">Continue Shopping</button>
+                `;
+                
+                overlay.appendChild(popup);
+                document.body.appendChild(overlay);
+                
+                document.getElementById("success-popup-btn").addEventListener("click", () => {
+                    document.body.removeChild(overlay);
+                    window.location.href = "/";
+                });
+            }
+
             checkoutPageForm.addEventListener("submit", async (e) => {
                 e.preventDefault();
                 if (cart.length === 0) {
                     showToast("Checkout Error", "Your shopping cart is empty!");
-                    return;
-                }
-
-                if (!isLoggedIn()) {
-                    showToast("Login Required", "Please log in to place an order.");
-                    setTimeout(() => { window.location.href = "login.html"; }, 1000);
                     return;
                 }
 
@@ -1523,12 +1562,18 @@ document.addEventListener("DOMContentLoaded", async () => {
                                         return;
                                     }
 
+                                    const verifyData = await verifyRes.json();
                                     cart = [];
                                     renderCart();
                                     checkoutPageForm.reset();
 
-                                    showToast("Payment Successful!", "Thank you! Redirecting to your dashboard...");
-                                    setTimeout(() => { window.location.href = "profile.html"; }, 1500);
+                                    if (isLoggedIn()) {
+                                        showToast("Payment Successful!", "Thank you! Redirecting to your dashboard...");
+                                        setTimeout(() => { window.location.href = "/profile"; }, 1500);
+                                    } else {
+                                        const orderId = verifyData.order ? verifyData.order.order_id : "N/A";
+                                        showGuestSuccessPopup(orderId);
+                                    }
                                 } catch (e) {
                                     placeBtn.disabled = false;
                                     placeBtn.innerHTML = originalBtnText;
@@ -1552,15 +1597,22 @@ document.addEventListener("DOMContentLoaded", async () => {
                             }
                         };
 
-                        if (window.Razorpay) {
+                        if (rzpOrderData.mock_payment || options.key.includes("SampleKey")) {
+                            showToast("Test Mode", "Simulating Razorpay payment for test mode...");
+                            setTimeout(() => {
+                                options.handler({
+                                    razorpay_payment_id: "pay_test_" + Date.now(),
+                                    razorpay_order_id: options.order_id,
+                                    razorpay_signature: "mock_signature"
+                                });
+                            }, 1000);
+                        } else if (window.Razorpay) {
                             const rzpInstance = new window.Razorpay(options);
                             rzpInstance.open();
                         } else {
-                            options.handler({
-                                razorpay_order_id: rzpOrderData.razorpay_order_id,
-                                razorpay_payment_id: `pay_sim_${Date.now()}`,
-                                razorpay_signature: "simulated_sig"
-                            });
+                            showToast("Error", "Razorpay SDK not loaded.");
+                            placeBtn.disabled = false;
+                            placeBtn.innerHTML = originalBtnText;
                         }
                         return;
                     }
@@ -1581,14 +1633,18 @@ document.addEventListener("DOMContentLoaded", async () => {
                         return;
                     }
 
+                    const codData = await res.json();
                     cart = [];
                     renderCart();
                     checkoutPageForm.reset();
 
-                    showToast("Order Successful!", "Thank you! Redirecting to your dashboard...");
-                    setTimeout(() => {
-                        window.location.href = "profile.html";
-                    }, 1500);
+                    if (isLoggedIn()) {
+                        showToast("Order Successful!", "Thank you! Redirecting to your dashboard...");
+                        setTimeout(() => { window.location.href = "/profile"; }, 1500);
+                    } else {
+                        const orderId = codData.order_id || "N/A";
+                        showGuestSuccessPopup(orderId);
+                    }
                 } catch (err) {
                     placeBtn.disabled = false;
                     placeBtn.innerHTML = originalBtnText;

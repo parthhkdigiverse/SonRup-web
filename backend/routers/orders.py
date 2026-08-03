@@ -9,8 +9,9 @@ from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from database import get_db
-from auth_utils import get_current_user
+from auth_utils import get_current_user, get_current_user_optional
 from schemas.order import OrderCreate, OrderOut
+from typing import Optional
 
 router = APIRouter(prefix="/orders", tags=["Orders"])
 
@@ -33,9 +34,9 @@ def _order_to_out(order: dict) -> OrderOut:
 @router.post("", response_model=OrderOut)
 async def create_order(
     data: OrderCreate,
-    current_user: dict = Depends(get_current_user),
+    current_user: Optional[dict] = Depends(get_current_user_optional),
 ):
-    """Place a new order (requires authentication)."""
+    """Place a new order (supports guest checkout if unauthenticated)."""
     db = get_db()
 
     if not data.items:
@@ -52,7 +53,7 @@ async def create_order(
 
     order_doc = {
         "order_id": order_id,
-        "user_id": current_user["_id"],
+        "user_id": current_user["_id"] if current_user else "guest",
         "items": [item.model_dump() for item in data.items],
         "total": total,
         "status": "Processing",
@@ -184,6 +185,7 @@ async def create_razorpay_order(data: RazorpayOrderCreateIn):
     import uuid
     rzp_order_id = f"order_{uuid.uuid4().hex[:14]}"
 
+    mock_payment = False
     if key_id.startswith("rzp_") and not key_id.endswith("SampleKey123"):
         try:
             import urllib.request
@@ -210,18 +212,25 @@ async def create_razorpay_order(data: RazorpayOrderCreateIn):
                 res_data = json.loads(response.read().decode())
                 rzp_order_id = res_data.get("id", rzp_order_id)
         except Exception as e:
-            print(f"⚠️ Razorpay API call note: {e}")
+            print(f"⚠️ Razorpay API call failed. Falling back to mock mode. Error: {e}")
+            mock_payment = True
+    else:
+        mock_payment = True
 
     return {
         "key_id": key_id,
         "razorpay_order_id": rzp_order_id,
         "amount": amount_paisa,
-        "currency": "INR"
+        "currency": "INR",
+        "mock_payment": mock_payment
     }
 
 
 @router.post("/verify-razorpay-payment")
-async def verify_razorpay_payment(data: RazorpayPaymentVerifyIn):
+async def verify_razorpay_payment(
+    data: RazorpayPaymentVerifyIn,
+    current_user: Optional[dict] = Depends(get_current_user_optional),
+):
     """Verify Razorpay payment signature and persist completed order."""
     db = get_db()
     settings = await db.settings.find_one({"_id": "global_settings"}) or {}
@@ -252,6 +261,9 @@ async def verify_razorpay_payment(data: RazorpayPaymentVerifyIn):
     if "order_id" not in order:
         import random
         order["order_id"] = f"SR{random.randint(100000, 999999)}"
+        
+    if "user_id" not in order:
+        order["user_id"] = current_user["_id"] if current_user else "guest"
 
     res = await db.orders.insert_one(order)
     order["_id"] = str(res.inserted_id)

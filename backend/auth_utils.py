@@ -87,7 +87,30 @@ async def get_current_user(
     return user
 
 
+async def get_current_user_optional(
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(HTTPBearer(auto_error=False)),
+) -> Optional[dict]:
+    """Dependency: extract user from JWT if present, otherwise return None."""
+    if not credentials:
+        return None
+    try:
+        payload = jwt.decode(credentials.credentials, SECRET_KEY, algorithms=[JWT_ALGORITHM])
+        user_id = payload.get("sub")
+        if not user_id:
+            return None
+            
+        db = get_db()
+        user = await db.users.find_one({"_id": ObjectId(user_id)})
+        if not user:
+            return None
+            
+        user["_id"] = str(user["_id"])
+        return user
+    except Exception:
+        return None
+
 async def get_current_admin_user(
+
     current_user: dict = Depends(get_current_user),
 ) -> dict:
     """Dependency: assert that the currently authenticated user has administrative rights."""
