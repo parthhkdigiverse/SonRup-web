@@ -1758,7 +1758,10 @@ function setupEventListeners() {
     // Sidebar Tabs
     const tabs = document.querySelectorAll(".sidebar-tab");
     tabs.forEach(tab => {
-        tab.addEventListener("click", () => {
+        tab.addEventListener("click", (e) => {
+            // Let the toggle-site-settings-menu handle its own click logic
+            if (tab.id === "toggle-site-settings-menu") return;
+            
             const targetId = tab.getAttribute("data-target");
             if (targetId) {
                 activateAdminTab(targetId);
@@ -1960,13 +1963,20 @@ function setupEventListeners() {
     const settingsArrow = document.getElementById("site-settings-arrow");
 
     if (toggleSettingsBtn && settingsSubmenu) {
-        toggleSettingsBtn.addEventListener("click", () => {
-            const isHidden = settingsSubmenu.style.display === "none";
-            settingsSubmenu.style.display = isHidden ? "block" : "none";
-            if (settingsArrow) {
-                settingsArrow.style.transform = isHidden ? "rotate(180deg)" : "rotate(0deg)";
+        toggleSettingsBtn.addEventListener("click", (e) => {
+            const isActive = document.getElementById("section-site-builder")?.classList.contains("active");
+            
+            if (isActive) {
+                // If already on the site builder tab, just toggle the submenu visibility
+                const isHidden = settingsSubmenu.style.display === "none";
+                settingsSubmenu.style.display = isHidden ? "block" : "none";
+                if (settingsArrow) {
+                    settingsArrow.style.transform = isHidden ? "rotate(180deg)" : "rotate(0deg)";
+                }
+            } else {
+                // If not active, activate the tab (which forces menu open via activateAdminTab)
+                activateAdminTab("section-site-builder");
             }
-            activateAdminTab("section-site-builder", "2");
         });
     }
 
