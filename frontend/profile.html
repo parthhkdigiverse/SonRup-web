@@ -39,11 +39,11 @@
 
             <div class="header-actions" id="header-auth-actions">
                 <button class="cart-trigger" id="cart-button" aria-label="View Cart">
-                    <i data-lucide="shopping-cart"></i>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
                     <span class="cart-badge" id="cart-count">0</span>
                 </button>
                 <a href="profile.html" class="nav-profile-btn" id="header-profile-icon" aria-label="Profile" style="display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid var(--color-gold); background: rgba(201, 162, 39, 0.1); color: var(--color-gold); cursor: pointer;">
-                    <i data-lucide="user" style="width: 16px; height: 16px;"></i>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                 </a>
             </div>
         </div>
@@ -54,43 +54,47 @@
         <div style="background: linear-gradient(135deg, rgba(201, 162, 39, 0.08) 0%, rgba(18, 18, 18, 0.5) 100%); border: 1px solid var(--border-dark); border-radius: 16px; padding: 40px; margin-bottom: 40px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
             <div>
                 <h1 style="font-size: 32px; color: #FFFFFF; font-family: var(--font-heading); margin-bottom: 8px;">Hello, <span id="profile-welcome-name"></span></h1>
-                <p style="color: var(--text-on-dark-muted); font-size: 14px;">Welcome to your Sonrup wellness dashboard. View orders and update addresses.</p>
+                <p style="color: var(--text-on-dark-muted); font-size: 14px;" id="profile-welcome-subtitle">Welcome to your Sonrup wellness dashboard. View orders and update addresses.</p>
             </div>
-            <button id="logout-btn" class="btn-secondary btn-sm" style="color: #FF5A5A; border-color: rgba(255, 90, 90, 0.2);"><i data-lucide="log-out" style="width: 14px; height: 14px; margin-right: 6px;"></i>Log Out</button>
+            <div id="profile-auth-actions" style="display: flex; gap: 10px; align-items: center;">
+                <a href="login.html" class="btn-primary btn-sm" id="profile-login-link" style="display: none; text-decoration: none;">Log In</a>
+                <a href="signup.html" class="btn-secondary btn-sm" id="profile-signup-link" style="display: none; text-decoration: none;">Sign Up</a>
+                <button id="logout-btn" class="btn-secondary btn-sm" style="color: #FF5A5A; border-color: rgba(255, 90, 90, 0.2); display: none;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Log Out</button>
+            </div>
         </div>
 
         <div class="profile-layout" style="display: grid; grid-template-columns: 1fr 2fr; gap: 40px; align-items: start;">
             <!-- Left Side: Profile Details -->
             <div style="background-color: var(--bg-dark-card); border: 1px solid var(--border-dark); border-radius: 16px; padding: 30px;">
-                <h2 style="font-size: 18px; color: #FFFFFF; margin-bottom: 20px; font-family: var(--font-heading); display: flex; align-items: center; gap: 10px;"><i data-lucide="user-check" class="text-gold"></i> Personal Information</h2>
+                <h2 style="font-size: 18px; color: #FFFFFF; margin-bottom: 20px; font-family: var(--font-heading); display: flex; align-items: center; gap: 10px;"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C9A227" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><polyline points="16 11 18 13 22 9"/></svg> Personal Information</h2>
                 <div style="display: flex; flex-direction: column; gap: 16px; font-size: 13.5px;">
                     <div>
                         <span style="display: block; font-size: 11px; text-transform: uppercase; color: var(--text-on-dark-muted); margin-bottom: 4px;">Full Name</span>
-                        <strong id="profile-detail-name" style="color: #FFFFFF;"></strong>
+                        <strong id="profile-detail-name" style="color: #FFFFFF;"><span class="profile-skeleton" style="width: 140px;"></span></strong>
                     </div>
                     <div>
                         <span style="display: block; font-size: 11px; text-transform: uppercase; color: var(--text-on-dark-muted); margin-bottom: 4px;">Email Address</span>
-                        <strong id="profile-detail-email" style="color: #FFFFFF;"></strong>
+                        <strong id="profile-detail-email" style="color: #FFFFFF;"><span class="profile-skeleton" style="width: 180px;"></span></strong>
                     </div>
                     <div>
                         <span style="display: block; font-size: 11px; text-transform: uppercase; color: var(--text-on-dark-muted); margin-bottom: 4px;">Phone Number</span>
-                        <strong id="profile-detail-phone" style="color: #FFFFFF;"></strong>
+                        <strong id="profile-detail-phone" style="color: #FFFFFF;"><span class="profile-skeleton" style="width: 110px;"></span></strong>
                     </div>
                     <div>
                         <span style="display: block; font-size: 11px; text-transform: uppercase; color: var(--text-on-dark-muted); margin-bottom: 4px;">Default Shipping Address</span>
-                        <strong id="profile-detail-address" style="color: #FFFFFF;"></strong>
+                        <strong id="profile-detail-address" style="color: #FFFFFF;"><span class="profile-skeleton" style="width: 220px;"></span></strong>
                     </div>
                 </div>
             </div>
 
             <!-- Right Side: Order History -->
             <div style="background-color: var(--bg-dark-card); border: 1px solid var(--border-dark); border-radius: 16px; padding: 30px;">
-                <h2 style="font-size: 18px; color: #FFFFFF; margin-bottom: 20px; font-family: var(--font-heading); display: flex; align-items: center; gap: 10px;"><i data-lucide="shopping-bag" class="text-gold"></i> Order History</h2>
+                <h2 style="font-size: 18px; color: #FFFFFF; margin-bottom: 20px; font-family: var(--font-heading); display: flex; align-items: center; gap: 10px;"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C9A227" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg> Order History</h2>
                 
                 <div id="profile-orders-list" style="display: flex; flex-direction: column; gap: 20px;">
                     <!-- Dynamic Orders go here -->
                     <div style="text-align: center; padding: 40px 20px; color: var(--text-on-dark-muted);" id="no-orders-msg">
-                        <i data-lucide="package-open" style="width: 48px; height: 48px; stroke-width: 1.5; color: var(--color-gold); margin-bottom: 12px; display: inline-block;"></i>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#C9A227" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 12px; display: inline-block;"><path d="M12 22v-9"/><path d="M15.17 2.21a1.67 1.67 0 0 1 1.63 0l5.04 2.86a1.7 1.7 0 0 1 .84 1.48v5.7a1.7 1.7 0 0 1-.84 1.47l-9.84 5.58a1.67 1.67 0 0 1-1.63 0L1.33 13.72A1.7 1.7 0 0 1 .49 12.25v-5.7A1.7 1.7 0 0 1 1.33 5.07l5.04-2.86a1.67 1.67 0 0 1 1.63 0l4 2.27Z"/><path d="M12 13 2.5 7.6"/><path d="m12 13 9.5-5.4"/><path d="M16 4.7 6.5 10.1"/></svg>
                         <p style="font-size: 14.5px;">No orders placed yet.</p>
                         <a href="shop.html" class="btn-primary btn-sm" style="margin-top: 15px; display: inline-flex;">Shop Wellness Gummies</a>
                     </div>
@@ -98,6 +102,47 @@
             </div>
         </div>
     </main>
+
+    <!-- Synchronous Immediate Cache Hydration Script (Zero-latency on Hard Refresh) -->
+    <script>
+        (function() {
+            try {
+                var cachedUser = JSON.parse(localStorage.getItem("sonrup_user") || "null");
+                var lastShipping = JSON.parse(localStorage.getItem("sonrup_last_order_shipping") || "null");
+                var token = localStorage.getItem("sonrup_token");
+
+                var wName = document.getElementById("profile-welcome-name");
+                var dName = document.getElementById("profile-detail-name");
+                var dEmail = document.getElementById("profile-detail-email");
+                var dPhone = document.getElementById("profile-detail-phone");
+                var dAddr = document.getElementById("profile-detail-address");
+
+                if (token && cachedUser) {
+                    var n = cachedUser.name || (lastShipping ? lastShipping.name : "");
+                    var e = cachedUser.email || (lastShipping ? lastShipping.email : "");
+                    var p = cachedUser.phone || (lastShipping ? lastShipping.phone : "");
+                    var a = cachedUser.address ? (cachedUser.address + (cachedUser.pincode ? ", " + cachedUser.pincode : "")) : (lastShipping && lastShipping.address ? (lastShipping.address + (lastShipping.city ? ", " + lastShipping.city : "") + (lastShipping.pincode ? " - " + lastShipping.pincode : "")) : "");
+
+                    if (wName && n) wName.textContent = n;
+                    if (dName && n) dName.textContent = n;
+                    if (dEmail && e) dEmail.textContent = e;
+                    if (dPhone && p) dPhone.textContent = p;
+                    if (dAddr && a) dAddr.textContent = a;
+                } else if (lastShipping) {
+                    var n = lastShipping.name || "Guest Customer";
+                    var e = lastShipping.email || "Not Provided";
+                    var p = lastShipping.phone || "Not Provided";
+                    var a = (lastShipping.address || "") + (lastShipping.city ? ", " + lastShipping.city : "") + (lastShipping.pincode ? " - " + lastShipping.pincode : "");
+
+                    if (wName && n) wName.textContent = n;
+                    if (dName && n) dName.textContent = n;
+                    if (dEmail && e) dEmail.textContent = e;
+                    if (dPhone && p) dPhone.textContent = p;
+                    if (dAddr && a) dAddr.textContent = a || "Not Provided";
+                }
+            } catch(e) {}
+        })();
+    </script>
 
     <!-- Footer -->
     <footer class="site-footer">

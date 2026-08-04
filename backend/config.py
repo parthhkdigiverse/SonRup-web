@@ -32,7 +32,7 @@ DB_NAME: str = get_env_var("DB_NAME", "sonrup")
 
 SECRET_KEY: str = get_env_var("SECRET_KEY", "")
 JWT_ALGORITHM: str = get_env_var("JWT_ALGORITHM", "HS256")
-TOKEN_EXPIRE_MINUTES: int = int(get_env_var("TOKEN_EXPIRE_MINUTES", "10080"))
+TOKEN_EXPIRE_MINUTES: int = int(get_env_var("TOKEN_EXPIRE_MINUTES", "5256000"))
 DEBUG: bool = get_env_var("DEBUG", "false").lower() == "true"
 
 # ─── Default Admin Account Credentials ───

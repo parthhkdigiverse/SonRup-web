@@ -23,6 +23,7 @@ async def submit_contact(data: ContactCreate):
         "phone": data.phone,
         "subject": data.subject,
         "message": data.message,
+        "status": "New",
         "created_at": datetime.now(timezone.utc),
     }
 
