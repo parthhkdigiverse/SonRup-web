@@ -2612,50 +2612,64 @@ document.addEventListener("DOMContentLoaded", async () => {
     const dotsContainer = document.getElementById("carousel-dots");
 
     if (reviewTrack && reviewCards && reviewCards.length > 0) {
-        let currentIndex = 0;
-        const totalReviews = reviewCards.length;
+        const totalOriginal = reviewCards.length;
+        let currentIndex = totalOriginal; // Start at the first original card
         let autoSlideTimer = null;
-        let maxIndex = 0;
         let dots = [];
 
-        const updateCarousel = (index) => {
-            const cardWidth = reviewCards[0].offsetWidth;
-            const containerWidth = reviewTrack.parentElement.offsetWidth;
-            const visibleCards = Math.round(containerWidth / cardWidth) || 1;
-            maxIndex = Math.max(0, totalReviews - visibleCards);
+        // Clone cards for infinite circular scroll (pre and post)
+        const preClones = [];
+        const postClones = [];
+        for (let i = 0; i < totalOriginal; i++) {
+            const pre = reviewCards[i].cloneNode(true);
+            pre.classList.add('clone');
+            preClones.push(pre);
+            
+            const post = reviewCards[i].cloneNode(true);
+            post.classList.add('clone');
+            postClones.push(post);
+        }
+        for (let i = totalOriginal - 1; i >= 0; i--) {
+            reviewTrack.insertBefore(preClones[i], reviewTrack.firstChild);
+        }
+        for (let i = 0; i < totalOriginal; i++) {
+            reviewTrack.appendChild(postClones[i]);
+        }
 
-            // Generate dots dynamically based on maxIndex + 1
-            if (dotsContainer && (!dots.length || dotsContainer.children.length !== maxIndex + 1)) {
+        const getVisibleCards = () => Math.round(reviewTrack.parentElement.offsetWidth / reviewCards[0].offsetWidth) || 1;
+        const getMaxIndex = () => Math.max(0, totalOriginal - getVisibleCards());
+
+        // Generate dots dynamically to match maxIndex + 1
+        const generateDots = () => {
+            const currentMax = getMaxIndex();
+            if (dotsContainer && (!dots.length || dotsContainer.children.length !== currentMax + 1)) {
                 dotsContainer.innerHTML = '';
-                for (let i = 0; i <= maxIndex; i++) {
+                for (let i = 0; i <= currentMax; i++) {
                     const dot = document.createElement('span');
                     dot.className = 'dot';
                     dot.dataset.index = i;
                     dot.addEventListener('click', () => {
                         stopAutoSlide();
-                        updateCarousel(i);
+                        updateCarousel(i + totalOriginal); // Jump to original item
                         startAutoSlide();
                     });
                     dotsContainer.appendChild(dot);
                 }
                 dots = Array.from(dotsContainer.querySelectorAll('.dot'));
             }
+        };
 
-            if (index < 0) {
-                currentIndex = 0;
-            } else if (index > maxIndex) {
-                currentIndex = maxIndex;
-            } else {
-                currentIndex = index;
-            }
-
+        const applyTransform = () => {
+            generateDots();
+            const cardWidth = reviewCards[0].offsetWidth;
             const gap = 30; // gap from CSS
             const translation = currentIndex * (cardWidth + gap);
             reviewTrack.style.transform = `translateX(-${translation}px)`;
 
+            const activeDotIndex = currentIndex % totalOriginal;
             if (dots && dots.length > 0) {
                 dots.forEach((dot, idx) => {
-                    if (idx === currentIndex) {
+                    if (idx === activeDotIndex) {
                         dot.classList.add("active");
                     } else {
                         dot.classList.remove("active");
@@ -2664,16 +2678,60 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
         };
 
-        let autoDirection = 1;
+        const updateCarousel = (index) => {
+            currentIndex = index;
+            reviewTrack.style.transition = 'transform 0.6s cubic-bezier(0.25, 1, 0.5, 1)';
+            applyTransform();
+        };
+
+        // Seamless loop without rewind, avoiding mixing start/end cards
+        reviewTrack.addEventListener('transitionend', () => {
+            let changed = false;
+            if (currentIndex >= totalOriginal * 2) {
+                currentIndex = currentIndex - totalOriginal;
+                changed = true;
+            } else if (currentIndex <= getMaxIndex()) {
+                currentIndex = currentIndex + totalOriginal;
+                changed = true;
+            }
+            if (changed) {
+                reviewTrack.style.transition = 'none';
+                applyTransform();
+                void reviewTrack.offsetWidth; // force reflow
+                reviewTrack.style.transition = 'transform 0.6s cubic-bezier(0.25, 1, 0.5, 1)';
+            }
+        });
+
+        // Recalculate on resize
+        window.addEventListener('resize', () => {
+            reviewTrack.style.transition = 'none';
+            applyTransform();
+        });
+        
+        const nextSlide = () => {
+            const maxIdx = getMaxIndex();
+            if (currentIndex === totalOriginal + maxIdx) {
+                // At the last valid index, jump to the first dot's clone
+                updateCarousel(totalOriginal * 2);
+            } else {
+                updateCarousel(currentIndex + 1);
+            }
+        };
+
+        const prevSlide = () => {
+            const maxIdx = getMaxIndex();
+            if (currentIndex === totalOriginal) {
+                // At the first dot, jump to the last dot's clone
+                updateCarousel(maxIdx);
+            } else {
+                updateCarousel(currentIndex - 1);
+            }
+        };
+
         const startAutoSlide = () => {
             stopAutoSlide();
             autoSlideTimer = setInterval(() => {
-                if (currentIndex >= maxIndex) {
-                    autoDirection = -1;
-                } else if (currentIndex <= 0) {
-                    autoDirection = 1;
-                }
-                updateCarousel(currentIndex + autoDirection);
+                nextSlide();
             }, 5000);
         };
 
@@ -2685,18 +2743,20 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         prevBtn?.addEventListener("click", () => {
             stopAutoSlide();
-            updateCarousel(currentIndex - 1);
+            prevSlide();
             startAutoSlide();
         });
 
         nextBtn?.addEventListener("click", () => {
             stopAutoSlide();
-            updateCarousel(currentIndex + 1);
+            nextSlide();
             startAutoSlide();
         });
 
-        // Initialize immediately
-        updateCarousel(0);
+        // Initialize with no transition
+        reviewTrack.style.transition = 'none';
+        applyTransform();
+        void reviewTrack.offsetWidth;
         startAutoSlide();
     }
 
