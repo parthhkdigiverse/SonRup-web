@@ -2610,37 +2610,70 @@ document.addEventListener("DOMContentLoaded", async () => {
     const prevBtn = document.getElementById("review-prev-btn");
     const nextBtn = document.getElementById("review-next-btn");
     const dotsContainer = document.getElementById("carousel-dots");
-    const dots = dotsContainer?.querySelectorAll(".dot");
 
     if (reviewTrack && reviewCards && reviewCards.length > 0) {
         let currentIndex = 0;
         const totalReviews = reviewCards.length;
         let autoSlideTimer = null;
+        let maxIndex = 0;
+        let dots = [];
 
         const updateCarousel = (index) => {
+            const cardWidth = reviewCards[0].offsetWidth;
+            const containerWidth = reviewTrack.parentElement.offsetWidth;
+            const visibleCards = Math.round(containerWidth / cardWidth) || 1;
+            maxIndex = Math.max(0, totalReviews - visibleCards);
+
+            // Generate dots dynamically based on maxIndex + 1
+            if (dotsContainer && (!dots.length || dotsContainer.children.length !== maxIndex + 1)) {
+                dotsContainer.innerHTML = '';
+                for (let i = 0; i <= maxIndex; i++) {
+                    const dot = document.createElement('span');
+                    dot.className = 'dot';
+                    dot.dataset.index = i;
+                    dot.addEventListener('click', () => {
+                        stopAutoSlide();
+                        updateCarousel(i);
+                        startAutoSlide();
+                    });
+                    dotsContainer.appendChild(dot);
+                }
+                dots = Array.from(dotsContainer.querySelectorAll('.dot'));
+            }
+
             if (index < 0) {
-                currentIndex = totalReviews - 1;
-            } else if (index >= totalReviews) {
                 currentIndex = 0;
+            } else if (index > maxIndex) {
+                currentIndex = maxIndex;
             } else {
                 currentIndex = index;
             }
 
-            reviewTrack.style.transform = `translateX(-${currentIndex * 100}%)`;
+            const gap = 30; // gap from CSS
+            const translation = currentIndex * (cardWidth + gap);
+            reviewTrack.style.transform = `translateX(-${translation}px)`;
 
-            dots?.forEach((dot, idx) => {
-                if (idx === currentIndex) {
-                    dot.classList.add("active");
-                } else {
-                    dot.classList.remove("active");
-                }
-            });
+            if (dots && dots.length > 0) {
+                dots.forEach((dot, idx) => {
+                    if (idx === currentIndex) {
+                        dot.classList.add("active");
+                    } else {
+                        dot.classList.remove("active");
+                    }
+                });
+            }
         };
 
+        let autoDirection = 1;
         const startAutoSlide = () => {
             stopAutoSlide();
             autoSlideTimer = setInterval(() => {
-                updateCarousel(currentIndex + 1);
+                if (currentIndex >= maxIndex) {
+                    autoDirection = -1;
+                } else if (currentIndex <= 0) {
+                    autoDirection = 1;
+                }
+                updateCarousel(currentIndex + autoDirection);
             }, 5000);
         };
 
@@ -2662,14 +2695,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             startAutoSlide();
         });
 
-        dots?.forEach((dot, idx) => {
-            dot.addEventListener("click", () => {
-                stopAutoSlide();
-                updateCarousel(idx);
-                startAutoSlide();
-            });
-        });
-
+        // Initialize immediately
+        updateCarousel(0);
         startAutoSlide();
     }
 
