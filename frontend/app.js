@@ -1763,10 +1763,29 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     // Profile Page Loader — fetches data from API
-    if (window.location.pathname.includes("profile.html")) {
+    if (window.location.pathname.includes("profile")) {
         if (!isLoggedIn()) {
             window.location.href = "login.html";
         } else {
+            // Instantly populate from localStorage cache to prevent loading flashes
+            const cachedUserStr = localStorage.getItem("sonrup_user");
+            if (cachedUserStr) {
+                try {
+                    const cachedUser = JSON.parse(cachedUserStr);
+                    const welcomeEl = document.getElementById("profile-welcome-name");
+                    const detailNameEl = document.getElementById("profile-detail-name");
+                    const detailEmailEl = document.getElementById("profile-detail-email");
+                    const detailPhoneEl = document.getElementById("profile-detail-phone");
+                    const detailAddressEl = document.getElementById("profile-detail-address");
+
+                    if (welcomeEl) welcomeEl.textContent = cachedUser.name || "";
+                    if (detailNameEl) detailNameEl.textContent = cachedUser.name || "";
+                    if (detailEmailEl) detailEmailEl.textContent = cachedUser.email || "";
+                    if (detailPhoneEl) detailPhoneEl.textContent = cachedUser.phone || "Not provided";
+                    if (detailAddressEl) detailAddressEl.textContent = cachedUser.address ? (cachedUser.address + (cachedUser.pincode ? `, ${cachedUser.pincode}` : "")) : "Not provided";
+                } catch(e) {}
+            }
+
             // Fetch user profile from API
             try {
                 const profileRes = await fetch(`${getApiBase()}/api/auth/me`, {
