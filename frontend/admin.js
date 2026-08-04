@@ -1324,7 +1324,17 @@ async function loadUsers() {
         if (!res.ok) throw new Error("Could not fetch registered accounts");
 
         const users = await res.json();
+        
+        if (!Array.isArray(users)) {
+            throw new Error("Invalid response format: expected an array");
+        }
+
         tbody.innerHTML = "";
+
+        if (users.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #94a3b8;">No registered users found.</td></tr>';
+            return;
+        }
 
         users.forEach(user => {
             const regDate = user.created_at ? new Date(user.created_at).toLocaleDateString() : "Active Account";
@@ -1358,6 +1368,10 @@ async function loadUsers() {
         if (window.lucide) window.lucide.createIcons();
     } catch (e) {
         console.error("Error loading users:", e);
+        const tbody = document.getElementById("users-table-body");
+        if (tbody) {
+            tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #ef4444;">Failed to load users: ${e.message}</td></tr>`;
+        }
     }
 }
 
@@ -1569,6 +1583,11 @@ async function loadCoupons() {
         if (!res.ok) throw new Error("Could not fetch promo coupons");
 
         cachedCoupons = await res.json();
+        
+        if (!Array.isArray(cachedCoupons)) {
+            throw new Error("Invalid response format: expected an array");
+        }
+
         tbody.innerHTML = "";
 
         if (cachedCoupons.length === 0) {
@@ -1616,6 +1635,10 @@ async function loadCoupons() {
         if (window.lucide) window.lucide.createIcons();
     } catch (e) {
         console.error("Error loading coupons:", e);
+        const tbody = document.getElementById("coupons-table-body");
+        if (tbody) {
+            tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #ef4444;">Failed to load coupons: ${e.message}</td></tr>`;
+        }
     }
 }
 
