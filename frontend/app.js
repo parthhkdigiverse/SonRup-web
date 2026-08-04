@@ -1140,27 +1140,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     }
 
-    // 5. FAQ Accordion Toggle
-    const faqQuestions = document.querySelectorAll(".faq-question");
-    faqQuestions.forEach(q => {
-        q.addEventListener("click", () => {
-            const faqItem = q.parentElement;
-            const isActive = faqItem.classList.contains("active");
-            
-            // Close all items
-            document.querySelectorAll(".faq-item").forEach(item => {
-                item.classList.remove("active");
-                item.querySelector(".faq-answer").style.maxHeight = null;
-            });
-            
-            // Open clicked item if it wasn't active
-            if (!isActive) {
-                faqItem.classList.add("active");
-                const answer = faqItem.querySelector(".faq-answer");
-                answer.style.maxHeight = answer.scrollHeight + "px";
-            }
-        });
-    });
 
     // 6. E-commerce Cart & Checkout Modal Logic
     const cartCountEl = document.getElementById("cart-count");
