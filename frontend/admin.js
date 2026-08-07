@@ -493,17 +493,17 @@ async function loadSettings() {
         if (document.getElementById("setting-social-twitter")) document.getElementById("setting-social-twitter").value = fs.twitter || "";
         if (document.getElementById("setting-social-whatsapp")) document.getElementById("setting-social-whatsapp").value = fs.whatsapp || "";
         
-        if (document.getElementById("setting-reg-lic")) document.getElementById("setting-reg-lic").value = fs.license || "GA/646-A";
-        if (document.getElementById("setting-reg-fssai")) document.getElementById("setting-reg-fssai").value = fs.fssai || "10726997000544";
+        if (document.getElementById("setting-license")) document.getElementById("setting-license").value = fs.license || "GA/646-A";
+        if (document.getElementById("setting-fssai")) document.getElementById("setting-fssai").value = fs.fssai || "10726997000544";
         if (document.getElementById("setting-reg-disclaimer")) document.getElementById("setting-reg-disclaimer").value = fs.disclaimer || "Disclaimer: These products are nutraceuticals and not intended to diagnose, treat, cure, or prevent any disease.";
 
 
         document.getElementById("setting-site-name").value = data.site_name || "Sonrup";
         document.getElementById("setting-support-email").value = data.support_email || "info@sonrup.com";
         document.getElementById("setting-support-phone").value = data.support_phone || "+91 76001 75193";
-        document.getElementById("setting-fssai").value = data.fssai_number || "10726997000544";
+        if (document.getElementById("setting-fssai")) document.getElementById("setting-fssai").value = data.fssai_number || "10726997000544";
         document.getElementById("setting-address").value = data.support_address || "A 584 Sitaram Society, Punagam Road, Surat-395010";
-        document.getElementById("setting-license").value = data.license_number || "GA/646-A";
+        if (document.getElementById("setting-license")) document.getElementById("setting-license").value = data.license_number || "GA/646-A";
         document.getElementById("setting-banner-enabled").value = data.announcement_banner_enabled ? "true" : "false";
         document.getElementById("setting-banner-text").value = data.announcement_banner_text || "";
         document.getElementById("setting-razorpay-enabled").value = data.razorpay_enabled !== false ? "true" : "false";
@@ -2109,8 +2109,8 @@ function setupEventListeners() {
             support_email: document.getElementById("setting-support-email").value.trim(),
             support_phone: document.getElementById("setting-support-phone").value.trim(),
             support_address: document.getElementById("setting-address").value.trim(),
-            fssai_number: document.getElementById("setting-fssai").value.trim(),
-            license_number: document.getElementById("setting-license").value.trim(),
+            fssai_number: document.getElementById("setting-fssai")?.value?.trim() || "",
+            license_number: document.getElementById("setting-license")?.value?.trim() || "",
             announcement_banner_enabled: document.getElementById("setting-banner-enabled").value === "true",
             announcement_banner_text: document.getElementById("setting-banner-text").value.trim(),
             razorpay_enabled: document.getElementById("setting-razorpay-enabled").value === "true",
@@ -2133,8 +2133,8 @@ function setupEventListeners() {
                 instagram: document.getElementById("setting-social-instagram")?.value.trim(),
                 twitter: document.getElementById("setting-social-twitter")?.value.trim(),
                 whatsapp: document.getElementById("setting-social-whatsapp")?.value.trim(),
-                license: document.getElementById("setting-reg-lic")?.value.trim(),
-                fssai: document.getElementById("setting-reg-fssai")?.value.trim(),
+                license: document.getElementById("setting-license")?.value.trim(),
+                fssai: document.getElementById("setting-fssai")?.value.trim(),
                 disclaimer: document.getElementById("setting-reg-disclaimer")?.value.trim(),
                 marketed_by: document.getElementById("setting-contact-marketed")?.value.trim(),
                 manufactured_by: document.getElementById("setting-contact-manufactured")?.value.trim(),
@@ -2152,6 +2152,8 @@ function setupEventListeners() {
             if (!res.ok) throw new Error("Could not save settings");
 
             showToast("🌟 Website Configuration successfully published across the live site!");
+            localStorage.removeItem("sonrup_config");
+            localStorage.removeItem("sonrup_config_time");
         } catch (err) {
             showToast("Failed to save website settings.", true);
         }
@@ -3175,6 +3177,8 @@ window.saveSiteSettingsToDB = async function() {
         if (!res.ok) throw new Error("Could not save settings");
         
         showToast("🌟 Footer Settings successfully published!");
+        localStorage.removeItem("sonrup_config");
+        localStorage.removeItem("sonrup_config_time");
         if(btn) {
             btn.innerHTML = '<i data-lucide="check"></i> Saved';
             setTimeout(() => { btn.innerHTML = '<i data-lucide="save"></i> Save & Publish Footer Settings'; lucide.createIcons(); }, 2000);

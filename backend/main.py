@@ -31,11 +31,15 @@ FRONTEND_DIR = Path(__file__).resolve().parent.parent / "frontend"
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Application lifecycle: connect DB, seed data, and generate static frontend config on startup."""
-    db = await connect_db()
-    await seed_products(db)
-    await seed_admin(db)
-    await seed_settings(db)
-    await seed_coupons(db)
+    try:
+        db = await connect_db()
+        await seed_products(db)
+        await seed_admin(db)
+        await seed_settings(db)
+        await seed_coupons(db)
+    except Exception as e:
+        print(f"⚠️ Could not connect to MongoDB or seed database: {e}")
+        print("⚠️ Application will continue to run, but API calls requiring DB may fail.")
     
     # Dump FRONTEND_CONFIG to frontend/config.json so standalone frontend servers on FRONTEND_PORT can access dynamic ports
     try:

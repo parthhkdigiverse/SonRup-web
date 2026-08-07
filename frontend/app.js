@@ -81,6 +81,9 @@ async function loadAppConfig() {
     } catch (err) {
         console.warn("Could not load app config, using defaults.", err);
         APP_CONFIG = { backend_port: 8010 };
+    } finally {
+        // Ensure the FOUC cloak is removed so the page becomes visible
+        document.body.classList.remove('fouc-cloak');
     }
 }
 
