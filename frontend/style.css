@@ -2154,3 +2154,12 @@ button {
     vertical-align: middle;
 }
 
+
+
+/* Anti-FOUC (Flash of Unstyled Content) */
+body.fouc-cloak {
+    opacity: 0 !important;
+}
+body {
+    transition: opacity 0.2s ease-in;
+}
