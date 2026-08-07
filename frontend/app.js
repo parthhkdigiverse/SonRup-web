@@ -627,79 +627,106 @@ function renderSiteFooterAndContactFromConfig() {
     }
 
     const fs = APP_CONFIG.footer_settings || {};
+    const cs = APP_CONFIG.contact_settings || {};
     
-    // 1. Logo & Desc
-    const footerLogo = document.querySelector(".footer-logo svg, .footer-logo img");
-    const navLogo = document.querySelector(".brand-logo svg, .brand-logo img, .nav-logo svg, .nav-logo img"); // Target header logo
-
-    if (fs.logo) {
-        if (footerLogo) {
-            const logoParent = footerLogo.parentElement;
-            logoParent.innerHTML = `<img src="${fs.logo}" alt="Footer Logo" style="height: 45px; object-fit: contain;">`;
-        }
-        if (navLogo) {
-            const navParent = navLogo.parentElement;
-            navParent.innerHTML = `<img src="${fs.logo}" alt="Header Logo" style="height: 40px; object-fit: contain;">`;
-        }
-    }
-    const footerDesc = document.querySelector(".footer-desc");
-    if (footerDesc) footerDesc.textContent = fs.desc || "Premium natural wellness solutions. Empowering health, strength, and happiness across generations.";
-
-    // 2. Social Links
-    const socialLinks = document.querySelector(".social-links");
-    if (socialLinks) {
-        socialLinks.innerHTML = '';
-        if (fs.facebook) socialLinks.innerHTML += `<a href="${fs.facebook}" aria-label="Facebook" target="_blank"><i data-lucide="facebook"></i></a>`;
-        if (fs.instagram) socialLinks.innerHTML += `<a href="${fs.instagram}" aria-label="Instagram" target="_blank"><i data-lucide="instagram"></i></a>`;
-        if (fs.twitter) socialLinks.innerHTML += `<a href="${fs.twitter}" aria-label="Twitter" target="_blank"><i data-lucide="twitter"></i></a>`;
-        if (fs.whatsapp) socialLinks.innerHTML += `<a href="${fs.whatsapp}" aria-label="WhatsApp" target="_blank"><i data-lucide="phone-call"></i></a>`;
-        if (!fs.facebook && !fs.instagram && !fs.twitter && !fs.whatsapp) {
-            socialLinks.innerHTML = `
-                <a href="#" aria-label="Facebook"><i data-lucide="facebook"></i></a>
-                <a href="#" aria-label="Instagram"><i data-lucide="instagram"></i></a>
-                <a href="#" aria-label="Twitter"><i data-lucide="twitter"></i></a>
-            `;
-        }
+    // Header Logo
+    const navLogo = document.querySelector(".brand-logo svg, .brand-logo img, .nav-logo svg, .nav-logo img");
+    if (fs.logo && navLogo) {
+        const navParent = navLogo.parentElement;
+        navParent.innerHTML = `<img src="${fs.logo}" alt="Header Logo" style="height: 40px; object-fit: contain;">`;
     }
 
-    // 3. Regulatory Info
-    const legalCol = document.querySelector(".footer-legal-col");
-    if (legalCol) {
-        legalCol.innerHTML = `
-            <h3>Regulatory Info</h3>
-            <p><strong>Lic No:</strong> ${fs.license || APP_CONFIG.license_number || "GA/646-A"}</p>
-            <p><strong>FSSAI:</strong> ${fs.fssai || APP_CONFIG.fssai_number || "10726997000544"}</p>
-            <p class="disclaimer">${fs.disclaimer || "Disclaimer: These products are nutraceuticals and not intended to diagnose, treat, cure, or prevent any disease."}</p>
+    // Build Social Links HTML
+    let socialLinksHtml = '';
+    if (fs.facebook || fs.instagram || fs.twitter || fs.whatsapp) {
+        if (fs.facebook) socialLinksHtml += `<a href="${fs.facebook}" aria-label="Facebook" target="_blank"><i data-lucide="facebook"></i></a>`;
+        if (fs.instagram) socialLinksHtml += `<a href="${fs.instagram}" aria-label="Instagram" target="_blank"><i data-lucide="instagram"></i></a>`;
+        if (fs.twitter) socialLinksHtml += `<a href="${fs.twitter}" aria-label="Twitter" target="_blank"><i data-lucide="twitter"></i></a>`;
+        if (fs.whatsapp) socialLinksHtml += `<a href="${fs.whatsapp}" aria-label="WhatsApp" target="_blank"><i data-lucide="phone-call"></i></a>`;
+    } else {
+        socialLinksHtml = `
+            <a href="#" aria-label="Facebook"><i data-lucide="facebook"></i></a>
+            <a href="#" aria-label="Instagram"><i data-lucide="instagram"></i></a>
+            <a href="#" aria-label="Twitter"><i data-lucide="twitter"></i></a>
         `;
     }
 
-    // 4. Contact & Manufacturing
-    const contactCol = document.querySelector(".footer-contact-col");
-    if (contactCol) {
-        const cs = APP_CONFIG.contact_settings || {};
-        const marketed = cs.hq || "SONRUP\\nA 584 Sitaram Society, Punagam Road,\\nSurat - 395010, Gujarat, India";
-        const manufactured = cs.lab || "KELLEN HEALTHCARE\\nGMP & ISO Certified Facility";
-        // Extract the first email from the newline-separated list
-        const emailStr = cs.emails || "vip-support@sonrup.com";
-        const firstEmail = emailStr.split('\\n')[0].trim();
-        const phone = cs.phone || "+91 88888 99999";
+    // Determine Contact Details
+    const marketed = cs.hq || "SONRUP\\nA 584 Sitaram Society, Punagam Road,\\nSurat - 395010, Gujarat, India";
+    const manufactured = cs.lab || "KELLEN HEALTHCARE\\nGMP & ISO Certified Facility";
+    const emailStr = cs.emails || "vip-support@sonrup.com";
+    const firstEmail = emailStr.split('\\n')[0].trim();
+    const phone = cs.phone || "+91 88888 99999";
+    
+    // Generate the full Footer HTML
+    const footerHtml = `
+        <div class="container footer-grid">
+            <div class="footer-brand-col">
+                <a href="index.html" class="footer-logo">
+                    ${fs.logo ? `<img src="${fs.logo}" alt="Footer Logo" style="height: 45px; object-fit: contain;">` : `
+                    <svg width="40" height="40" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="50" cy="50" r="45" stroke="#C9A227" stroke-width="2" fill="transparent" />
+                        <path d="M35 38C35 32 45 28 50 35C55 28 65 32 65 38C65 52 50 68 50 68C50 68 35 52 35 38Z" fill="#C9A227" />
+                        <circle cx="43" cy="40" r="3" fill="#121212" />
+                        <circle cx="57" cy="40" r="3" fill="#121212" />
+                    </svg>
+                    <span class="brand-name" style="margin-left:8px; font-weight:700; color:#fff;">${APP_CONFIG.site_name ? APP_CONFIG.site_name.toUpperCase() : "SONRUP"}</span>
+                    `}
+                </a>
+                <p class="footer-desc">${fs.desc || "Premium natural wellness solutions. Empowering health, strength, and happiness across generations."}</p>
+                <div class="social-links">
+                    ${socialLinksHtml}
+                </div>
+            </div>
 
-        contactCol.innerHTML = `
-            <p><strong>Marketed By:</strong> ${marketed.replace(/\\n/g, '<br>')}</p>
-            <br>
-            <p><strong>Manufactured By:</strong> ${manufactured.replace(/\\n/g, '<br>')}</p>
-            <br>
-            <p class="contact-methods">
-                <span style="display: flex; align-items: center; gap: 8px;"><i data-lucide="mail"></i> <a href="mailto:${firstEmail}" style="color: inherit; text-decoration: none;">${firstEmail}</a></span>
-                <span style="display: flex; align-items: center; gap: 8px; margin-top: 5px;"><i data-lucide="phone"></i> <a href="tel:${phone.replace(/\\s+/g, '')}" style="color: inherit; text-decoration: none;">${phone}</a></span>
-            </p>
-        `;
-    }
+            <div class="footer-links-col">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="shop.html">Our Gummies</a></li>
+                    <li><a href="about.html">Our Story</a></li>
+                    <li><a href="faq.html">Dietary FAQs</a></li>
+                    <li><a href="blog.html">Wellness Blog</a></li>
+                    <li><a href="contact.html">Contact Us</a></li>
+                </ul>
+            </div>
 
-    // Update global support emails/phones everywhere else just in case
+            <div class="footer-legal-col">
+                <h3>Regulatory Info</h3>
+                <p><strong>Lic No:</strong> ${fs.license || APP_CONFIG.license_number || "GA/646-A"}</p>
+                <p><strong>FSSAI:</strong> ${fs.fssai || APP_CONFIG.fssai_number || "10726997000544"}</p>
+                <p class="disclaimer">${fs.disclaimer || "Disclaimer: These products are nutraceuticals and not intended to diagnose, treat, cure, or prevent any disease."}</p>
+            </div>
+
+            <div class="footer-contact-col">
+                <h3>Marketed & Manufactured</h3>
+                <p><strong>Marketed By:</strong> ${marketed.replace(/\\n/g, '<br>')}</p>
+                <br>
+                <p><strong>Manufactured By:</strong> ${manufactured.replace(/\\n/g, '<br>')}</p>
+                <br>
+                <p class="contact-methods">
+                    <span style="display: flex; align-items: center; gap: 8px;"><i data-lucide="mail"></i> <a href="mailto:${firstEmail}" style="color: inherit; text-decoration: none;">${firstEmail}</a></span>
+                    <span style="display: flex; align-items: center; gap: 8px; margin-top: 5px;"><i data-lucide="phone"></i> <a href="tel:${phone.replace(/\\s+/g, '')}" style="color: inherit; text-decoration: none;">${phone}</a></span>
+                </p>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <div class="container footer-bottom-flex">
+                <p>&copy; ${new Date().getFullYear()} ${APP_CONFIG.site_name || "Sonrup"}. All rights reserved. Made with ❤️ in India.</p>
+            </div>
+        </div>
+    `;
+
+    // Inject into all footer elements on the page
+    document.querySelectorAll('.site-footer').forEach(footer => {
+        footer.innerHTML = footerHtml;
+    });
+
+    // Update other standalone support elements if any
     const supportEmailElements = document.querySelectorAll(".contact-email-val, #footer-support-email");
     supportEmailElements.forEach(el => {
-        const email = fs.email || APP_CONFIG.support_email;
+        const email = fs.email || APP_CONFIG.support_email || firstEmail;
         if (email) {
             el.textContent = email;
             if (el.tagName === 'A') el.href = `mailto:${email}`;
@@ -708,10 +735,10 @@ function renderSiteFooterAndContactFromConfig() {
 
     const supportPhoneElements = document.querySelectorAll(".contact-phone-val, #footer-support-phone");
     supportPhoneElements.forEach(el => {
-        const phone = fs.phone || APP_CONFIG.support_phone;
-        if (phone) {
-            el.textContent = phone;
-            if (el.tagName === 'A') el.href = `tel:${phone.replace(/\s+/g, '')}`;
+        const p = fs.phone || APP_CONFIG.support_phone || phone;
+        if (p) {
+            el.textContent = p;
+            if (el.tagName === 'A') el.href = `tel:${p.replace(/\\s+/g, '')}`;
         }
     });
 
