@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sonrup™ - Dietary Guide & FAQs</title>
-    <meta name="description" content="Dietary dosage guidelines, timing instructions, and frequently asked questions for Sonrup Shilajit, Biotin, and Kids Immunity Gummies.">
+    <title id="article-head-title">Sonrup™ Wellness Blog - Article</title>
+    <meta name="description" content="Discover how Himalayan shilajit resin boosts stamina, supports cellular rejuvenation, and why our 75% Fulvic Acid extract is safe for daily performance.">
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,168 +14,113 @@
     <!-- Lucide Icons CDN -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        .guide-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 30px;
-            margin-bottom: 60px;
+        .article-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding-top: 130px;
+            padding-bottom: 80px;
         }
 
-        .guide-card {
-            background-color: var(--bg-dark-card);
+        .article-header {
+            margin-bottom: 40px;
+        }
+
+        .article-category {
+            display: inline-block;
+            background-color: rgba(201, 162, 39, 0.08);
             border: 1px solid var(--border-dark);
+            color: var(--color-gold);
+            padding: 6px 16px;
             border-radius: 20px;
-            padding: 30px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            position: relative;
-            overflow: hidden;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 20px;
         }
 
-        .guide-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 4px;
-        }
-
-        .card-him::before { background-color: var(--color-gold); }
-        .card-her::before { background-color: var(--color-orange); }
-        .card-kids::before { background-color: var(--color-blue); }
-
-        .guide-icon-wrapper {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .card-him .guide-icon-wrapper { background: rgba(201,162,39,0.05); color: var(--color-gold); border: 1px solid rgba(201,162,39,0.15); }
-        .card-her .guide-icon-wrapper { background: rgba(225,85,46,0.05); color: var(--color-orange); border: 1px solid rgba(225,85,46,0.15); }
-        .card-kids .guide-icon-wrapper { background: rgba(63,169,220,0.05); color: var(--color-blue); border: 1px solid rgba(63,169,220,0.15); }
-
-        .guide-card h3 {
-            font-size: 18px;
+        .article-title {
+            font-size: 40px;
+            line-height: 1.25;
             color: #FFFFFF;
+            margin-bottom: 20px;
             font-family: var(--font-heading);
         }
 
-        .guide-card ul {
-            list-style: none;
-            padding: 0; margin: 0;
+        .article-meta {
             display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .guide-card li {
+            align-items: center;
+            gap: 20px;
             font-size: 13.5px;
             color: var(--text-on-dark-muted);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 25px;
+        }
+
+        .article-meta span {
             display: flex;
-            align-items: flex-start;
-            gap: 8px;
-            line-height: 1.5;
-        }
-
-        .guide-card li i {
-            flex-shrink: 0;
-            width: 14px;
-            height: 14px;
-            margin-top: 3px;
-        }
-
-        .faq-accordion-box {
-            max-width: 800px;
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .faq-item {
-            background-color: var(--bg-dark-card);
-            border: 1px solid rgba(255, 255, 255, 0.03);
-            border-radius: 12px;
-            overflow: hidden;
-            transition: border-color 0.2s ease;
-        }
-
-        .faq-item.active {
-            border-color: var(--border-dark);
-        }
-
-        .faq-question {
-            width: 100%;
-            padding: 20px 24px;
-            display: flex;
-            justify-content: space-between;
             align-items: center;
-            font-size: 15px;
-            font-weight: 600;
+            gap: 6px;
+        }
+
+        .article-hero-img {
+            background-color: var(--bg-dark-card);
+            border: 1px solid var(--border-dark);
+            border-radius: 16px;
+            padding: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 40px;
+            box-shadow: var(--shadow-premium);
+        }
+
+        .article-hero-img img {
+            max-height: 350px;
+            object-fit: contain;
+            filter: drop-shadow(0 20px 45px rgba(0,0,0,0.5));
+        }
+
+        .article-content {
+            font-size: 16px;
+            line-height: 1.8;
+            color: rgba(255, 255, 255, 0.85);
+        }
+
+        .article-content p {
+            margin-bottom: 25px;
+        }
+
+        .article-content h2 {
+            font-size: 24px;
             color: #FFFFFF;
-            font-family: var(--font-body);
-            text-align: left;
-            cursor: pointer;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            font-family: var(--font-heading);
         }
 
-        .faq-question i {
-            transition: transform 0.3s ease;
+        .article-content ul {
+            margin-bottom: 25px;
+            padding-left: 20px;
+        }
+
+        .article-content li {
+            margin-bottom: 10px;
+            color: var(--text-on-dark-muted);
+        }
+
+        .back-to-blog-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
             color: var(--color-gold);
+            font-weight: 600;
+            margin-bottom: 30px;
+            font-size: 14px;
         }
 
-        .faq-item.active .faq-question i {
-            transform: rotate(180deg);
-        }
-
-        .faq-answer {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
-            opacity: 0;
-            background-color: rgba(255, 255, 255, 0.02);
-        }
-
-        .faq-answer p,
-        .faq-answer-text,
-        .faq-answer-content,
-        .faq-answer .faq-answer-content {
-            padding: 6px 24px 22px 24px !important;
-            font-size: 14.5px !important;
-            color: #E2E8F0 !important;
-            line-height: 1.7 !important;
-            margin: 0 !important;
-            display: block !important;
-            visibility: visible !important;
-        }
-
-        .faq-item.active {
-            border: 1px solid #C9A227 !important;
-            box-shadow: 0 0 20px rgba(201, 162, 39, 0.25) !important;
-            background-color: rgba(255, 255, 255, 0.03) !important;
-        }
-
-        .faq-item.active .faq-question {
-            color: #FFFFFF !important;
-        }
-
-        .faq-item.active .faq-question svg,
-        .faq-item.active .faq-question i {
-            transform: rotate(180deg) !important;
-            color: #C9A227 !important;
-        }
-
-        .faq-item.active .faq-answer {
-            max-height: 600px !important;
-            opacity: 1 !important;
-        }
-
-        @media (max-width: 992px) {
-            .guide-grid {
-                grid-template-columns: 1fr;
-                gap: 25px;
-            }
+        .back-to-blog-link:hover {
+            color: #FFFFFF;
         }
     </style>
 </head>
@@ -189,10 +134,6 @@
                 <svg width="40" height="40" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <circle cx="50" cy="50" r="45" stroke="#C9A227" stroke-width="2" />
                     <path d="M35 38C35 32 45 28 50 35C55 28 65 32 65 38C65 52 50 68 50 68C50 68 35 52 35 38Z" fill="#C9A227" />
-                    <circle cx="43" cy="40" r="3" fill="#121212" />
-                    <circle cx="57" cy="40" r="3" fill="#121212" />
-                    <path d="M47 48C47 48 48 50 50 50C52 50 53 48 53 48" stroke="#121212" stroke-width="2" stroke-linecap="round" />
-                    <path d="M50 25C47 25 45 23 45 21C45 19 47 18 50 18C53 18 55 19 55 21C55 23 53 25 50 25Z" fill="#D9B24C" />
                 </svg>
                 <span class="brand-name">s<span>o</span>nrup</span>
             </a>
@@ -201,8 +142,8 @@
                 <a href="index.html" class="nav-link">Home</a>
                 <a href="shop.html" class="nav-link">Shop</a>
                 <a href="about.html" class="nav-link">Our Story</a>
-                <a href="faq.html" class="nav-link active">FAQs</a>
-                <a href="blog.html" class="nav-link">Blog</a>
+                <a href="faq.html" class="nav-link">FAQs</a>
+                <a href="blog.html" class="nav-link active">Blog</a>
                 <a href="contact.html" class="nav-link">Contact</a>
             </nav>
 
@@ -216,29 +157,28 @@
         </div>
     </header>
 
-    <main class="container" style="padding-top: 130px; padding-bottom: 80px;">
-        <!-- Dietary Guide Header -->
-        <div class="section-header" style="margin-bottom: 40px; text-align: left;">
-            <span class="sub-heading">DIETARY USER GUIDE</span>
-            <h1 style="font-size: 36px; color: #FFFFFF; font-family: var(--font-heading); margin-top: 10px;">Dosages & Usage Instructions</h1>
-            <p class="section-desc" style="margin-left: 0; max-width: 650px;">Follow our certified dietary guides to maximize the energy, vitality, and cellular protection benefits of your daily Sonrup gummies.</p>
-        </div>
+    <!-- Main Content -->
+    <main class="container article-container">
+        <a href="blog.html" class="back-to-blog-link"><i data-lucide="arrow-left" style="width: 16px; height: 16px;"></i> Back to Blog</a>
+        
+        <article class="article-detail">
+            <div class="article-header">
+                <span class="article-category" id="article-category">Wellness</span>
+                <h1 class="article-title" id="article-title">Loading Article...</h1>
+                
+                <div class="article-meta">
+                    <span><i data-lucide="user" style="width: 14px; height: 14px;"></i> By Sonrup Science Team</span>
+                </div>
+            </div>
 
-        <!-- Dietary Cards Grid -->
-        <div class="guide-grid">
-            <!-- Dynamically rendered from Admin Panel / MongoDB -->
-        </div>
+            <div class="article-hero-img">
+                <img id="article-image" src="assets/images/shilajit-bottle.jpg" alt="Article Hero Image">
+            </div>
 
-        <!-- FAQ Header -->
-        <div class="section-header" style="margin-bottom: 40px; text-align: center;">
-            <span class="sub-heading">FAQ PORTAL</span>
-            <h2 style="font-size: 32px; color: #FFFFFF; font-family: var(--font-heading); margin-top: 10px;">Frequently Asked Questions</h2>
-        </div>
-
-        <!-- FAQ Accordion Grid -->
-        <div class="faq-accordion-box">
-            <!-- Dynamically rendered from Admin Panel / MongoDB -->
-        </div>
+            <div class="article-content" id="article-content">
+                <p>Loading content...</p>
+            </div>
+        </article>
     </main>
 
     <!-- Footer -->
@@ -265,6 +205,8 @@
                 <ul>
                     <li><a href="index.html">Home</a></li>
                     <li><a href="shop.html">Our Gummies</a></li>
+                    <li><a href="about.html">Our Story</a></li>
+                    <li><a href="faq.html">Dietary FAQs</a></li>
                     <li><a href="blog.html">Wellness Blog</a></li>
                     <li><a href="contact.html">Contact Us</a></li>
                 </ul>
@@ -311,7 +253,7 @@
             <div class="cart-footer" id="cart-footer-panel">
                 <div class="cart-summary-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-weight: 600; font-size: 16px;">
                     <span>Subtotal</span>
-                    <span class="cart-subtotal-price" id="cart-subtotal" style="color: var(--color-gold); font-family: var(--font-heading);">₹0.00</span>
+                    <span class="cart-subtotal-price" id="cart-subtotal" style="color: var(--color-gold); font-family: var(--font-heading);">â‚¹0.00</span>
                 </div>
                 <button class="btn-primary btn-block" id="cart-checkout-btn">Proceed to Checkout</button>
             </div>

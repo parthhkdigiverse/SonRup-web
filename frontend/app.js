@@ -2,6 +2,12 @@
 let APP_CONFIG = {};
 let AUTH_TOKEN = localStorage.getItem("sonrup_token") || null;
 
+// Try instant pre-hydration from cached config to prevent FOUC / hardcoded text flash
+try {
+    const cached = localStorage.getItem("sonrup_app_config");
+    if (cached) APP_CONFIG = JSON.parse(cached);
+} catch (e) {}
+
 async function loadAppConfig() {
     try {
         // Try fetching from API directly (when served on backend port)
@@ -11,7 +17,8 @@ async function loadAppConfig() {
             res = await fetch("/config.json");
             if (!res.ok) res = await fetch("config.json");
         }
-        APP_CONFIG = await res.json();
+        const loadedConfig = await res.json();
+        APP_CONFIG = { ...APP_CONFIG, ...loadedConfig };
 
         // Fetch live MongoDB settings from backend server directly
         if (APP_CONFIG.backend_port && window.location.port != APP_CONFIG.backend_port) {
@@ -23,6 +30,11 @@ async function loadAppConfig() {
                 }
             } catch (e) { /* use cached config */ }
         }
+
+        // Cache live config for instant zero-latency pre-rendering on hard refresh
+        try {
+            localStorage.setItem("sonrup_app_config", JSON.stringify(APP_CONFIG));
+        } catch (e) {}
 
         // Inject Dynamic Announcement Top Bar if configured
         if (APP_CONFIG.announcement_banner_enabled && APP_CONFIG.announcement_banner_text) {
@@ -51,11 +63,701 @@ async function loadAppConfig() {
             }
             banner.textContent = APP_CONFIG.announcement_banner_text;
         }
+
+        // Render dynamic Hero Section, Trust Badges, Label Transparency, Advantage section, Guidance section, FAQ section, Dietary Guide & Footer details from config
+        renderHeroSectionFromConfig();
+        renderTrustBadgesFromConfig();
+        renderTransparencyFromConfig();
+        renderAdvantageFromConfig();
+        renderGuidanceFromConfig();
+        renderFaqFromConfig();
+        renderDietaryGuideFromConfig();
+        renderStoryFromConfig();
+        renderBlogFromConfig();
+        renderSingleArticleView();
+        renderSiteFooterAndContactFromConfig();
+        renderContactPageFromConfig();
+        renderShopPageFromConfig();
     } catch (err) {
         console.warn("Could not load app config, using defaults.", err);
         APP_CONFIG = { backend_port: 8010 };
     }
 }
+
+function renderHeroSectionFromConfig() {
+    const heroSec = document.querySelector(".hero-section");
+    if (!heroSec || !APP_CONFIG) return;
+
+    // 1. Promo Badge
+    const badgeSpan = heroSec.querySelector(".promo-badge span");
+    if (badgeSpan && APP_CONFIG.hero_badge_text) {
+        badgeSpan.textContent = APP_CONFIG.hero_badge_text;
+    }
+
+    // 2. Title / Headline
+    const heroTitle = heroSec.querySelector(".hero-title");
+    if (heroTitle && APP_CONFIG.hero_title) {
+        heroTitle.innerHTML = APP_CONFIG.hero_title;
+    }
+
+    // 3. Subtitle / Description
+    const heroSubtitle = heroSec.querySelector(".hero-subtitle");
+    if (heroSubtitle && APP_CONFIG.hero_subtitle) {
+        heroSubtitle.textContent = APP_CONFIG.hero_subtitle;
+    }
+
+    // 4. Primary CTA Button
+    const heroCtaBtn = heroSec.querySelector("#hero-cta-btn");
+    if (heroCtaBtn) {
+        const ctaSpan = heroCtaBtn.querySelector("span");
+        if (ctaSpan && APP_CONFIG.hero_cta_text) ctaSpan.textContent = APP_CONFIG.hero_cta_text;
+        if (APP_CONFIG.hero_cta_link) heroCtaBtn.setAttribute("href", APP_CONFIG.hero_cta_link);
+    }
+
+    // 5. Sub-Trust Points
+    const trustSpans = heroSec.querySelectorAll(".hero-trust span");
+    if (trustSpans && trustSpans.length >= 2) {
+        if (APP_CONFIG.hero_trust_1) {
+            trustSpans[0].innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C9A227" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gold" style="vertical-align: middle; margin-right: 4px;"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.8 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg> ${APP_CONFIG.hero_trust_1}`;
+        }
+        if (APP_CONFIG.hero_trust_2) {
+            trustSpans[1].innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px;"><rect width="1" height="1"/><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.62l-3.23-4.11a1 1 0 0 0-.77-.37H15"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg> ${APP_CONFIG.hero_trust_2}`;
+        }
+    }
+
+    // 6. Hero Image
+    const heroImg = heroSec.querySelector("#hero-image");
+    if (heroImg && APP_CONFIG.hero_image_path) {
+        heroImg.src = APP_CONFIG.hero_image_path;
+    }
+
+    // 7. Floating Badges
+    const badgeShilajit = heroSec.querySelector(".shilajit-badge");
+    if (badgeShilajit && APP_CONFIG.hero_float_badge_1) {
+        badgeShilajit.innerHTML = `<span class="dot gold-dot"></span> ${APP_CONFIG.hero_float_badge_1}`;
+    }
+
+    const badgeBiotin = heroSec.querySelector(".biotin-badge");
+    if (badgeBiotin && APP_CONFIG.hero_float_badge_2) {
+        badgeBiotin.innerHTML = `<span class="dot orange-dot"></span> ${APP_CONFIG.hero_float_badge_2}`;
+    }
+
+    const badgeKids = heroSec.querySelector(".kids-badge");
+    if (badgeKids && APP_CONFIG.hero_float_badge_3) {
+        badgeKids.innerHTML = `<span class="dot blue-dot"></span> ${APP_CONFIG.hero_float_badge_3}`;
+    }
+}
+
+function renderTrustBadgesFromConfig() {
+    const trustStrip = document.getElementById("trust-strip");
+    if (!trustStrip || !APP_CONFIG) return;
+
+    const trustContainer = trustStrip.querySelector(".trust-container");
+    if (!trustContainer) return;
+
+    const badges = (APP_CONFIG.trust_badges && APP_CONFIG.trust_badges.length > 0) ? APP_CONFIG.trust_badges : [
+        { icon: "ban", title: "Sugar Free", subtitle: "No Added Sugar" },
+        { icon: "droplet-off", title: "No Artificial Color", subtitle: "100% Safe Formulas" },
+        { icon: "apple", title: "Natural Fruit Flavor", subtitle: "Imli, Citrus & Mixed Fruit" },
+        { icon: "shield-check", title: "FSSAI Licensed", subtitle: "Regulated Quality" },
+        { icon: "calendar", title: "36-Month Shelf Life", subtitle: "Long-Lasting Freshness" },
+        { icon: "map-pin", title: "Made in India", subtitle: "Kellen Healthcare" }
+    ];
+
+    trustContainer.innerHTML = badges.map(b => {
+        let iconMarkup = `<i data-lucide="${b.icon || 'shield-check'}"></i>`;
+        if (b.title && b.title.toUpperCase().includes("FSSAI")) {
+            iconMarkup = `<span class="badge-text">FSSAI</span>`;
+        }
+
+        return `
+            <div class="trust-item">
+                <div class="trust-icon">${iconMarkup}</div>
+                <div class="trust-text">
+                    <h4>${b.title || ''}</h4>
+                    <p>${b.subtitle || ''}</p>
+                </div>
+            </div>
+        `;
+    }).join("");
+
+    if (window.lucide) {
+        window.lucide.createIcons();
+    }
+}
+
+function renderTransparencyFromConfig() {
+    const section = document.getElementById("ingredients-section");
+    if (!section || !APP_CONFIG) return;
+
+    const subHeading = section.querySelector(".sub-heading");
+    if (subHeading && APP_CONFIG.transparency_subheading) subHeading.textContent = APP_CONFIG.transparency_subheading;
+
+    const mainTitle = section.querySelector("h2");
+    if (mainTitle && APP_CONFIG.transparency_title) mainTitle.textContent = APP_CONFIG.transparency_title;
+
+    const desc = section.querySelector(".section-desc");
+    if (desc && APP_CONFIG.transparency_desc) desc.textContent = APP_CONFIG.transparency_desc;
+
+    const tabSystem = section.querySelector(".tab-system");
+    if (!tabSystem || !APP_CONFIG.transparency_tabs || APP_CONFIG.transparency_tabs.length === 0) return;
+
+    const tabs = APP_CONFIG.transparency_tabs;
+
+    const navHTML = tabs.map((t, idx) => `
+        <button class="tab-btn ${idx === 0 ? 'active' : ''}" data-tab="dynamic-transparency-tab-${idx}">${t.name || ('Tab ' + (idx + 1))}</button>
+    `).join("");
+
+    const contentsHTML = tabs.map((t, idx) => {
+        const rowsHTML = (t.rows || []).map(r => `
+            <tr>
+                <td><strong>${r.component || ''}</strong></td>
+                <td>${r.feature || ''}</td>
+                <td>${r.amount || ''}</td>
+            </tr>
+        `).join("");
+
+        return `
+            <div class="tab-content ${idx === 0 ? 'active' : ''}" id="dynamic-transparency-tab-${idx}">
+                <div class="label-table-wrapper">
+                    <table class="label-table">
+                        <thead>
+                            <tr>
+                                <th>Component</th>
+                                <th>Key Features / Source</th>
+                                <th>Unit Amount Per Gummy</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${rowsHTML}
+                        </tbody>
+                    </table>
+                    <div class="table-footnote">
+                        <p><i data-lucide="info"></i> Suggested Usage: ${t.suggested_usage || 'Take 1 Gummy daily or as directed by a healthcare professional.'}</p>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join("");
+
+    tabSystem.innerHTML = `
+        <div class="tab-nav">
+            ${navHTML}
+        </div>
+        ${contentsHTML}
+    `;
+
+    if (window.lucide) window.lucide.createIcons();
+
+    const tabButtons = tabSystem.querySelectorAll(".tab-btn");
+    const tabContents = tabSystem.querySelectorAll(".tab-content");
+
+    tabButtons.forEach(btn => {
+        btn.addEventListener("click", () => {
+            const targetTab = btn.getAttribute("data-tab");
+            tabButtons.forEach(b => b.classList.remove("active"));
+            tabContents.forEach(c => c.classList.remove("active"));
+
+            btn.classList.add("active");
+            const activeContent = document.getElementById(targetTab);
+            if (activeContent) activeContent.classList.add("active");
+        });
+    });
+}
+
+function renderAdvantageFromConfig() {
+    const section = document.getElementById("why-section");
+    if (!section || !APP_CONFIG) return;
+
+    const subHeading = section.querySelector(".sub-heading");
+    if (subHeading && APP_CONFIG.advantage_subheading) subHeading.textContent = APP_CONFIG.advantage_subheading;
+
+    const mainTitle = section.querySelector("h2");
+    if (mainTitle && APP_CONFIG.advantage_title) mainTitle.textContent = APP_CONFIG.advantage_title;
+
+    const desc = section.querySelector(".section-desc");
+    if (desc && APP_CONFIG.advantage_desc) desc.textContent = APP_CONFIG.advantage_desc;
+
+    const grid = section.querySelector(".why-grid");
+    if (!grid || !APP_CONFIG.advantage_cards || APP_CONFIG.advantage_cards.length === 0) return;
+
+    grid.innerHTML = APP_CONFIG.advantage_cards.map(c => `
+        <div class="why-card">
+            <div class="why-icon-container"><i data-lucide="${c.icon || 'zap'}"></i></div>
+            <h3>${c.title || ''}</h3>
+            <p>${c.description || ''}</p>
+        </div>
+    `).join("");
+
+    if (window.lucide) window.lucide.createIcons();
+}
+
+function renderGuidanceFromConfig() {
+    const section = document.getElementById("usage-section");
+    if (!section || !APP_CONFIG) return;
+
+    const subHeading = section.querySelector(".sub-heading");
+    if (subHeading && APP_CONFIG.guidance_subheading) subHeading.textContent = APP_CONFIG.guidance_subheading;
+
+    const mainTitle = section.querySelector("h2");
+    if (mainTitle && APP_CONFIG.guidance_title) mainTitle.textContent = APP_CONFIG.guidance_title;
+
+    const desc = section.querySelector(".section-desc");
+    if (desc && APP_CONFIG.guidance_desc) desc.textContent = APP_CONFIG.guidance_desc;
+
+    const grid = section.querySelector(".usage-grid");
+    if (!grid || !APP_CONFIG.guidance_columns || APP_CONFIG.guidance_columns.length === 0) return;
+
+    grid.innerHTML = APP_CONFIG.guidance_columns.map(col => {
+        const itemsHTML = (col.items || []).map(item => `
+            <h4>${item.product || ''}</h4>
+            <p>${item.usage || ''}</p>
+        `).join("");
+
+        const warningHTML = col.warning ? `<p class="kids-warning">${col.warning}</p>` : '';
+
+        return `
+            <div class="usage-column">
+                <div class="usage-header">
+                    <span class="avatar-icon"><i data-lucide="${col.icon || 'user'}"></i></span>
+                    <h3>${col.title || ''}</h3>
+                    <span class="target-desc">${col.subtitle || ''}</span>
+                </div>
+                <div class="usage-body">
+                    ${itemsHTML}
+                    ${warningHTML}
+                </div>
+            </div>
+        `;
+    }).join("");
+
+    if (window.lucide) window.lucide.createIcons();
+}
+
+function renderFaqFromConfig() {
+    if (!APP_CONFIG) return;
+
+    const faqItems = (APP_CONFIG.faq_items && APP_CONFIG.faq_items.length > 0) ? APP_CONFIG.faq_items : [
+        { question: "What is the recommended age suitability for the kids' gummies?", answer: "Our Kid's Multivitamin and Immunity Booster gummies are specifically formulated for kids aged 4 and above. We recommend 1 gummy daily under parental supervision. For children under 4, please consult your family pediatrician." },
+        { question: "Are these gummies completely sugar-free?", answer: "Yes! All three gummies in the Sonrup Family Wellness Combo are completely sugar-free and contain no added sugars. They are sweetened with premium natural substitutes, making them delicious without raising blood sugar levels." },
+        { question: "What is the shelf life of these products?", answer: "Each bottle has a shelf life of 36 months from the date of manufacture. Please store them in a cool, dry place away from direct sunlight, and keep the container tightly closed to preserve moisture levels." },
+        { question: "How does the return policy work?", answer: "We stand behind the quality of our products. If you are not satisfied with your purchase, you can contact our customer support team within 30 days of delivery for a full replacement or refund. No questions asked." },
+        { question: "Can both men and women take the Shilajit and Biotin gummies?", answer: "Absolutely. Both products are unisex. Shilajit gummies help improve stamina and strength for anyone, while Biotin + Multivitamin gummies support skin, hair, and nail health for all adults." }
+    ];
+
+    // Sub-heading update on both index.html & faq.html
+    document.querySelectorAll(".sub-heading").forEach(el => {
+        if (APP_CONFIG.faq_subheading && (el.textContent.includes("ANSWERS") || el.textContent.includes("FAQ"))) {
+            el.textContent = APP_CONFIG.faq_subheading;
+        }
+    });
+
+    // Main section title update on both index.html & faq.html
+    document.querySelectorAll("h2, h1").forEach(el => {
+        if (APP_CONFIG.faq_title && el.textContent.includes("Frequently Asked Questions")) {
+            el.textContent = APP_CONFIG.faq_title;
+        }
+    });
+
+    // Description paragraph update
+    document.querySelectorAll("#faq-section .section-desc, main .section-desc").forEach(el => {
+        if (APP_CONFIG.faq_desc && el.textContent.includes("Got questions")) {
+            el.textContent = APP_CONFIG.faq_desc;
+        }
+    });
+
+    const containers = document.querySelectorAll(".faq-accordion-container, .faq-accordion-box");
+    if (!containers || containers.length === 0) return;
+
+    containers.forEach(container => {
+        container.innerHTML = faqItems.map((item, idx) => `
+            <div class="faq-item ${idx === 0 ? 'active' : ''}">
+                <button class="faq-question" type="button">
+                    <span>${item.question || ''}</span>
+                    <i data-lucide="chevron-down"></i>
+                </button>
+                <div class="faq-answer">
+                    <div class="faq-answer-content">
+                        <p>${item.answer || ''}</p>
+                    </div>
+                </div>
+            </div>
+        `).join("");
+
+        // Single Event Delegation on Container — Zero Double Fire!
+        container.onclick = (e) => {
+            const faqHeader = e.target.closest(".faq-question") || e.target.closest(".faq-item");
+            if (!faqHeader) return;
+
+            const targetItem = faqHeader.closest(".faq-item");
+            if (!targetItem) return;
+
+            e.preventDefault();
+
+            const isAlreadyActive = targetItem.classList.contains("active");
+
+            // Close all items in this accordion container
+            container.querySelectorAll(".faq-item").forEach(el => el.classList.remove("active"));
+
+            // If it wasn't active before, open it!
+            if (!isAlreadyActive) {
+                targetItem.classList.add("active");
+            }
+        };
+    });
+
+    if (window.lucide) window.lucide.createIcons();
+}
+
+function renderDietaryGuideFromConfig() {
+    const guideGrid = document.querySelector(".guide-grid");
+    if (!guideGrid || !APP_CONFIG) return;
+
+    // Dynamic header texts on faq.html
+    const guideMain = guideGrid.closest("main");
+    if (guideMain) {
+        const subHead = guideMain.querySelector(".section-header .sub-heading");
+        if (subHead && APP_CONFIG.dietary_guide_subheading) subHead.textContent = APP_CONFIG.dietary_guide_subheading;
+
+        const mainTitle = guideMain.querySelector(".section-header h1, .section-header h2");
+        if (mainTitle && APP_CONFIG.dietary_guide_title) mainTitle.textContent = APP_CONFIG.dietary_guide_title;
+
+        const desc = guideMain.querySelector(".section-header .section-desc");
+        if (desc && APP_CONFIG.dietary_guide_desc) desc.textContent = APP_CONFIG.dietary_guide_desc;
+    }
+
+    if (!APP_CONFIG.dietary_guide_cards || APP_CONFIG.dietary_guide_cards.length === 0) return;
+
+    const cardTypes = ["card-him", "card-her", "card-kids"];
+    const textColors = ["text-gold", "text-orange", "text-blue"];
+
+    guideGrid.innerHTML = APP_CONFIG.dietary_guide_cards.map((card, idx) => {
+        const cClass = card.card_type ? `card-${card.card_type}` : cardTypes[idx % 3];
+        const tColor = textColors[idx % 3];
+
+        return `
+            <div class="guide-card ${cClass}">
+                <div class="guide-icon-wrapper">
+                    <i data-lucide="${card.icon || 'zap'}"></i>
+                </div>
+                <h3>${card.title || ''}</h3>
+                <ul>
+                    ${card.timing ? `<li><i data-lucide="clock" class="${tColor}"></i> <strong>Timing:</strong> ${card.timing}</li>` : ''}
+                    ${card.dosage ? `<li><i data-lucide="check" class="${tColor}"></i> <strong>Daily Dosage:</strong> ${card.dosage}</li>` : ''}
+                    ${card.target ? `<li><i data-lucide="alert-triangle" class="${tColor}"></i> <strong>Target User:</strong> ${card.target}</li>` : ''}
+                </ul>
+            </div>
+        `;
+    }).join("");
+
+    if (window.lucide) window.lucide.createIcons();
+}
+
+function renderStoryFromConfig() {
+    if (!APP_CONFIG) return;
+
+    // 1. Hero Header on about.html only!
+    const heroSec = document.querySelector(".about-hero");
+    if (!heroSec) return; // Exit immediately if not on about.html!
+
+    if (APP_CONFIG.story_bg_image) {
+        heroSec.style.backgroundImage = `linear-gradient(180deg, rgba(18,18,18,0.3) 0%, rgba(15,15,16,1) 100%), url('${APP_CONFIG.story_bg_image}')`;
+    }
+
+    const heroContent = document.querySelector(".about-hero-content");
+    if (heroContent) {
+        const sub = heroContent.querySelector(".sub-heading");
+        if (sub && APP_CONFIG.story_subheading) sub.textContent = APP_CONFIG.story_subheading;
+
+        const title = heroContent.querySelector("h1");
+        if (title && APP_CONFIG.story_title) title.innerHTML = APP_CONFIG.story_title;
+
+        const desc = heroContent.querySelector("p");
+        if (desc && APP_CONFIG.story_desc) desc.textContent = APP_CONFIG.story_desc;
+    }
+
+    // 2. Main Story Sections & Stat Highlights on about.html only!
+    const mainContainer = document.querySelector(".story-container, #story-sections-container") || heroSec.nextElementSibling;
+    if (!mainContainer) return;
+
+    const storySections = (APP_CONFIG.story_sections && APP_CONFIG.story_sections.length > 0) ? APP_CONFIG.story_sections : [
+        { badge: "01. PURE SOURCE", title: "Harvested From the Peaks", image: "assets/images/shilajit-detail1.jpg", p1: "Our flagship ingredient, pure Shilajit resin, is wild-harvested at elevations above 16,000 feet in the pristine Himalayan ranges. Formed over centuries, this dense Ayurvedic restorative is packed with over 84 ionic minerals.", p2: "We purify this raw resin under strict laboratory standards to achieve an industry-leading 75% Fulvic Acid concentration, ensuring maximum bioavailability and strength in every single bite." },
+        { badge: "02. THE SCIENCE", title: "100% Sugar-Free Nutrition", image: "assets/images/biotin-detail1.jpg", p1: "Most wellness gummies on the market are packed with processed sugars, glucose syrups, and gelatin—turning vital supplements into unhealthy candy. At Sonrup, we knew there was a better way.", p2: "Our research team formulated a completely sugar-free gummie base that retains premium textures and natural, kid-approved fruit flavours (like Tamarind and Orange Citrus) without compromising your metabolic health." },
+        { badge: "03. TRUST & HYGIENE", title: "GMP & ISO Certified Labs", image: "assets/images/kids-detail1.jpg", p1: "Quality and safety are the core pillars of Sonrup. Every bottle is manufactured at our state-of-the-art facility operated by Kellen Healthcare. Our plant operates under strict GMP (Good Manufacturing Practices) and ISO-9001 quality guidelines.", p2: "From heavy-metal clearance tests to batch consistency, we guarantee a safe, pure, and premium supplement that you can trust for your children, parents, and yourself." }
+    ];
+
+    const storyStats = (APP_CONFIG.story_stats && APP_CONFIG.story_stats.length > 0) ? APP_CONFIG.story_stats : [
+        { number: "16k+ Ft", label: "Himalayan Sourcing" },
+        { number: "100%", label: "Sugar-Free Formula" },
+        { number: "GMP", label: "Certified Facility" }
+    ];
+
+    // Build Story Sections HTML
+    const sectionsHTML = storySections.map((sec, idx) => {
+        const isReverse = idx % 2 === 1 ? 'reverse' : '';
+        const imgHTML = `
+            <div class="story-img-container">
+                <img src="${sec.image || 'assets/images/shilajit-detail1.jpg'}" alt="${sec.title || 'Sonrup Story'}">
+            </div>
+        `;
+        const textHTML = `
+            <div class="story-text">
+                <span class="sub-heading" style="color: var(--color-gold);">${sec.badge || `0${idx + 1}. STORY`}</span>
+                <h2>${sec.title || ''}</h2>
+                ${sec.p1 ? `<p>${sec.p1}</p>` : ''}
+                ${sec.p2 ? `<p>${sec.p2}</p>` : ''}
+            </div>
+        `;
+
+        return `
+            <div class="story-section ${isReverse}">
+                ${isReverse ? (textHTML + imgHTML) : (imgHTML + textHTML)}
+            </div>
+        `;
+    }).join("");
+
+    // Build Stats Grid HTML
+    const statsHTML = `
+        <div class="stat-grid">
+            ${storyStats.map(st => `
+                <div class="stat-card">
+                    <div class="stat-number">${st.number || ''}</div>
+                    <div class="stat-label">${st.label || ''}</div>
+                </div>
+            `).join("")}
+        </div>
+    `;
+
+    mainContainer.innerHTML = sectionsHTML + statsHTML;
+    if (window.lucide) window.lucide.createIcons();
+}
+
+function renderBlogFromConfig() {
+    const blogGrid = document.querySelector(".blog-grid");
+    if (!blogGrid || !APP_CONFIG) return;
+
+    // 1. Header Title & Subheading
+    const headerSec = document.querySelector("main.container .section-header");
+    if (headerSec) {
+        const sub = headerSec.querySelector(".sub-heading");
+        if (sub && APP_CONFIG.blog_subheading) sub.textContent = APP_CONFIG.blog_subheading;
+
+        const title = headerSec.querySelector("h1");
+        if (title && APP_CONFIG.blog_title) title.textContent = APP_CONFIG.blog_title;
+
+        const desc = headerSec.querySelector(".section-desc");
+        if (desc && APP_CONFIG.blog_desc) desc.textContent = APP_CONFIG.blog_desc;
+    }
+
+    // 2. Blog Articles Grid
+    const articles = (APP_CONFIG.blog_articles && APP_CONFIG.blog_articles.length > 0) ? APP_CONFIG.blog_articles : [
+        { title: "The Power of Pure Shilajit: Why Fulvic Acid Matters", category: "Ayurveda", image: "assets/images/shilajit-bottle.jpg", excerpt: "Discover how Himalayan shilajit resin boosts stamina, supports cellular rejuvenation, and why our 75% Fulvic Acid Ayurvedic extract is safe for daily performance.", link: "/blog/pure-shilajit" },
+        { title: "Biotin & Zinc: The Daily Vitality Shield", category: "Science", image: "assets/images/biotin-bottle.jpg", excerpt: "Unpack the biological functions of high-potency Biotin (Vitamin H), Vitamin C, and Zinc in protecting nail strength, hair growth, and overall skin cell turnover.", link: "/blog/biotin-zinc" },
+        { title: "Sugar-Free Kids Nutrition: Safety & Pediatric Care", category: "Nutrition", image: "assets/images/kids-bottle.jpg", excerpt: "Why we completely avoid high fructose corn syrup and sugar in children's multivitamins, focusing instead on safe fruit pectin, Iron, Zinc, and Choline.", link: "/blog/kids-nutrition" }
+    ];
+
+    blogGrid.innerHTML = articles.map(art => `
+        <article class="blog-card">
+            <a href="article.html?id=${art.id}" style="display: block; text-decoration: none; color: inherit;">
+                <div class="blog-card-img">
+                    <div class="blog-category">${art.category || 'Wellness'}</div>
+                    <img src="${art.image || 'assets/images/shilajit-bottle.jpg'}" alt="${art.title || 'Blog Article'}" style="object-fit: contain; width: auto; height: 160px;">
+                </div>
+            </a>
+            <div class="blog-card-body">
+                <a href="article.html?id=${art.id}" style="text-decoration: none; color: inherit;">
+                    <h3 style="margin-top: 0;">${art.title || ''}</h3>
+                </a>
+                <p>${art.excerpt || ''}</p>
+                <a href="article.html?id=${art.id}" class="read-more-btn">Read Full Article <i data-lucide="arrow-right" style="width: 14px; height: 14px;"></i></a>
+            </div>
+        </article>
+    `).join("");
+
+    if (window.lucide) window.lucide.createIcons();
+}
+
+function renderSingleArticleView() {
+    if (!window.location.pathname.includes("article")) return;
+    
+    // Always wait for the fresh API response before rendering an article to ensure real-time updates
+    if (!APP_CONFIG || !APP_CONFIG.blog_articles) return;
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const articleId = urlParams.get('id');
+    
+    if (!articleId) {
+        document.getElementById("article-title").textContent = "Article Not Found";
+        document.getElementById("article-content").innerHTML = "<p>Please select a valid article from the blog page.</p>";
+        return;
+    }
+
+    const article = APP_CONFIG.blog_articles.find(a => a.id === articleId);
+    
+    if (article) {
+        document.getElementById("article-head-title").textContent = (article.title || "Article") + " - Sonrup™ Wellness Blog";
+        document.getElementById("article-category").textContent = article.category || "Wellness";
+        document.getElementById("article-title").textContent = article.title || "";
+        document.getElementById("article-image").src = article.image || "assets/images/shilajit-bottle.jpg";
+        
+        let contentHtml = article.content || "<p>No content written for this article yet.</p>";
+        if (article.inner_image) {
+            // Check if the article already contains this image natively, if not, prepend it.
+            if (!contentHtml.includes(article.inner_image)) {
+                contentHtml = `<img src="${article.inner_image}" style="width: 100%; max-width: 600px; border-radius: 8px; margin: 20px 0;" alt="Blog Inner Image"><br>` + contentHtml;
+            }
+        }
+        
+        document.getElementById("article-content").innerHTML = contentHtml;
+    } else {
+        document.getElementById("article-title").textContent = "Article Not Found";
+        document.getElementById("article-content").innerHTML = "<p>The requested article could not be found.</p>";
+    }
+}
+
+function renderSiteFooterAndContactFromConfig() {
+    if (!APP_CONFIG) return;
+
+    if (APP_CONFIG.site_name) {
+        document.querySelectorAll(".brand-name").forEach(el => el.textContent = APP_CONFIG.site_name.toUpperCase());
+        document.querySelectorAll(".site-title-name").forEach(el => el.textContent = APP_CONFIG.site_name);
+    }
+
+    const fs = APP_CONFIG.footer_settings || {};
+    
+    // 1. Logo & Desc
+    const footerLogo = document.querySelector(".footer-logo svg, .footer-logo img");
+    const navLogo = document.querySelector(".nav-logo svg, .nav-logo img"); // Also target header logo
+
+    if (fs.logo) {
+        if (footerLogo) {
+            const logoParent = footerLogo.parentElement;
+            logoParent.innerHTML = `<img src="${fs.logo}" alt="Footer Logo" style="height: 45px; object-fit: contain;"> <span class="brand-name">${APP_CONFIG.site_name ? APP_CONFIG.site_name.toUpperCase() : 'SONRUP'}</span>`;
+        }
+        if (navLogo) {
+            const navParent = navLogo.parentElement;
+            navParent.innerHTML = `<img src="${fs.logo}" alt="Header Logo" style="height: 40px; object-fit: contain;"> <span class="brand-name">${APP_CONFIG.site_name ? APP_CONFIG.site_name.toUpperCase() : 'SONRUP'}</span>`;
+        }
+    }
+    const footerDesc = document.querySelector(".footer-desc");
+    if (footerDesc) footerDesc.textContent = fs.desc || "Premium natural wellness solutions. Empowering health, strength, and happiness across generations.";
+
+    // 2. Social Links
+    const socialLinks = document.querySelector(".social-links");
+    if (socialLinks) {
+        socialLinks.innerHTML = '';
+        if (fs.facebook) socialLinks.innerHTML += `<a href="${fs.facebook}" aria-label="Facebook" target="_blank"><i data-lucide="facebook"></i></a>`;
+        if (fs.instagram) socialLinks.innerHTML += `<a href="${fs.instagram}" aria-label="Instagram" target="_blank"><i data-lucide="instagram"></i></a>`;
+        if (fs.twitter) socialLinks.innerHTML += `<a href="${fs.twitter}" aria-label="Twitter" target="_blank"><i data-lucide="twitter"></i></a>`;
+        if (fs.whatsapp) socialLinks.innerHTML += `<a href="${fs.whatsapp}" aria-label="WhatsApp" target="_blank"><i data-lucide="phone-call"></i></a>`;
+        if (!fs.facebook && !fs.instagram && !fs.twitter && !fs.whatsapp) {
+            socialLinks.innerHTML = `
+                <a href="#" aria-label="Facebook"><i data-lucide="facebook"></i></a>
+                <a href="#" aria-label="Instagram"><i data-lucide="instagram"></i></a>
+                <a href="#" aria-label="Twitter"><i data-lucide="twitter"></i></a>
+            `;
+        }
+    }
+
+    // 3. Regulatory Info
+    const legalCol = document.querySelector(".footer-legal-col");
+    if (legalCol) {
+        legalCol.innerHTML = `
+            <h3>Regulatory Info</h3>
+            <p><strong>Lic No:</strong> ${fs.license || APP_CONFIG.license_number || "GA/646-A"}</p>
+            <p><strong>FSSAI:</strong> ${fs.fssai || APP_CONFIG.fssai_number || "10726997000544"}</p>
+            <p class="disclaimer">${fs.disclaimer || "Disclaimer: These products are nutraceuticals and not intended to diagnose, treat, cure, or prevent any disease."}</p>
+        `;
+    }
+
+    // 4. Contact & Manufacturing
+    const contactCol = document.querySelector(".footer-contact-col");
+    if (contactCol) {
+        const cs = APP_CONFIG.contact_settings || {};
+        const marketed = cs.hq || "SONRUP\\nA 584 Sitaram Society, Punagam Road,\\nSurat - 395010, Gujarat, India";
+        const manufactured = cs.lab || "KELLEN HEALTHCARE\\nGMP & ISO Certified Facility";
+        // Extract the first email from the newline-separated list
+        const emailStr = cs.emails || "vip-support@sonrup.com";
+        const firstEmail = emailStr.split('\\n')[0].trim();
+        const phone = cs.phone || "+91 88888 99999";
+
+        contactCol.innerHTML = `
+            <p><strong>Marketed By:</strong> ${marketed.replace(/\\n/g, '<br>')}</p>
+            <br>
+            <p><strong>Manufactured By:</strong> ${manufactured.replace(/\\n/g, '<br>')}</p>
+            <br>
+            <p class="contact-methods">
+                <span style="display: flex; align-items: center; gap: 8px;"><i data-lucide="mail"></i> <a href="mailto:${firstEmail}" style="color: inherit; text-decoration: none;">${firstEmail}</a></span>
+                <span style="display: flex; align-items: center; gap: 8px; margin-top: 5px;"><i data-lucide="phone"></i> <a href="tel:${phone.replace(/\\s+/g, '')}" style="color: inherit; text-decoration: none;">${phone}</a></span>
+            </p>
+        `;
+    }
+
+    // Update global support emails/phones everywhere else just in case
+    const supportEmailElements = document.querySelectorAll(".contact-email-val, #footer-support-email");
+    supportEmailElements.forEach(el => {
+        const email = fs.email || APP_CONFIG.support_email;
+        if (email) {
+            el.textContent = email;
+            if (el.tagName === 'A') el.href = `mailto:${email}`;
+        }
+    });
+
+    const supportPhoneElements = document.querySelectorAll(".contact-phone-val, #footer-support-phone");
+    supportPhoneElements.forEach(el => {
+        const phone = fs.phone || APP_CONFIG.support_phone;
+        if (phone) {
+            el.textContent = phone;
+            if (el.tagName === 'A') el.href = `tel:${phone.replace(/\s+/g, '')}`;
+        }
+    });
+
+    const supportAddrElements = document.querySelectorAll(".contact-address-val, #footer-support-address");
+    supportAddrElements.forEach(el => {
+        if (APP_CONFIG.support_address) el.textContent = APP_CONFIG.support_address;
+    });
+
+    if (window.lucide && window.lucide.createIcons) {
+        window.lucide.createIcons();
+    }
+}
+
+function renderContactPageFromConfig() {
+    if (!APP_CONFIG || !APP_CONFIG.contact_settings) return;
+    const cs = APP_CONFIG.contact_settings;
+
+    const hqEl = document.getElementById("contact-hq-text");
+    if (hqEl && cs.hq) hqEl.innerHTML = cs.hq.replace(/\n/g, '<br>');
+
+    const labEl = document.getElementById("contact-lab-text");
+    if (labEl && cs.lab) labEl.innerHTML = cs.lab.replace(/\n/g, '<br>');
+
+    const emailsEl = document.getElementById("contact-emails-text");
+    if (emailsEl && cs.emails) emailsEl.innerHTML = cs.emails.replace(/\n/g, '<br>');
+
+    const phoneEl = document.getElementById("contact-phone-text");
+    if (phoneEl) {
+        const phone = cs.phone || APP_CONFIG.support_phone || "+91 76001 75193";
+        const hours = cs.hours || "Mon - Sat, 10:00 AM - 6:00 PM IST";
+        phoneEl.innerHTML = `${phone}<br>${hours}`;
+    }
+}
+
+function renderShopPageFromConfig() {
+    if (!APP_CONFIG || !APP_CONFIG.shop_settings) return;
+    const shop = APP_CONFIG.shop_settings;
+
+    const headingEl = document.getElementById("shop-page-heading");
+    if (headingEl && shop.heading) headingEl.textContent = shop.heading;
+
+    const titleEl = document.getElementById("shop-page-title");
+    if (titleEl && shop.title) titleEl.textContent = shop.title;
+
+    const descEl = document.getElementById("shop-page-desc");
+    if (descEl && shop.desc) descEl.innerHTML = shop.desc.replace(/\n/g, '<br>');
+}
+
+
 
 function getApiBase() {
     if (!APP_CONFIG || !APP_CONFIG.backend_port) return "";
@@ -91,8 +793,88 @@ function isLoggedIn() {
     return !!AUTH_TOKEN;
 }
 
-// Initialize Lucide Icons
+// Global helper to hydrate single product page to avoid FOUC
+function hydrateSingleProductDOM(products) {
+    const bodySlug = document.body.getAttribute('data-product-slug');
+    if (!bodySlug) return;
+    
+    const currentProduct = products.find(p => p.slug === bodySlug);
+    if (!currentProduct) return;
+    
+    const descEl = document.getElementById("dynamic-product-description");
+    if (descEl && currentProduct.description) {
+        descEl.textContent = currentProduct.description;
+    }
+    
+    const benefitsEl = document.getElementById("dynamic-product-benefits");
+    if (benefitsEl && currentProduct.benefits && currentProduct.benefits.length > 0) {
+        benefitsEl.innerHTML = "";
+        currentProduct.benefits.forEach(b => {
+            const li = document.createElement("li");
+            const iconColor = bodySlug === 'shilajit' ? 'text-gold' : bodySlug === 'biotin' ? 'text-orange' : 'text-blue';
+            li.innerHTML = `<i data-lucide="check-circle" class="${iconColor}" style="width: 16px; height: 16px; flex-shrink: 0; margin-top: 2px;"></i> <span style="flex: 1;">${b}</span>`;
+            li.style.display = "flex";
+            li.style.alignItems = "flex-start";
+            li.style.gap = "10px";
+            benefitsEl.appendChild(li);
+        });
+        if (window.lucide) window.lucide.createIcons();
+    }
+    
+    const suggestedEl = document.getElementById("dynamic-suggested-usage");
+    if (suggestedEl && currentProduct.suggested_usage) {
+        suggestedEl.textContent = `Suggested Usage: ${currentProduct.suggested_usage}`;
+    }
+    
+    const ingredientsTableEl = document.getElementById("dynamic-ingredients-table");
+    if (ingredientsTableEl && currentProduct.ingredients && currentProduct.ingredients.length > 0) {
+        ingredientsTableEl.innerHTML = "";
+        currentProduct.ingredients.forEach(ing => {
+            const tr = document.createElement("tr");
+            tr.style.borderBottom = "1px solid rgba(255, 255, 255, 0.03)";
+            tr.innerHTML = `
+                <td style="padding: 15px; color: #FFFFFF;"><strong>${ing.component}</strong></td>
+                <td style="padding: 15px; color: var(--text-on-dark-muted);">${ing.feature}</td>
+                <td style="padding: 15px; text-align: right; color: var(--color-gold); font-weight: 600;">${ing.amount}</td>
+            `;
+            ingredientsTableEl.appendChild(tr);
+        });
+    }
+}
+
+// ─── DOMContentLoaded Initialization ───
 document.addEventListener("DOMContentLoaded", async () => {
+    // Attempt instant render of single product data from cache to prevent FOUC
+    try {
+        const cachedProducts = localStorage.getItem("sonrup_products_cache");
+        if (cachedProducts) {
+            hydrateSingleProductDOM(JSON.parse(cachedProducts));
+        }
+    } catch(e) {}
+
+    // Render immediately from cached APP_CONFIG if available
+    const cachedConfig = localStorage.getItem("sonrup_config");
+    if (cachedConfig) {
+        try {
+            APP_CONFIG = JSON.parse(cachedConfig);
+            renderHeroSectionFromConfig();
+            renderTrustBadgesFromConfig();
+            renderTransparencyFromConfig();
+            renderAdvantageFromConfig();
+            renderGuidanceFromConfig();
+            renderFaqFromConfig();
+            renderDietaryGuideFromConfig();
+            renderStoryFromConfig();
+            renderBlogFromConfig();
+            renderSingleArticleView();
+            renderSiteFooterAndContactFromConfig();
+        renderContactPageFromConfig();
+        renderShopPageFromConfig();
+        } catch (e) {
+            console.error("Error loading cached config", e);
+        }
+    }
+
     // Load frontend config from backend .env
     await loadAppConfig();
 
@@ -238,6 +1020,28 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     };
 
+    // Define rendering function to update product details in modal
+    const renderDynamicProducts = (products) => {
+        products.forEach(p => {
+            if (productDetailsDb[p.slug]) {
+                productDetailsDb[p.slug].desc = p.description || productDetailsDb[p.slug].desc;
+                productDetailsDb[p.slug].benefits = p.benefits && p.benefits.length > 0 ? p.benefits : productDetailsDb[p.slug].benefits;
+            }
+        });
+        // Also ensure single page is up-to-date with freshest data
+        hydrateSingleProductDOM(products);
+    };
+
+    // Dynamically load fresh product data from admin panel
+    fetch(`${getApiBase()}/api/products`).then(res => {
+        if (res.ok) {
+            res.json().then(products => {
+                localStorage.setItem("sonrup_products_cache", JSON.stringify(products));
+                renderDynamicProducts(products);
+            });
+        }
+    }).catch(e => console.error("Failed to load dynamic product data", e));
+
     let activeModalProduct = null;
 
     const openProductDetailsModal = (productId) => {
@@ -336,27 +1140,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     }
 
-    // 5. FAQ Accordion Toggle
-    const faqQuestions = document.querySelectorAll(".faq-question");
-    faqQuestions.forEach(q => {
-        q.addEventListener("click", () => {
-            const faqItem = q.parentElement;
-            const isActive = faqItem.classList.contains("active");
-            
-            // Close all items
-            document.querySelectorAll(".faq-item").forEach(item => {
-                item.classList.remove("active");
-                item.querySelector(".faq-answer").style.maxHeight = null;
-            });
-            
-            // Open clicked item if it wasn't active
-            if (!isActive) {
-                faqItem.classList.add("active");
-                const answer = faqItem.querySelector(".faq-answer");
-                answer.style.maxHeight = answer.scrollHeight + "px";
-            }
-        });
-    });
 
     // 6. E-commerce Cart & Checkout Modal Logic
     const cartCountEl = document.getElementById("cart-count");
@@ -732,8 +1515,11 @@ document.addEventListener("DOMContentLoaded", async () => {
             card.dataset.cardEventBound = "true";
             
             card.addEventListener("click", (e) => {
-                if (e.target.closest(".add-to-cart-btn") || e.target.closest(".buy-now-btn")) {
-                    return;
+                // Only redirect if clicking on product image or title
+                const clickedImg = e.target.closest(".product-img-holder");
+                const clickedTitle = e.target.closest("h3");
+                if (!clickedImg && !clickedTitle) {
+                    return; // Prevent accidental redirection on buttons, bullets, or card whitespace!
                 }
                 const name = card.getAttribute("data-name") || card.querySelector("h3")?.textContent || "";
                 
@@ -752,8 +1538,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                         window.location.href = "mom-kid.html";
                     } else if (name.includes("Dad & Kid")) {
                         window.location.href = "dad-kid.html";
-                    } else {
-                        window.location.href = "shop.html";
                     }
                 }
             });
@@ -977,10 +1761,29 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     // Profile Page Loader — fetches data from API
-    if (window.location.pathname.includes("/profile")) {
+    if (window.location.pathname.includes("profile")) {
         if (!isLoggedIn()) {
             window.location.href = "/login";
         } else {
+            // Instantly populate from localStorage cache to prevent loading flashes
+            const cachedUserStr = localStorage.getItem("sonrup_user");
+            if (cachedUserStr) {
+                try {
+                    const cachedUser = JSON.parse(cachedUserStr);
+                    const welcomeEl = document.getElementById("profile-welcome-name");
+                    const detailNameEl = document.getElementById("profile-detail-name");
+                    const detailEmailEl = document.getElementById("profile-detail-email");
+                    const detailPhoneEl = document.getElementById("profile-detail-phone");
+                    const detailAddressEl = document.getElementById("profile-detail-address");
+
+                    if (welcomeEl) welcomeEl.textContent = cachedUser.name || "";
+                    if (detailNameEl) detailNameEl.textContent = cachedUser.name || "";
+                    if (detailEmailEl) detailEmailEl.textContent = cachedUser.email || "";
+                    if (detailPhoneEl) detailPhoneEl.textContent = cachedUser.phone || "Not provided";
+                    if (detailAddressEl) detailAddressEl.textContent = cachedUser.address ? (cachedUser.address + (cachedUser.pincode ? `, ${cachedUser.pincode}` : "")) : "Not provided";
+                } catch(e) {}
+            }
+
             // Fetch user profile from API
             try {
                 const profileRes = await fetch(`${getApiBase()}/api/auth/me`, {
@@ -1836,13 +2639,14 @@ document.addEventListener("DOMContentLoaded", async () => {
             if (!catalogGrid) return;
 
             const activeBtn = document.querySelector(".filter-tab-btn.active") || filterBtns[0];
-            const activeFilter = activeBtn ? activeBtn.getAttribute("data-filter") : "all";
+            const activeFilter = activeBtn ? (activeBtn.getAttribute("data-filter") || "all") : "all";
             const searchQuery = searchInput ? searchInput.value.toLowerCase().trim() : "";
             const currentSort = sortSelect ? sortSelect.value : "default";
 
             // Update Tab Button Highlight Styles visually
             filterBtns.forEach(btn => {
-                const isCurrentActive = btn === activeBtn || btn.getAttribute("data-filter") === activeFilter;
+                const filterVal = btn.getAttribute("data-filter");
+                const isCurrentActive = btn === activeBtn || filterVal === activeFilter;
                 if (isCurrentActive) {
                     btn.classList.add("active");
                     btn.style.backgroundColor = "var(--color-gold)";
@@ -1861,9 +2665,18 @@ document.addEventListener("DOMContentLoaded", async () => {
             // Get cards list
             let cards = [...originalCardsOrder];
 
-            // 1. Filter by category
+            // 1. Filter by category (handles "singles"/"single" & "combos"/"combo")
             if (activeFilter !== "all") {
-                cards = cards.filter(card => card.getAttribute("data-type") === activeFilter);
+                cards = cards.filter(card => {
+                    const cardType = (card.getAttribute("data-type") || "").toLowerCase();
+                    if (activeFilter === "singles") {
+                        return cardType === "singles" || cardType === "single";
+                    }
+                    if (activeFilter === "combos") {
+                        return cardType === "combos" || cardType === "combo";
+                    }
+                    return cardType === activeFilter;
+                });
             }
 
             // 2. Filter by search query
@@ -1922,8 +2735,71 @@ document.addEventListener("DOMContentLoaded", async () => {
             sortSelect.addEventListener("change", updateCatalog);
         }
 
-        // Initial setup run
-        updateCatalog();
+        // Fetch products directly from API matching Admin Panel CRUD and render live
+        const loadCatalogFromApi = async () => {
+            try {
+                const res = await fetch(`${getApiBase()}/api/products`);
+                if (!res.ok) return;
+                const apiProducts = await res.json();
+
+                if (apiProducts && apiProducts.length > 0) {
+                    catalogGrid.innerHTML = "";
+
+                    apiProducts.forEach(prod => {
+                        const card = document.createElement("div");
+                        const pType = (prod.product_type === "single" || prod.product_type === "singles") ? "singles" : "combos";
+                        const img = (prod.images && prod.images.length > 0) ? prod.images[0] : "assets/images/hero-combo.jpg";
+                        const tagClass = prod.tag_class || (pType === "combos" ? "tag-combo" : "tag-him");
+
+                        card.className = `product-card ${pType === "combos" ? "card-combo" : ("card-" + prod.slug)}`;
+                        card.setAttribute("data-type", pType);
+                        card.setAttribute("data-price", prod.price);
+                        card.setAttribute("data-name", prod.name);
+                        card.style.display = "flex";
+                        card.style.flexDirection = "column";
+
+                        const benefitsHtml = (prod.benefits || []).slice(0, 3).map(b => `
+                            <li><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C9A227" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gold" style="vertical-align: middle; margin-right: 6px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> ${b}</li>
+                        `).join("");
+
+                        card.innerHTML = `
+                            <div class="card-accent-line"></div>
+                            <div class="product-img-holder">
+                                <img src="${img}" alt="${prod.name}">
+                                <span class="product-tag ${tagClass}">${prod.tag || 'Wellness'}</span>
+                            </div>
+                            <div class="product-card-body" style="display: flex; flex-direction: column; flex-grow: 1; padding: 24px; height: 100%;">
+                                <h3>${prod.name}</h3>
+                                <p class="flavor-info"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> ${prod.flavor || 'Natural Flavor'}</p>
+                                <p class="product-summary">${prod.description || ''}</p>
+                                <ul class="benefit-bullets" style="margin-bottom: 20px;">
+                                    ${benefitsHtml}
+                                </ul>
+                                <div class="product-card-footer" style="display: flex; flex-direction: column; gap: 10px; border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 16px; margin-top: auto; width: 100%;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                                        <span class="qty-info">60 Gummies</span>
+                                        <span class="price-info" style="font-family: var(--font-heading); font-weight: 700; color: #FFFFFF; font-size: 18px;">₹${prod.price.toLocaleString('en-IN')}</span>
+                                    </div>
+                                    <div style="display: flex; gap: 8px; width: 100%;">
+                                        <button class="btn-secondary add-to-cart-btn" data-name="${prod.name}" data-price="${prod.price}" data-img="${img}" style="flex: 1; padding: 8px; font-size: 11px; justify-content: center;">Add to Cart</button>
+                                        <button class="btn-primary buy-now-btn" data-name="${prod.name}" data-price="${prod.price}" data-img="${img}" style="flex: 1.2; padding: 8px; font-size: 11px; justify-content: center;">Buy Now</button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+
+                        catalogGrid.appendChild(card);
+                    });
+
+                    originalCardsOrder = Array.from(catalogGrid.querySelectorAll(".product-card"));
+                    updateCatalog();
+                }
+            } catch (e) {
+                console.error("Error loading products from API:", e);
+            }
+        };
+
+        loadCatalogFromApi();
     }
 
     // Reviews Carousel Logic
@@ -1932,37 +2808,128 @@ document.addEventListener("DOMContentLoaded", async () => {
     const prevBtn = document.getElementById("review-prev-btn");
     const nextBtn = document.getElementById("review-next-btn");
     const dotsContainer = document.getElementById("carousel-dots");
-    const dots = dotsContainer?.querySelectorAll(".dot");
 
     if (reviewTrack && reviewCards && reviewCards.length > 0) {
-        let currentIndex = 0;
-        const totalReviews = reviewCards.length;
+        const totalOriginal = reviewCards.length;
+        let currentIndex = totalOriginal; // Start at the first original card
         let autoSlideTimer = null;
+        let dots = [];
+
+        // Clone cards for infinite circular scroll (pre and post)
+        const preClones = [];
+        const postClones = [];
+        for (let i = 0; i < totalOriginal; i++) {
+            const pre = reviewCards[i].cloneNode(true);
+            pre.classList.add('clone');
+            preClones.push(pre);
+            
+            const post = reviewCards[i].cloneNode(true);
+            post.classList.add('clone');
+            postClones.push(post);
+        }
+        for (let i = totalOriginal - 1; i >= 0; i--) {
+            reviewTrack.insertBefore(preClones[i], reviewTrack.firstChild);
+        }
+        for (let i = 0; i < totalOriginal; i++) {
+            reviewTrack.appendChild(postClones[i]);
+        }
+
+        const getVisibleCards = () => Math.round(reviewTrack.parentElement.offsetWidth / reviewCards[0].offsetWidth) || 1;
+        const getMaxIndex = () => Math.max(0, totalOriginal - getVisibleCards());
+
+        // Generate dots dynamically to match maxIndex + 1
+        const generateDots = () => {
+            const currentMax = getMaxIndex();
+            if (dotsContainer && (!dots.length || dotsContainer.children.length !== currentMax + 1)) {
+                dotsContainer.innerHTML = '';
+                for (let i = 0; i <= currentMax; i++) {
+                    const dot = document.createElement('span');
+                    dot.className = 'dot';
+                    dot.dataset.index = i;
+                    dot.addEventListener('click', () => {
+                        stopAutoSlide();
+                        updateCarousel(i + totalOriginal); // Jump to original item
+                        startAutoSlide();
+                    });
+                    dotsContainer.appendChild(dot);
+                }
+                dots = Array.from(dotsContainer.querySelectorAll('.dot'));
+            }
+        };
+
+        const applyTransform = () => {
+            generateDots();
+            const cardWidth = reviewCards[0].offsetWidth;
+            const gap = 30; // gap from CSS
+            const translation = currentIndex * (cardWidth + gap);
+            reviewTrack.style.transform = `translateX(-${translation}px)`;
+
+            const activeDotIndex = currentIndex % totalOriginal;
+            if (dots && dots.length > 0) {
+                dots.forEach((dot, idx) => {
+                    if (idx === activeDotIndex) {
+                        dot.classList.add("active");
+                    } else {
+                        dot.classList.remove("active");
+                    }
+                });
+            }
+        };
 
         const updateCarousel = (index) => {
-            if (index < 0) {
-                currentIndex = totalReviews - 1;
-            } else if (index >= totalReviews) {
-                currentIndex = 0;
-            } else {
-                currentIndex = index;
+            currentIndex = index;
+            reviewTrack.style.transition = 'transform 0.6s cubic-bezier(0.25, 1, 0.5, 1)';
+            applyTransform();
+        };
+
+        // Seamless loop without rewind, avoiding mixing start/end cards
+        reviewTrack.addEventListener('transitionend', () => {
+            let changed = false;
+            if (currentIndex >= totalOriginal * 2) {
+                currentIndex = currentIndex - totalOriginal;
+                changed = true;
+            } else if (currentIndex <= getMaxIndex()) {
+                currentIndex = currentIndex + totalOriginal;
+                changed = true;
             }
+            if (changed) {
+                reviewTrack.style.transition = 'none';
+                applyTransform();
+                void reviewTrack.offsetWidth; // force reflow
+                reviewTrack.style.transition = 'transform 0.6s cubic-bezier(0.25, 1, 0.5, 1)';
+            }
+        });
 
-            reviewTrack.style.transform = `translateX(-${currentIndex * 100}%)`;
+        // Recalculate on resize
+        window.addEventListener('resize', () => {
+            reviewTrack.style.transition = 'none';
+            applyTransform();
+        });
+        
+        const nextSlide = () => {
+            const maxIdx = getMaxIndex();
+            if (currentIndex === totalOriginal + maxIdx) {
+                // At the last valid index, jump to the first dot's clone
+                updateCarousel(totalOriginal * 2);
+            } else {
+                updateCarousel(currentIndex + 1);
+            }
+        };
 
-            dots?.forEach((dot, idx) => {
-                if (idx === currentIndex) {
-                    dot.classList.add("active");
-                } else {
-                    dot.classList.remove("active");
-                }
-            });
+        const prevSlide = () => {
+            const maxIdx = getMaxIndex();
+            if (currentIndex === totalOriginal) {
+                // At the first dot, jump to the last dot's clone
+                updateCarousel(maxIdx);
+            } else {
+                updateCarousel(currentIndex - 1);
+            }
         };
 
         const startAutoSlide = () => {
             stopAutoSlide();
             autoSlideTimer = setInterval(() => {
-                updateCarousel(currentIndex + 1);
+                nextSlide();
             }, 5000);
         };
 
@@ -1974,24 +2941,20 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         prevBtn?.addEventListener("click", () => {
             stopAutoSlide();
-            updateCarousel(currentIndex - 1);
+            prevSlide();
             startAutoSlide();
         });
 
         nextBtn?.addEventListener("click", () => {
             stopAutoSlide();
-            updateCarousel(currentIndex + 1);
+            nextSlide();
             startAutoSlide();
         });
 
-        dots?.forEach((dot, idx) => {
-            dot.addEventListener("click", () => {
-                stopAutoSlide();
-                updateCarousel(idx);
-                startAutoSlide();
-            });
-        });
-
+        // Initialize with no transition
+        reviewTrack.style.transition = 'none';
+        applyTransform();
+        void reviewTrack.offsetWidth;
         startAutoSlide();
     }
 
@@ -2101,3 +3064,152 @@ window.trackDelhivery = async (waybill) => {
 window.closeTrackingModal = () => {
     document.getElementById("delhivery-tracking-modal").style.display = "none";
 };
+
+
+async function renderProductPage() {
+    const slug = document.body.getAttribute("data-product-slug");
+    if (!slug) return;
+
+    try {
+        const res = await fetch(`${API_BASE_URL}/products`);
+        if (!res.ok) return;
+        const products = await res.json();
+        const product = products.find(p => p.slug === slug);
+        if (!product) return;
+
+        // Update basic text
+        if (document.getElementById("dynamic-product-name")) document.getElementById("dynamic-product-name").textContent = product.name;
+        if (document.getElementById("dynamic-product-flavor")) {
+            const iconColor = product.tag_class === "tag-kids" ? "text-blue" : (product.tag_class === "tag-biotin" ? "text-orange" : "text-gold");
+            document.getElementById("dynamic-product-flavor").innerHTML = `<i data-lucide="leaf" class="${iconColor}"></i> ${product.flavor || 'Regular Flavor'}`;
+        }
+        if (document.getElementById("dynamic-product-description")) document.getElementById("dynamic-product-description").textContent = product.description;
+        if (document.getElementById("dynamic-product-price")) document.getElementById("dynamic-product-price").textContent = `₹${product.price}`;
+        
+        if (document.getElementById("dynamic-product-tag")) {
+            const tagEl = document.getElementById("dynamic-product-tag");
+            tagEl.className = `product-tag ${product.tag_class || 'tag-shilajit'}`;
+            tagEl.textContent = product.tag || 'Wellness';
+        }
+
+        // Update Benefits
+        const benefitsUl = document.getElementById("dynamic-product-benefits");
+        if (benefitsUl && product.benefits) {
+            const iconColor = product.tag_class === "tag-kids" ? "text-blue" : (product.tag_class === "tag-biotin" ? "text-orange" : "text-gold");
+            benefitsUl.innerHTML = "";
+            product.benefits.forEach(b => {
+                const li = document.createElement("li");
+                li.innerHTML = `<i data-lucide="check-circle" class="${iconColor}"></i> ${b}`;
+                benefitsUl.appendChild(li);
+            });
+        }
+
+        // Update Button Data
+        const addBtn = document.getElementById("dynamic-add-to-cart");
+        if (addBtn) {
+            addBtn.setAttribute("data-name", product.name);
+            addBtn.setAttribute("data-price", product.price);
+            addBtn.setAttribute("data-img", product.images[0] || 'assets/images/hero-combo.jpg');
+        }
+
+        // Update Image Gallery
+        const mainImg = document.getElementById("main-product-image");
+        if (mainImg && product.images && product.images.length > 0) {
+            mainImg.src = product.images[0];
+        }
+
+        const thumbsContainer = document.getElementById("dynamic-product-thumbs");
+        if (thumbsContainer && product.images && product.images.length > 0) {
+            thumbsContainer.innerHTML = "";
+            product.images.forEach((imgSrc, idx) => {
+                const div = document.createElement("div");
+                div.className = "gallery-thumb";
+                if (idx === 0) div.classList.add("active");
+                div.style = "border: 1.5px solid rgba(255,255,255,0.05); border-radius: 8px; overflow: hidden; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; background-color: var(--bg-dark-card); cursor: pointer; padding: 6px;";
+                div.innerHTML = `<img src="${imgSrc}" style="max-height: 100%; object-fit: contain;">`;
+                
+                div.addEventListener("click", () => {
+                    if (mainImg) mainImg.src = imgSrc;
+                    document.querySelectorAll("#dynamic-product-thumbs .gallery-thumb").forEach(t => {
+                        t.classList.remove("active");
+                        t.style.borderColor = "rgba(255,255,255,0.05)";
+                    });
+                    div.classList.add("active");
+                    div.style.borderColor = "var(--color-gold)";
+                });
+                
+                thumbsContainer.appendChild(div);
+            });
+        }
+
+        if (window.lucide) window.lucide.createIcons();
+    } catch (e) {
+        console.error("Error dynamically rendering product page:", e);
+    }
+}
+
+
+function renderShopCards(products) {
+    const grid = document.getElementById("catalog-grid");
+    if (!grid) return;
+    
+    grid.innerHTML = "";
+    
+    if (!products || products.length === 0) {
+        grid.innerHTML = "<p style='color: white; grid-column: 1 / -1; text-align: center;'>No products found in the catalog.</p>";
+        return;
+    }
+    
+    products.forEach(prod => {
+        // Build benefits HTML (limit to 3 for the card)
+        const benefitsHtml = (prod.benefits || []).slice(0, 3).map(b => {
+            return `<li><i data-lucide="check-circle" style="color: #E5C365; width: 16px; margin-right: 8px;"></i> ${b}</li>`;
+        }).join("");
+        
+        // Define tag text based on tag_class
+        let tagText = prod.tag || "Wellness";
+        let iconHtml = `<i data-lucide="zap"></i>`;
+        if (prod.tag_class === "tag-biotin") iconHtml = `<i data-lucide="chevrons-right"></i>`;
+        
+        // Generate the card
+        const cardHtml = `
+            <div class="product-card card-${prod.slug}" data-type="${prod.product_type}s" data-price="${prod.price}" data-name="${prod.name}" style="display: flex; flex-direction: column;">
+                <div class="card-accent-line"></div>
+                <div class="product-img-holder">
+                    <img src="${prod.images && prod.images.length > 0 ? prod.images[0] : 'assets/images/hero-combo.jpg'}" alt="${prod.name}">
+                    <span class="product-tag ${prod.tag_class || 'tag-shilajit'}">${tagText}</span>
+                </div>
+                <div class="product-card-body" style="display: flex; flex-direction: column; flex-grow: 1; padding: 24px; height: 100%;">
+                    <h3>${prod.name}</h3>
+                    <p class="flavor-info">${iconHtml} ${prod.flavor || ''}</p>
+                    <p class="product-summary">${(prod.description || '').substring(0, 130)}...</p>
+                    <ul class="benefit-bullets" style="margin-bottom: 20px;">
+                        ${benefitsHtml}
+                    </ul>
+                    <div class="product-card-footer" style="display: flex; flex-direction: column; gap: 10px; border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 16px; margin-top: auto; width: 100%;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                            <span class="qty-info">60 Gummies</span>
+                            <span class="price-info" style="font-family: var(--font-heading); font-weight: 700; color: #FFFFFF; font-size: 18px;">₹${prod.price}</span>
+                        </div>
+                        <div style="display: flex; gap: 8px; width: 100%;">
+                            <button class="btn-secondary add-to-cart-btn" data-name="${prod.name}" data-price="${prod.price}" data-img="${prod.images && prod.images.length > 0 ? prod.images[0] : ''}" style="flex: 1; padding: 8px; font-size: 11px; justify-content: center;">Add to Cart</button>
+                            <a href="${prod.slug}.html" class="btn-primary" style="flex: 1.2; padding: 8px; font-size: 11px; display: flex; align-items: center; justify-content: center; text-decoration: none; color: black; font-weight: 600; border-radius: 6px;">Buy Now</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        grid.innerHTML += cardHtml;
+    });
+    
+    // Re-initialize Lucide icons for dynamically added elements
+    if (window.lucide) {
+        window.lucide.createIcons();
+    }
+    
+    // Re-bind Add to Cart buttons
+    if (window.bindCartButtons) {
+        window.bindCartButtons();
+    }
+}

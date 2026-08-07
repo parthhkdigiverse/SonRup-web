@@ -9,6 +9,10 @@ class ProductVariant(BaseModel):
     sku: Optional[str] = ""
     in_stock: bool = True
 
+class IngredientRow(BaseModel):
+    component: str
+    feature: str
+    amount: str
 
 class ProductOut(BaseModel):
     """Schema for product response."""
@@ -24,3 +28,5 @@ class ProductOut(BaseModel):
     tag_class: str
     product_type: str  # "single" or "combo"
     variants: Optional[List[ProductVariant]] = []
+    suggested_usage: Optional[str] = ""
+    ingredients: Optional[List[IngredientRow]] = []

@@ -67,10 +67,32 @@ api_app.include_router(admin_router)
 # ─── Main application ───
 app = FastAPI(lifespan=lifespan)
 
-# Allow all origins silently without requiring any CORS config or domain lists in .env
+# Add CORS to the API sub-application specifically
+api_app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "http://localhost:8030",
+        "http://127.0.0.1:8030",
+        "http://localhost:5500",
+        "http://127.0.0.1:5500"
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "http://localhost:8030",
+        "http://127.0.0.1:8030",
+        "http://localhost:5500",
+        "http://127.0.0.1:5500"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

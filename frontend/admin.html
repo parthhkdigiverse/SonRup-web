@@ -11,6 +11,25 @@
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
     <!-- Base Stylesheet -->
     <link rel="stylesheet" href="style.css">
+    <!-- Quill.js for Rich Text Editing -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+    <!-- Immediate Tab Restore script (Prevents Dashboard flicker on refresh) -->
+    <script>
+        (function() {
+            try {
+                var hash = window.location.hash.replace('#', '').split('?')[0];
+                var savedTab = localStorage.getItem("sonrup_admin_active_tab") || sessionStorage.getItem("sonrup_admin_active_tab");
+                var validTabs = ["section-overview","section-products","section-orders","section-settings","section-site-builder","section-users","section-coupons"];
+                var activeTab = (hash && validTabs.indexOf(hash) !== -1) ? hash : (savedTab || "section-overview");
+                
+                var style = document.createElement("style");
+                style.id = "instant-tab-style";
+                style.innerHTML = "#" + activeTab + " { display: block !important; opacity: 1 !important; visibility: visible !important; } .admin-section:not(#" + activeTab + ") { display: none !important; }";
+                document.head.appendChild(style);
+            } catch(e){}
+        })();
+    </script>
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -22,6 +41,28 @@
             --gold-glow: 0 0 20px rgba(201, 162, 39, 0.2);
             --emerald-glow: 0 0 20px rgba(16, 185, 129, 0.2);
         }
+        
+        /* Quill Dark Theme Overrides */
+        .ql-toolbar.ql-snow {
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(0,0,0,0.6);
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+        }
+        .ql-container.ql-snow {
+            border: 1px solid rgba(255,255,255,0.15);
+            border-top: none;
+            background: rgba(0,0,0,0.3);
+            border-bottom-left-radius: 8px;
+            border-bottom-right-radius: 8px;
+            color: #f1f5f9;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            min-height: 250px;
+        }
+        .ql-snow .ql-stroke { stroke: #94a3b8; }
+        .ql-snow .ql-fill { fill: #94a3b8; }
+        .ql-snow .ql-picker { color: #94a3b8; }
 
         body.admin-body {
             background-color: var(--admin-bg);
@@ -505,6 +546,59 @@
             <button class="sidebar-tab" data-target="section-settings">
                 <i data-lucide="settings"></i> Website Settings
             </button>
+            
+            <!-- Collapsible Site Settings Submenu -->
+            <div class="sidebar-dropdown-group">
+                <button class="sidebar-tab dropdown-toggle-btn" data-target="section-site-builder" id="toggle-site-settings-menu" style="width: 100%; display: flex; align-items: center; justify-content: space-between;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <i data-lucide="sliders"></i> <span>Site Settings</span>
+                    </div>
+                    <i data-lucide="chevron-down" id="site-settings-arrow" style="transition: transform 0.3s ease; width: 14px;"></i>
+                </button>
+
+                <div class="sidebar-submenu-container" id="site-settings-submenu" style="display: none; padding-left: 10px; margin-top: 6px; margin-bottom: 8px; position: relative;">
+                    <button class="sidebar-subtab-btn builder-step-btn active" data-step="2" style="display: flex; align-items: center; gap: 10px; width: 100%; background: rgba(201,162,39,0.12); border: 1px solid rgba(201,162,39,0.3); color: #ffffff; font-weight: 700; padding: 7px 8px; border-radius: 6px; cursor: pointer; text-align: left; position: relative; z-index: 2; margin-bottom: 4px;">
+                        <div class="subtab-step-num" style="width: 24px; height: 24px; border-radius: 50%; background: #2b231c; border: 1.5px solid #C9A227; color: #E5C365; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; box-shadow: 0 0 8px rgba(201,162,39,0.4);">1</div>
+                        <span class="subtab-label" style="font-family: 'Outfit', sans-serif; font-size: 11px; letter-spacing: 0.8px; text-transform: uppercase;">HERO SECTION</span>
+                    </button>
+                    <button class="sidebar-subtab-btn builder-step-btn" data-step="3" style="display: flex; align-items: center; gap: 10px; width: 100%; background: none; border: none; color: #94a3b8; font-weight: 400; padding: 7px 8px; border-radius: 6px; cursor: pointer; text-align: left; position: relative; z-index: 2; margin-bottom: 4px;">
+                        <div class="subtab-step-num" style="width: 24px; height: 24px; border-radius: 50%; background: #1a1a1a; border: 1.5px solid rgba(255, 255, 255, 0.2); color: #94a3b8; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0;">2</div>
+                        <span class="subtab-label" style="font-family: 'Outfit', sans-serif; font-size: 11px; letter-spacing: 0.8px; text-transform: uppercase;">TRUST BADGES</span>
+                    </button>
+                    <button class="sidebar-subtab-btn builder-step-btn" data-step="4" style="display: flex; align-items: center; gap: 10px; width: 100%; background: none; border: none; color: #94a3b8; font-weight: 400; padding: 7px 8px; border-radius: 6px; cursor: pointer; text-align: left; position: relative; z-index: 2; margin-bottom: 4px;">
+                        <div class="subtab-step-num" style="width: 24px; height: 24px; border-radius: 50%; background: #1a1a1a; border: 1.5px solid rgba(255, 255, 255, 0.2); color: #94a3b8; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0;">3</div>
+                        <span class="subtab-label" style="font-family: 'Outfit', sans-serif; font-size: 11px; letter-spacing: 0.8px; text-transform: uppercase;">LABEL TRANSPARENCY</span>
+                    </button>
+                    <button class="sidebar-subtab-btn builder-step-btn" data-step="5" style="display: flex; align-items: center; gap: 10px; width: 100%; background: none; border: none; color: #94a3b8; font-weight: 400; padding: 7px 8px; border-radius: 6px; cursor: pointer; text-align: left; position: relative; z-index: 2; margin-bottom: 4px;">
+                        <div class="subtab-step-num" style="width: 24px; height: 24px; border-radius: 50%; background: #1a1a1a; border: 1.5px solid rgba(255, 255, 255, 0.2); color: #94a3b8; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0;">4</div>
+                        <span class="subtab-label" style="font-family: 'Outfit', sans-serif; font-size: 11px; letter-spacing: 0.8px; text-transform: uppercase;">THE ADVANTAGE</span>
+                    </button>
+                    <button class="sidebar-subtab-btn builder-step-btn" data-step="6" style="display: flex; align-items: center; gap: 10px; width: 100%; background: none; border: none; color: #94a3b8; font-weight: 400; padding: 7px 8px; border-radius: 6px; cursor: pointer; text-align: left; position: relative; z-index: 2; margin-bottom: 4px;">
+                        <div class="subtab-step-num" style="width: 24px; height: 24px; border-radius: 50%; background: #1a1a1a; border: 1.5px solid rgba(255, 255, 255, 0.2); color: #94a3b8; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0;">5</div>
+                        <span class="subtab-label" style="font-family: 'Outfit', sans-serif; font-size: 11px; letter-spacing: 0.8px; text-transform: uppercase;">GUIDANCE</span>
+                    </button>
+                    <button class="sidebar-subtab-btn builder-step-btn" data-step="7" style="display: flex; align-items: center; gap: 10px; width: 100%; background: none; border: none; color: #94a3b8; font-weight: 400; padding: 7px 8px; border-radius: 6px; cursor: pointer; text-align: left; position: relative; z-index: 2; margin-bottom: 4px;">
+                        <div class="subtab-step-num" style="width: 24px; height: 24px; border-radius: 50%; background: #1a1a1a; border: 1.5px solid rgba(255, 255, 255, 0.2); color: #94a3b8; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0;">6</div>
+                        <span class="subtab-label" style="font-family: 'Outfit', sans-serif; font-size: 11px; letter-spacing: 0.8px; text-transform: uppercase;">FAQ</span>
+                    </button>
+                    <button class="sidebar-subtab-btn builder-step-btn" data-step="8" style="display: flex; align-items: center; gap: 10px; width: 100%; background: none; border: none; color: #94a3b8; font-weight: 400; padding: 7px 8px; border-radius: 6px; cursor: pointer; text-align: left; position: relative; z-index: 2; margin-bottom: 4px;">
+                        <div class="subtab-step-num" style="width: 24px; height: 24px; border-radius: 50%; background: #1a1a1a; border: 1.5px solid rgba(255, 255, 255, 0.2); color: #94a3b8; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0;">7</div>
+                        <span class="subtab-label" style="font-family: 'Outfit', sans-serif; font-size: 11px; letter-spacing: 0.8px; text-transform: uppercase;">OUR STORY</span>
+                    </button>
+                    <button class="sidebar-subtab-btn builder-step-btn" data-step="9" style="display: flex; align-items: center; gap: 10px; width: 100%; background: none; border: none; color: #94a3b8; font-weight: 400; padding: 7px 8px; border-radius: 6px; cursor: pointer; text-align: left; position: relative; z-index: 2; margin-bottom: 4px;">
+                        <div class="subtab-step-num" style="width: 24px; height: 24px; border-radius: 50%; background: #1a1a1a; border: 1.5px solid rgba(255, 255, 255, 0.2); color: #94a3b8; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0;">8</div>
+                        <span class="subtab-label" style="font-family: 'Outfit', sans-serif; font-size: 11px; letter-spacing: 0.8px; text-transform: uppercase;">BLOG</span>
+                    </button>
+                    <button class="sidebar-subtab-btn builder-step-btn" data-step="10" style="display: flex; align-items: center; gap: 10px; width: 100%; background: none; border: none; color: #94a3b8; font-weight: 400; padding: 7px 8px; border-radius: 6px; cursor: pointer; text-align: left; position: relative; z-index: 2;">
+                        <div class="subtab-step-num" style="width: 24px; height: 24px; border-radius: 50%; background: #1a1a1a; border: 1.5px solid rgba(255, 255, 255, 0.2); color: #94a3b8; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0;">9</div>
+                        <span class="subtab-label" style="font-family: 'Outfit', sans-serif; font-size: 11px; letter-spacing: 0.8px; text-transform: uppercase;">FOOTER</span>
+                    </button>
+                    <button class="sidebar-subtab-btn builder-step-btn" data-step="11" style="display: flex; align-items: center; gap: 10px; width: 100%; background: none; border: none; color: #94a3b8; font-weight: 400; padding: 7px 8px; border-radius: 6px; cursor: pointer; text-align: left; position: relative; z-index: 2;">
+                        <div class="subtab-step-num" style="width: 20px; height: 20px; border-radius: 50%; background: #1a1a1a; border: 1px solid rgba(255, 255, 255, 0.2); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; flex-shrink: 0;">11</div>
+                        <span class="subtab-label" style="font-family: 'Outfit', sans-serif; font-size: 11px; letter-spacing: 0.8px; text-transform: uppercase; margin-left: 10px;">CONTACT PAGE</span>
+                    </button>
+                </div>
+            </div>
             <button class="sidebar-tab" data-target="section-users">
                 <i data-lucide="users"></i> Registered Users
             </button>
@@ -520,7 +614,7 @@
         <main class="admin-content">
 
             <!-- 1. DASHBOARD OVERVIEW SECTION -->
-            <section id="section-overview" class="admin-section active">
+            <section id="section-overview" class="admin-section">
                 <div class="section-header">
                     <div>
                         <h1 class="section-title">Operational Overview</h1>
@@ -569,6 +663,9 @@
                     <button class="btn-action btn-gold" id="btn-open-add-product"><i data-lucide="plus-circle" width="16"></i> Add New Product</button>
                 </div>
 
+
+                
+
                 <div class="glass-panel">
                     <table class="admin-table">
                         <thead>
@@ -596,6 +693,9 @@
                     </div>
                 </div>
 
+
+                
+
                 <div class="glass-panel">
                     <table class="admin-table">
                         <thead>
@@ -622,6 +722,32 @@
                         <p class="section-subtitle">Modify brand copy, support contact info, and top announcement bar dynamically.</p>
                     </div>
                 </div>
+
+                <div class="glass-panel" style="margin-bottom: 24px;">
+                    <h2 style="font-family: 'Outfit', sans-serif; font-size: 20px; margin-top: 0; margin-bottom: 16px; color: #ffffff;">Shop Page Header Text</h2>
+                    <form id="form-shop-settings" onsubmit="event.preventDefault(); window.saveShopSettingsToDB();">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Overline Heading</label>
+                                <input type="text" id="setting-shop-heading" class="form-input" placeholder="SONRUP WELLNESS SHELF">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Main Title</label>
+                                <input type="text" id="setting-shop-title" class="form-input" placeholder="PREMIUM GUMMIES & BUNDLES">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group full-width">
+                                <label class="form-label">Subtitle / Description</label>
+                                <textarea id="setting-shop-desc" class="form-input" rows="2" placeholder="Sugar-free, clinical-grade formulations crafted to elevate active health..."></textarea>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-action btn-gold" style="padding: 10px 20px; font-size: 13px; border-radius: 6px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                            <i data-lucide="save"></i> Save Shop Text
+                        </button>
+                    </form>
+                </div>
+
 
                 <form id="settings-form" class="glass-panel form-grid">
                     <div class="form-group">
@@ -749,10 +875,658 @@
                         <input type="text" class="form-input" id="setting-delhivery-warehouse-pincode" placeholder="395010">
                     </div>
 
-                    <div class="form-group full-width" style="display: flex; justify-content: flex-end; margin-top: 16px;">
-                        <button type="submit" class="btn-action btn-gold" style="padding: 14px 32px; font-size: 15px;"><i data-lucide="save"></i> Save Website Configuration</button>
+                    <div class="form-group full-width" style="display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: flex-start !important; margin-top: 24px !important; padding-top: 20px !important; border-top: 1px solid rgba(255,255,255,0.08) !important; width: 100% !important; grid-column: 1 / -1 !important;">
+                        <button type="submit" class="btn-action btn-gold" style="padding: 12px 28px; font-size: 14px; border-radius: 8px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap;">
+                            <i data-lucide="save"></i> Save Website Configuration
+                        </button>
                     </div>
                 </form>
+            </section>
+
+            <!-- 4.5 SITE SETTINGS & SECTIONS BUILDER -->
+            <section id="section-site-builder" class="admin-section">
+                <div class="section-header">
+                    <div>
+                        <h1 class="section-title">Site Settings & Sections Builder</h1>
+                        <p class="section-subtitle">Manage homepage content sections, hero sliders, trust badges, and brand copy in real time.</p>
+                    </div>
+                </div>
+
+                <div class="site-builder-content-panel">
+                        <!-- Step 2 Panel: HERO SECTION CRUD -->
+                        <div class="builder-step-panel active" id="builder-step-2">
+                            <form id="hero-builder-form" class="glass-panel form-grid">
+                                <div class="form-group full-width" style="border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 16px; margin-bottom: 12px;">
+                                    <h3 style="font-family: 'Outfit', sans-serif; font-size: 18px; color: #fff; margin: 0 0 4px 0; display: flex; align-items: center; gap: 8px;">
+                                        <i data-lucide="sparkles" class="text-gold"></i> <span>2. HERO SECTION CRUD (Live Homepage Sync)</span>
+                                    </h3>
+                                    <p style="font-size: 12.5px; color: #94a3b8; margin: 0;">Manage main headline, sub-heading, button labels, trust indicators, floating badges, and banner image displayed on the website home page.</p>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Promo Badge Text</label>
+                                    <input type="text" class="form-input" id="setting-hero-badge" placeholder="PREMIUM NATURAL WELLNESS">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Hero Headline (Main Text)</label>
+                                    <input type="text" class="form-input" id="setting-hero-title-main" placeholder="Premium Gummies for">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Hero Headline (Gold Highlighted Text)</label>
+                                    <input type="text" class="form-input" id="setting-hero-title-gold" placeholder="Active Health & Beauty.">
+                                </div>
+                                <div class="form-group full-width">
+                                    <label class="form-label">Hero Subtitle / Description Copy</label>
+                                    <textarea class="form-input" id="setting-hero-subtitle" rows="3" placeholder="Sugar-free, clinical-grade formulations crafted..."></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Primary CTA Button Text</label>
+                                    <input type="text" class="form-input" id="setting-hero-cta-text" placeholder="Explore Collection">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Primary CTA Link Target (Clean Route Path)</label>
+                                    <input type="text" class="form-input" id="setting-hero-cta-link" placeholder="/shop">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Sub-Trust Point #1</label>
+                                    <input type="text" class="form-input" id="setting-hero-trust1" placeholder="100% Sugar-Free & Safe">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Sub-Trust Point #2</label>
+                                    <input type="text" class="form-input" id="setting-hero-trust2" placeholder="Free Shipping India-Wide">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Floating Pill 1 (Top Left)</label>
+                                    <input type="text" class="form-input" id="setting-hero-float1" placeholder="Adult Performance">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Floating Pill 2 (Middle Right)</label>
+                                    <input type="text" class="form-input" id="setting-hero-float2" placeholder="Beauty & Energy">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Floating Pill 3 (Bottom Left)</label>
+                                    <input type="text" class="form-input" id="setting-hero-float3" placeholder="Kids' Immunity">
+                                </div>
+
+                                <!-- Manual Image Selection Block -->
+                                <input type="hidden" id="setting-hero-image-path">
+                                <div class="form-group full-width" style="margin-top: 10px; background: rgba(255,255,255,0.03); border: 1px dashed rgba(201,162,39,0.3); padding: 20px; border-radius: 12px;">
+                                    <label class="form-label" style="font-size: 14px; font-weight: 700; color: #E5C365; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+                                        <i data-lucide="image"></i> Select Hero Banner Image (Manual Photo Picker)
+                                    </label>
+                                    <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+                                        <div style="width: 100px; height: 100px; border-radius: 10px; overflow: hidden; border: 2px solid #C9A227; background: #000; flex-shrink: 0;">
+                                            <img id="setting-hero-image-preview" src="assets/images/hero-combo.jpg" alt="Hero Image Preview" style="width: 100%; height: 100%; object-fit: cover;">
+                                        </div>
+                                        <div style="flex: 1;">
+                                            <p style="font-size: 12.5px; color: #94a3b8; margin: 0 0 10px 0;">Choose a custom photo from your computer to set as the main homepage banner image.</p>
+                                            <input type="file" class="form-input" id="setting-hero-image-file" accept="image/*" style="padding: 8px; cursor: pointer;">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group full-width" style="display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: flex-start !important; margin-top: 24px !important; padding-top: 20px !important; border-top: 1px solid rgba(255,255,255,0.08) !important; width: 100% !important; grid-column: 1 / -1 !important;">
+                                    <button type="submit" class="btn-action btn-gold" style="padding: 12px 28px; font-size: 14px; border-radius: 8px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap;">
+                                        <i data-lucide="save"></i> Save & Publish Hero Section
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Step 3 Panel: TRUST BADGES DYNAMIC CRUD -->
+                        <div class="builder-step-panel" id="builder-step-3" style="display: none;">
+                            <div class="glass-panel" style="padding: 28px;">
+                                <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 16px; margin-bottom: 24px; flex-wrap: wrap; gap: 12px;">
+                                    <div>
+                                        <h3 style="font-family: 'Outfit', sans-serif; font-size: 20px; color: #fff; margin: 0 0 6px 0;">2. TRUST BADGES DYNAMIC CRUD</h3>
+                                        <p style="font-size: 13px; color: #94a3b8; margin: 0;">Add, Edit, or Remove trust indicators displayed on the live homepage.</p>
+                                    </div>
+                                    <button type="button" id="btn-add-trust-badge" class="btn-action btn-gold" style="padding: 10px 20px; font-size: 13.5px; border-radius: 8px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
+                                        <i data-lucide="plus"></i> Add New Trust Badge
+                                    </button>
+                                </div>
+
+                                <form id="trust-builder-form">
+                                    <div id="trust-badges-list-container" style="display: flex; flex-direction: column; gap: 16px;">
+                                        <!-- Dynamic Trust Badge Items rendered by admin.js -->
+                                    </div>
+
+                                    <div class="form-group full-width" style="display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: flex-start !important; margin-top: 24px !important; padding-top: 20px !important; border-top: 1px solid rgba(255,255,255,0.08) !important; width: 100% !important;">
+                                        <button type="submit" class="btn-action btn-gold" style="padding: 12px 28px; font-size: 14px; border-radius: 8px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap;">
+                                            <i data-lucide="save"></i> Save & Publish All Trust Badges
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Step 4 Panel: LABEL TRANSPARENCY DYNAMIC CRUD -->
+                        <div class="builder-step-panel" id="builder-step-4" style="display: none;">
+                            <div class="glass-panel" style="padding: 28px;">
+                                <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 16px; margin-bottom: 24px; flex-wrap: wrap; gap: 12px;">
+                                    <div>
+                                        <h3 style="font-family: 'Outfit', sans-serif; font-size: 20px; color: #fff; margin: 0 0 6px 0;">3. LABEL TRANSPARENCY & NUTRITION BUILDER</h3>
+                                        <p style="font-size: 13px; color: #94a3b8; margin: 0;">Add, Edit, or Remove product tabs, nutritional rows, and label details displayed on the homepage.</p>
+                                    </div>
+                                    <button type="button" id="btn-add-transparency-tab" class="btn-action btn-gold" style="padding: 10px 20px; font-size: 13.5px; border-radius: 8px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
+                                        <i data-lucide="plus"></i> Add New Product Tab
+                                    </button>
+                                </div>
+
+                                <form id="transparency-builder-form">
+                                    <!-- Section Header Controls -->
+                                    <div class="glass-panel" style="padding: 20px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); margin-bottom: 24px; border-radius: 12px;">
+                                        <h4 style="font-family: 'Outfit', sans-serif; color: #E5C365; margin: 0 0 16px 0; font-size: 15px; letter-spacing: 0.5px;">SECTION HEADER TEXTS</h4>
+                                        <div class="form-grid">
+                                            <div class="form-group">
+                                                <label class="form-label">Sub-Heading Badge</label>
+                                                <input type="text" class="form-input" id="setting-transparency-subheading" placeholder="TRANSPARENCY">
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="form-label">Main Section Title</label>
+                                                <input type="text" class="form-input" id="setting-transparency-title" placeholder="Amount Per Gummy & Label Details">
+                                            </div>
+                                            <div class="form-group full-width">
+                                                <label class="form-label">Section Description Paragraph</label>
+                                                <textarea class="form-input" id="setting-transparency-desc" rows="2" placeholder="We believe in complete ingredient transparency..."></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Dynamic Product Tabs & Nutritional Rows Container -->
+                                    <div id="transparency-tabs-list-container" style="display: flex; flex-direction: column; gap: 24px;">
+                                        <!-- Dynamic Product Tabs rendered by admin.js -->
+                                    </div>
+
+                                    <div class="form-group full-width" style="display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: flex-start !important; margin-top: 28px !important; padding-top: 20px !important; border-top: 1px solid rgba(255,255,255,0.08) !important; width: 100% !important;">
+                                        <button type="submit" class="btn-action btn-gold" style="padding: 12px 28px; font-size: 14px; border-radius: 8px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap;">
+                                            <i data-lucide="save"></i> Save & Publish Label Transparency
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Step 5 Panel: THE ADVANTAGE DYNAMIC CRUD -->
+                        <div class="builder-step-panel" id="builder-step-5" style="display: none;">
+                            <div class="glass-panel" style="padding: 28px;">
+                                <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 16px; margin-bottom: 24px; flex-wrap: wrap; gap: 12px;">
+                                    <div>
+                                        <h3 style="font-family: 'Outfit', sans-serif; font-size: 20px; color: #fff; margin: 0 0 6px 0;">4. THE ADVANTAGE SECTION BUILDER</h3>
+                                        <p style="font-size: 13px; color: #94a3b8; margin: 0;">Add, Edit, or Remove feature value cards and titles displayed in the 'Why The Combo' section.</p>
+                                    </div>
+                                    <button type="button" id="btn-add-advantage-card" class="btn-action btn-gold" style="padding: 10px 20px; font-size: 13.5px; border-radius: 8px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
+                                        <i data-lucide="plus"></i> Add New Advantage Card
+                                    </button>
+                                </div>
+
+                                <form id="advantage-builder-form">
+                                    <!-- Section Header Controls -->
+                                    <div class="glass-panel" style="padding: 20px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); margin-bottom: 24px; border-radius: 12px;">
+                                        <h4 style="font-family: 'Outfit', sans-serif; color: #E5C365; margin: 0 0 16px 0; font-size: 15px; letter-spacing: 0.5px;">SECTION HEADER TEXTS</h4>
+                                        <div class="form-grid">
+                                            <div class="form-group">
+                                                <label class="form-label">Sub-Heading Badge</label>
+                                                <input type="text" class="form-input" id="setting-advantage-subheading" placeholder="THE ADVANTAGE">
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="form-label">Main Section Title</label>
+                                                <input type="text" class="form-input" id="setting-advantage-title" placeholder="Why The Family Wellness Combo?">
+                                            </div>
+                                            <div class="form-group full-width">
+                                                <label class="form-label">Section Description Paragraph</label>
+                                                <textarea class="form-input" id="setting-advantage-desc" rows="2" placeholder="Why buy multiple packs from different brands..."></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Dynamic Advantage Cards Container -->
+                                    <div id="advantage-cards-list-container" style="display: flex; flex-direction: column; gap: 16px;">
+                                        <!-- Dynamic Advantage Cards rendered by admin.js -->
+                                    </div>
+
+                                    <div class="form-group full-width" style="display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: flex-start !important; margin-top: 28px !important; padding-top: 20px !important; border-top: 1px solid rgba(255,255,255,0.08) !important; width: 100% !important;">
+                                        <button type="submit" class="btn-action btn-gold" style="padding: 12px 28px; font-size: 14px; border-radius: 8px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap;">
+                                            <i data-lucide="save"></i> Save & Publish Advantage Section
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Step 6 Panel: GUIDANCE DYNAMIC CRUD -->
+                        <div class="builder-step-panel" id="builder-step-6" style="display: none;">
+                            <div class="glass-panel" style="padding: 28px;">
+                                <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 16px; margin-bottom: 24px; flex-wrap: wrap; gap: 12px;">
+                                    <div>
+                                        <h3 style="font-family: 'Outfit', sans-serif; font-size: 20px; color: #fff; margin: 0 0 6px 0;">5. GUIDANCE SECTION BUILDER</h3>
+                                        <p style="font-size: 13px; color: #94a3b8; margin: 0;">Add, Edit, or Remove daily routine guidance columns, instructions, and target groups displayed in 'How & Who It's For'.</p>
+                                    </div>
+                                    <button type="button" id="btn-add-guidance-col" class="btn-action btn-gold" style="padding: 10px 20px; font-size: 13.5px; border-radius: 8px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
+                                        <i data-lucide="plus"></i> Add New Guidance Card
+                                    </button>
+                                </div>
+
+                                <form id="guidance-builder-form">
+                                    <!-- Section Header Controls -->
+                                    <div class="glass-panel" style="padding: 20px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); margin-bottom: 24px; border-radius: 12px;">
+                                        <h4 style="font-family: 'Outfit', sans-serif; color: #E5C365; margin: 0 0 16px 0; font-size: 15px; letter-spacing: 0.5px;">SECTION HEADER TEXTS</h4>
+                                        <div class="form-grid">
+                                            <div class="form-group">
+                                                <label class="form-label">Sub-Heading Badge</label>
+                                                <input type="text" class="form-input" id="setting-guidance-subheading" placeholder="GUIDANCE">
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="form-label">Main Section Title</label>
+                                                <input type="text" class="form-input" id="setting-guidance-title" placeholder="How & Who It's For">
+                                            </div>
+                                            <div class="form-group full-width">
+                                                <label class="form-label">Section Description Paragraph</label>
+                                                <textarea class="form-input" id="setting-guidance-desc" rows="2" placeholder="Simple guidelines for the daily routine of each family member..."></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Dynamic Guidance Cards Container -->
+                                    <div id="guidance-cols-list-container" style="display: flex; flex-direction: column; gap: 24px;">
+                                        <!-- Dynamic Guidance Cards rendered by admin.js -->
+                                    </div>
+
+                                    <div class="form-group full-width" style="display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: flex-start !important; margin-top: 28px !important; padding-top: 20px !important; border-top: 1px solid rgba(255,255,255,0.08) !important; width: 100% !important;">
+                                        <button type="submit" class="btn-action btn-gold" style="padding: 12px 28px; font-size: 14px; border-radius: 8px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap;">
+                                            <i data-lucide="save"></i> Save & Publish Guidance Section
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Step 7 Panel: FAQ DYNAMIC CRUD -->
+                        <div class="builder-step-panel" id="builder-step-7" style="display: none;">
+                            <div class="glass-panel" style="padding: 28px;">
+                                <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 16px; margin-bottom: 24px; flex-wrap: wrap; gap: 12px;">
+                                    <div>
+                                        <h3 style="font-family: 'Outfit', sans-serif; font-size: 20px; color: #fff; margin: 0 0 6px 0;">6. FREQUENTLY ASKED QUESTIONS (FAQ) BUILDER</h3>
+                                        <p style="font-size: 13px; color: #94a3b8; margin: 0;">Add, Edit, or Remove FAQ questions and answers displayed in the accordion section on the homepage.</p>
+                                    </div>
+                                    <button type="button" id="btn-add-faq-item" class="btn-action btn-gold" style="padding: 10px 20px; font-size: 13.5px; border-radius: 8px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
+                                        <i data-lucide="plus"></i> Add New FAQ Question
+                                    </button>
+                                </div>
+
+                                <form id="faq-builder-form">
+                                    <!-- PART 1: DIETARY USER GUIDE CARDS -->
+                                    <div class="glass-panel" style="padding: 16px 20px; background: rgba(0,0,0,0.3); border: 1px solid rgba(201,162,39,0.25); margin-bottom: 24px; border-radius: 12px;">
+                                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 10px; flex-wrap: wrap; gap: 10px;">
+                                            <div>
+                                                <h4 style="font-family: 'Outfit', sans-serif; color: #E5C365; margin: 0 0 2px 0; font-size: 15px;">PART 1: DIETARY USER GUIDE (DOSAGES & USAGE CARDS)</h4>
+                                                <p style="font-size: 12px; color: #94a3b8; margin: 0;">Manage the 3 dosage cards and header text displayed at the top of the FAQ page.</p>
+                                            </div>
+                                            <button type="button" id="btn-add-dietary-card" class="btn-action btn-gold" style="padding: 7px 14px; font-size: 12px; border-radius: 6px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                                                <i data-lucide="plus"></i> Add Dosage Card
+                                            </button>
+                                        </div>
+
+                                        <!-- Dietary Guide Header Text Inputs -->
+                                        <div class="form-grid" style="margin-bottom: 16px;">
+                                            <div class="form-group">
+                                                <label class="form-label">Dietary Sub-Heading</label>
+                                                <input type="text" class="form-input" id="setting-dietary-subheading" placeholder="DIETARY USER GUIDE" style="padding: 6px 10px; font-size: 12.5px;">
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="form-label">Dietary Main Title</label>
+                                                <input type="text" class="form-input" id="setting-dietary-title" placeholder="Dosages & Usage Instructions" style="padding: 6px 10px; font-size: 12.5px;">
+                                            </div>
+                                            <div class="form-group full-width">
+                                                <label class="form-label">Dietary Description Paragraph</label>
+                                                <textarea class="form-input" id="setting-dietary-desc" rows="2" placeholder="Follow our certified dietary guides..." style="padding: 6px 10px; font-size: 12.5px;"></textarea>
+                                            </div>
+                                        </div>
+
+                                        <div id="dietary-cards-list-container" style="display: flex; flex-direction: column; gap: 10px;">
+                                            <!-- Rendered by admin.js -->
+                                        </div>
+                                    </div>
+
+                                    <!-- PART 2: FAQ ACCORDION QUESTIONS -->
+                                    <div style="margin-bottom: 12px;">
+                                        <h4 style="font-family: 'Outfit', sans-serif; color: #E5C365; margin: 0 0 6px 0; font-size: 15px;">PART 2: FREQUENTLY ASKED QUESTIONS (ACCORDION)</h4>
+                                    </div>
+
+                                    <!-- Section Header Controls -->
+                                    <div class="glass-panel" style="padding: 16px 20px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); margin-bottom: 18px; border-radius: 12px;">
+                                        <h4 style="font-family: 'Outfit', sans-serif; color: #94a3b8; margin: 0 0 12px 0; font-size: 12.5px; letter-spacing: 0.5px;">FAQ ACCORDION SECTION TEXTS</h4>
+                                        <div class="form-grid">
+                                            <div class="form-group">
+                                                <label class="form-label">Sub-Heading Badge</label>
+                                                <input type="text" class="form-input" id="setting-faq-subheading" placeholder="ANSWERS">
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="form-label">Main Section Title</label>
+                                                <input type="text" class="form-input" id="setting-faq-title" placeholder="Frequently Asked Questions">
+                                            </div>
+                                            <div class="form-group full-width">
+                                                <label class="form-label">Section Description Paragraph</label>
+                                                <textarea class="form-input" id="setting-faq-desc" rows="2" placeholder="Got questions about dosage, safety, or suitability..."></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Dynamic FAQ Items Container -->
+                                    <div id="faq-items-list-container" style="display: flex; flex-direction: column; gap: 16px;">
+                                        <!-- Dynamic FAQ Items rendered by admin.js -->
+                                    </div>
+
+                                    <div class="form-group full-width" style="display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: flex-start !important; margin-top: 28px !important; padding-top: 20px !important; border-top: 1px solid rgba(255,255,255,0.08) !important; width: 100% !important;">
+                                        <button type="submit" class="btn-action btn-gold" style="padding: 12px 28px; font-size: 14px; border-radius: 8px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap;">
+                                            <i data-lucide="save"></i> Save & Publish FAQ Section
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Step 8 Panel: OUR STORY BUILDER -->
+                        <div class="builder-step-panel" id="builder-step-8" style="display: none;">
+                            <div class="glass-panel" style="padding: 28px;">
+                                <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 16px; margin-bottom: 24px; flex-wrap: wrap; gap: 12px;">
+                                    <div>
+                                        <h3 style="font-family: 'Outfit', sans-serif; font-size: 18px; color: #fff; margin: 0 0 4px 0; display: flex; align-items: center; gap: 8px;">
+                                            <i data-lucide="book-open" class="text-gold"></i> <span>7. OUR STORY BUILDER (About Us Page Sync)</span>
+                                        </h3>
+                                        <p style="font-size: 13px; color: #94a3b8; margin: 0;">Manage main story hero headline, story text blocks, images, and stat highlight cards displayed on the Our Story (about.html) page.</p>
+                                    </div>
+                                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                                        <button type="button" id="btn-add-story-section" class="btn-action btn-gold" style="padding: 8px 16px; font-size: 12.5px; border-radius: 8px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                                            <i data-lucide="plus"></i> Add Story Block
+                                        </button>
+                                        <button type="button" id="btn-add-story-stat" class="btn-action btn-gold" style="padding: 8px 16px; font-size: 12.5px; border-radius: 8px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                                            <i data-lucide="plus"></i> Add Stat Card
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <form id="story-builder-form">
+                                    <!-- Hero Header Controls -->
+                                    <div class="glass-panel" style="padding: 16px 20px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); margin-bottom: 20px; border-radius: 12px;">
+                                        <h4 style="font-family: 'Outfit', sans-serif; color: #E5C365; margin: 0 0 12px 0; font-size: 14px; letter-spacing: 0.5px;">OUR STORY HERO HEADER</h4>
+                                        <div class="form-grid">
+                                            <div class="form-group">
+                                                <label class="form-label">Sub-Heading Badge</label>
+                                                <input type="text" class="form-input" id="setting-story-subheading" placeholder="OUR STORY">
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="form-label">Main Title</label>
+                                                <input type="text" class="form-input" id="setting-story-title" placeholder="Himalayan Purity, Modern Scientific Wellness">
+                                            </div>
+                                            <div class="form-group full-width">
+                                                <label class="form-label">Description Paragraph</label>
+                                                <textarea class="form-input" id="setting-story-desc" rows="2" placeholder="At Sonrup™, we bridge the wisdom of traditional Ayurveda..."></textarea>
+                                            </div>
+                                            <!-- Story Hero Background Image Box -->
+                                            <input type="hidden" id="setting-story-bg-path">
+                                            <div class="form-group full-width" style="margin-top: 10px; background: rgba(255,255,255,0.02); border: 1px dashed rgba(201,162,39,0.3); padding: 16px; border-radius: 10px;">
+                                                <label class="form-label" style="font-size: 13px; font-weight: 700; color: #E5C365; display: flex; align-items: center; gap: 8px;">
+                                                    <i data-lucide="image"></i> Our Story Header Background Image (Upload Custom Photo)
+                                                </label>
+                                                <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin-top: 8px;">
+                                                    <div style="width: 90px; height: 60px; border-radius: 8px; overflow: hidden; border: 1.5px solid #C9A227; background: #000; flex-shrink: 0;">
+                                                        <img id="setting-story-bg-preview" src="assets/images/wellness-login-hero.jpg" alt="Header Background Preview" style="width: 100%; height: 100%; object-fit: cover;">
+                                                    </div>
+                                                    <div style="flex: 1; display: flex; flex-direction: column; gap: 6px;">
+                                                        <p style="font-size: 12px; color: #94a3b8; margin: 0;">Select a photo file from your computer to set as the background of the Our Story hero section.</p>
+                                                        <input type="file" class="form-input" id="setting-story-bg-file" accept="image/*" style="padding: 6px; font-size: 12px; cursor: pointer;">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- PART 1: STORY BLOCKS LIST -->
+                                    <div style="margin-bottom: 12px;">
+                                        <h4 style="font-family: 'Outfit', sans-serif; color: #E5C365; margin: 0 0 6px 0; font-size: 14px;">PART 1: STORY SECTIONS (IMAGE & CONTENT BLOCKS)</h4>
+                                        <p style="font-size: 12px; color: #94a3b8; margin: 0 0 12px 0;">Manage the story narrative sections displayed on the About Us page.</p>
+                                    </div>
+                                    <div id="story-sections-list-container" style="display: flex; flex-direction: column; gap: 16px; margin-bottom: 24px;">
+                                        <!-- Rendered by admin.js -->
+                                    </div>
+
+                                    <!-- PART 2: STAT HIGHLIGHT CARDS -->
+                                    <div style="margin-bottom: 12px;">
+                                        <h4 style="font-family: 'Outfit', sans-serif; color: #E5C365; margin: 0 0 6px 0; font-size: 14px;">PART 2: STAT HIGHLIGHT CARDS</h4>
+                                        <p style="font-size: 12px; color: #94a3b8; margin: 0 0 12px 0;">Manage the 3 stat numbers displayed at the bottom of the Story section.</p>
+                                    </div>
+                                    <div id="story-stats-list-container" style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px;">
+                                        <!-- Rendered by admin.js -->
+                                    </div>
+
+                                    <div class="form-group full-width" style="display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: flex-start !important; margin-top: 28px !important; padding-top: 20px !important; border-top: 1px solid rgba(255,255,255,0.08) !important; width: 100% !important;">
+                                        <button type="submit" class="btn-action btn-gold" style="padding: 12px 28px; font-size: 14px; border-radius: 8px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap;">
+                                            <i data-lucide="save"></i> Save & Publish Our Story
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- STEP 9: BLOG BUILDER PANEL -->
+                        <div class="builder-step-panel" id="builder-step-9" style="display: none;">
+                            <div class="glass-panel" style="border: 1px solid rgba(201, 162, 39, 0.2); background: rgba(18, 18, 20, 0.6); padding: 24px; border-radius: 12px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 12px;">
+                                    <div>
+                                        <h3 style="font-family: 'Outfit', sans-serif; color: #FFFFFF; margin: 0 0 4px 0; font-size: 18px; display: flex; align-items: center; gap: 8px;">
+                                            <i data-lucide="newspaper" style="color: var(--admin-accent-gold);"></i> 8. BLOG PAGE BUILDER
+                                        </h3>
+                                        <p style="font-size: 12px; color: #94a3b8; margin: 0;">Add, edit, delete, upload images, and rearrange blog articles for blog.html.</p>
+                                    </div>
+                                    <button type="button" class="btn-action btn-gold" id="btn-add-blog-article" style="padding: 8px 16px; font-size: 12px; font-weight: 700; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+                                        <i data-lucide="plus"></i> Add Article
+                                    </button>
+                                </div>
+
+                                <form id="blog-builder-form">
+                                    <!-- PART 1: HEADER CONTROLS -->
+                                    <div style="margin-bottom: 20px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); padding: 16px; border-radius: 8px;">
+                                        <h4 style="font-family: 'Outfit', sans-serif; color: #E5C365; margin: 0 0 12px 0; font-size: 14px;">BLOG HEADER CONTROLS</h4>
+                                        <div class="form-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
+                                            <div class="form-group">
+                                                <label for="setting-blog-subheading" class="form-label">Sub-Heading Badge</label>
+                                                <input type="text" id="setting-blog-subheading" class="form-input" placeholder="WELLNESS CORNER">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="setting-blog-title" class="form-label">Blog Main Title</label>
+                                                <input type="text" id="setting-blog-title" class="form-input" placeholder="The Sonrup Blog">
+                                            </div>
+                                            <div class="form-group full-width" style="grid-column: 1 / -1;">
+                                                <label for="setting-blog-desc" class="form-label">Header Description Paragraph</label>
+                                                <textarea id="setting-blog-desc" class="form-input" rows="2" placeholder="Expert insights, lifestyle tips, and scientific research..."></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- PART 2: ARTICLES LIST -->
+                                    <div style="margin-bottom: 12px;">
+                                        <h4 style="font-family: 'Outfit', sans-serif; color: #E5C365; margin: 0 0 6px 0; font-size: 14px;">PART 2: BLOG ARTICLES (FULL CRUD & PHOTO UPLOAD)</h4>
+                                        <p style="font-size: 12px; color: #94a3b8; margin: 0 0 12px 0;">Create and customize individual articles shown in the blog grid.</p>
+                                    </div>
+                                    <div id="blog-articles-list-container" style="display: flex; flex-direction: column; gap: 16px; margin-bottom: 24px;">
+                                        <!-- Rendered by admin.js -->
+                                    </div>
+
+                                    <div class="form-group full-width" style="display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: flex-start !important; margin-top: 28px !important; padding-top: 20px !important; border-top: 1px solid rgba(255,255,255,0.08) !important; width: 100% !important;">
+                                        <button type="submit" class="btn-action btn-gold" style="padding: 12px 28px; font-size: 14px; border-radius: 8px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap;">
+                                            <i data-lucide="save"></i> Save & Publish Blog Articles
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- ----------------------------------------------------------- -->
+                    <!-- STEP 10: FOOTER SETTINGS -->
+                    <!-- ----------------------------------------------------------- -->
+                    <div class="builder-step-panel" id="builder-step-10" style="display: none;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                            <div>
+                                <h2 style="font-family: 'Outfit', sans-serif; color: #ffffff; font-size: 24px; margin: 0 0 4px 0; display: flex; align-items: center; gap: 10px;">
+                                    <i data-lucide="layout-template" style="color: #C9A227;"></i> Footer Configuration
+                                </h2>
+                                <p style="color: #94a3b8; font-size: 14px; margin: 0;">Manage your brand logo, social media links, regulatory disclosures, and contact information for the site footer.</p>
+                            </div>
+                        </div>
+
+                        <form id="form-footer-settings" onsubmit="event.preventDefault(); saveSiteSettingsToDB();">
+                            <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 25px; margin-bottom: 20px;">
+                                <h3 style="color: #E5C365; font-size: 16px; margin-top: 0; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+                                    <i data-lucide="image" style="width: 18px;"></i> Brand Logo & Description
+                                </h3>
+                                <div class="form-row">
+                                    <div class="form-group full-width">
+                                        <label class="form-label">Website Logo (Header & Footer)</label>
+                                        <div style="display: flex; align-items: center; gap: 16px; margin-top: 6px;">
+                                            <div style="width: 60px; height: 60px; border-radius: 8px; border: 1px solid #333; background: #111; overflow: hidden; flex-shrink: 0; padding: 8px;">
+                                                <img id="setting-footer-logo-preview" src="" alt="Footer Logo" style="width: 100%; height: 100%; object-fit: contain;">
+                                            </div>
+                                            <div style="flex: 1; display: flex; flex-direction: column; gap: 6px;">
+                                                <div style="display: flex; gap: 10px;">
+                                                    <input type="file" id="setting-footer-logo-file" class="form-input" accept="image/*" style="padding: 6px; font-size: 12px; cursor: pointer; flex: 1;" onchange="uploadFooterLogo(this)">
+                                                    <input type="text" id="setting-footer-logo-input" class="form-input" placeholder="assets/images/logo.png" style="background: rgba(0,0,0,0.5); flex: 2; font-size: 12px;">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group full-width">
+                                        <label class="form-label">Footer Short Description</label>
+                                        <textarea id="setting-footer-desc" class="form-input" rows="2" placeholder="Premium natural wellness solutions..."></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 25px; margin-bottom: 20px;">
+                                <h3 style="color: #E5C365; font-size: 16px; margin-top: 0; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+                                    <i data-lucide="share-2" style="width: 18px;"></i> Social Media Links
+                                </h3>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label class="form-label">Facebook URL</label>
+                                        <input type="url" id="setting-social-facebook" class="form-input" placeholder="https://facebook.com/sonrup">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Instagram URL</label>
+                                        <input type="url" id="setting-social-instagram" class="form-input" placeholder="https://instagram.com/sonrup">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Twitter / X URL</label>
+                                        <input type="url" id="setting-social-twitter" class="form-input" placeholder="https://twitter.com/sonrup">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">WhatsApp URL</label>
+                                        <input type="url" id="setting-social-whatsapp" class="form-input" placeholder="https://wa.me/917600175193">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 25px; margin-bottom: 20px;">
+                                <h3 style="color: #E5C365; font-size: 16px; margin-top: 0; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+                                    <i data-lucide="scale" style="width: 18px;"></i> Regulatory Information
+                                </h3>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label class="form-label">License Number</label>
+                                        <input type="text" id="setting-reg-lic" class="form-input" placeholder="GA/646-A">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">FSSAI Number</label>
+                                        <input type="text" id="setting-reg-fssai" class="form-input" placeholder="10726997000544">
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group full-width">
+                                        <label class="form-label">Legal Disclaimer</label>
+                                        <textarea id="setting-reg-disclaimer" class="form-input" rows="2" placeholder="Disclaimer: These products are nutraceuticals..."></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            
+                            <div class="form-group full-width" style="display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: flex-start !important; margin-top: 28px !important; padding-top: 20px !important; border-top: 1px solid rgba(255,255,255,0.08) !important; width: 100% !important;">
+                                <button type="submit" class="btn-action btn-gold" style="padding: 12px 28px; font-size: 14px; border-radius: 8px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap;">
+                                    <i data-lucide="save"></i> Save & Publish Footer Settings
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- ----------------------------------------------------------- -->
+                    <!-- STEP 11: CONTACT PAGE SETTINGS -->
+                    <!-- ----------------------------------------------------------- -->
+                    <div class="builder-step-panel" id="builder-step-11" style="display: none;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                            <div>
+                                <h2 style="font-family: 'Outfit', sans-serif; color: #ffffff; font-size: 24px; margin: 0 0 4px 0; display: flex; align-items: center; gap: 10px;">
+                                    <i data-lucide="book-user" style="color: #C9A227;"></i> Contact Page Configuration
+                                </h2>
+                                <p style="color: #94a3b8; font-size: 14px; margin: 0;">Manage your HQ Address, Lab details, multiple emails, and phone numbers exclusively for the Contact Us page.</p>
+                            </div>
+                        </div>
+
+                        <form id="form-contact-page-settings" onsubmit="event.preventDefault(); window.saveContactPageSettingsToDB();">
+                            <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 25px; margin-bottom: 20px;">
+                                <h3 style="color: #E5C365; font-size: 16px; margin-top: 0; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+                                    <i data-lucide="map-pin" style="width: 18px;"></i> Addresses
+                                </h3>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label class="form-label">Marketed Headquarters (Address & Name)</label>
+                                        <textarea id="setting-contact-page-hq" class="form-input" rows="4" placeholder="SONRUP\nA 584 Sitaram Society..."></textarea>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Manufacturing Lab Details</label>
+                                        <textarea id="setting-contact-page-lab" class="form-input" rows="4" placeholder="KELLEN HEALTHCARE\nGMP & ISO Certified Facility"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 25px; margin-bottom: 20px;">
+                                <h3 style="color: #E5C365; font-size: 16px; margin-top: 0; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+                                    <i data-lucide="mail" style="width: 18px;"></i> Email & Support
+                                </h3>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label class="form-label">Direct Emails (Newline separated)</label>
+                                        <textarea id="setting-contact-page-emails" class="form-input" rows="3" placeholder="info@sonrup.com\nsales@sonrup.com"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 25px; margin-bottom: 20px;">
+                                <h3 style="color: #E5C365; font-size: 16px; margin-top: 0; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+                                    <i data-lucide="phone" style="width: 18px;"></i> Phone & Hours
+                                </h3>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label class="form-label">Customer Care Helpline</label>
+                                        <input type="text" id="setting-contact-page-phone" class="form-input" placeholder="+91 76001 75193">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Working Hours</label>
+                                        <input type="text" id="setting-contact-page-hours" class="form-input" placeholder="Mon - Sat, 10:00 AM - 6:00 PM IST">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group full-width" style="display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: flex-start !important; margin-top: 28px !important; padding-top: 20px !important; border-top: 1px solid rgba(255,255,255,0.08) !important; width: 100% !important;">
+                                <button type="submit" class="btn-action btn-gold" style="padding: 12px 28px; font-size: 14px; border-radius: 8px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap;">
+                                    <i data-lucide="save"></i> Save Contact Page Settings
+                                </button>
+                            </div>
+                        </form>
+                    </div>
             </section>
 
             <!-- 5. REGISTERED USERS SECTION -->
@@ -763,6 +1537,9 @@
                         <p class="section-subtitle">Manage customer accounts and administrative role assignments.</p>
                     </div>
                 </div>
+
+
+                
 
                 <div class="glass-panel">
                     <table class="admin-table">
@@ -791,6 +1568,9 @@
                     </div>
                     <button class="btn-action btn-gold" id="btn-open-add-coupon"><i data-lucide="plus-circle" width="16"></i> Create New Coupon</button>
                 </div>
+
+
+                
 
                 <div class="glass-panel">
                     <table class="admin-table">
@@ -872,12 +1652,19 @@
                     <input type="text" class="form-input" id="prod-tag" placeholder="e.g. Adult Performance" required>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Tag Class Color</label>
-                    <select class="form-input" id="prod-tag-class">
-                        <option value="tag-shilajit">Shilajit Gold</option>
-                        <option value="tag-biotin">Biotin Rose</option>
-                        <option value="tag-kids">Kids Emerald</option>
-                        <option value="tag-combo">Combo Purple</option>
+                    <label class="form-label">Product Type</label>
+                    <select class="form-input" id="prod-type" required>
+                        <option value="single">Single Product</option>
+                        <option value="combo">Combo Bundle</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Tag Style Class</label>
+                    <select class="form-input" id="prod-tag-class" required>
+                        <option value="tag-shilajit">Shilajit Style (Gold)</option>
+                        <option value="tag-biotin">Biotin Style (Orange)</option>
+                        <option value="tag-kids">Kids Style (Blue)</option>
+                        <option value="tag-combo">Combo Style (Dark Gold)</option>
                     </select>
                 </div>
                 <div class="form-group full-width">
@@ -889,19 +1676,18 @@
                     <textarea class="form-input" id="prod-benefits" rows="3" placeholder="Boosts Daily Energy & Stamina&#10;100% Sugar-Free Formulation&#10;Ayurvedic Restorative" required></textarea>
                 </div>
                 <div class="form-group full-width">
-                    <label class="form-label">Product Variants & Pack Options (Format: Variant Name - Price, one per line)</label>
-                    <textarea class="form-input" id="prod-variants" rows="3" placeholder="1 Month Pack (30 Gummies) - 999&#10;2 Month Pack (60 Gummies) - 1799&#10;3 Month Family Bundle - 2499"></textarea>
+                    <label class="form-label">Product Image Gallery (First is Cover)</label>
+                    <div id="prod-images-preview" style="display: flex; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; min-height: 80px; padding: 12px; background: rgba(0,0,0,0.2); border-radius: 8px; border: 1px dashed rgba(255,255,255,0.1);">
+                        <span style="color: #94a3b8; font-size: 13px; align-self: center; width: 100%; text-align: center;">No images added yet.</span>
+                    </div>
+                    <textarea class="form-input" id="prod-all-images" rows="4" placeholder="assets/images/shilajit-bottle.jpg&#10;assets/images/detail1.jpg" required style="display: none;"></textarea>
                 </div>
                 <div class="form-group full-width">
-                    <label class="form-label">Image Path / URL (or Upload Below)</label>
-                    <input type="text" class="form-input" id="prod-image-path" placeholder="assets/images/shilajit-bottle.jpg" required>
-                </div>
-                <div class="form-group full-width">
-                    <label class="form-label">Upload New Product Image (Optional Override)</label>
+                    <label class="form-label">Upload New Image (Appends to list automatically)</label>
                     <input type="file" class="form-input" id="prod-image-file" accept="image/*">
                 </div>
                 
-                <div class="form-group full-width" style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 16px;">
+                <div class="form-group full-width" style="display: flex; flex-direction: row; justify-content: flex-end; gap: 12px; margin-top: 16px;">
                     <button type="button" class="btn-action" style="background: rgba(255,255,255,0.1); color:#fff;" id="modal-cancel-btn">Cancel</button>
                     <button type="submit" class="btn-action btn-gold" style="padding: 12px 28px; font-size: 14px;" id="modal-submit-btn"><i data-lucide="check"></i> Save Product to Catalog</button>
                 </div>
@@ -945,7 +1731,7 @@
                     </select>
                 </div>
 
-                <div class="form-group full-width" style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 16px;">
+                <div class="form-group full-width" style="display: flex; flex-direction: row; justify-content: flex-end; gap: 12px; margin-top: 16px;">
                     <button type="button" class="btn-action" style="background: rgba(255,255,255,0.1); color:#fff;" id="coupon-modal-cancel-btn">Cancel</button>
                     <button type="submit" class="btn-action btn-gold" style="padding: 12px 24px; font-size: 14px;" id="coupon-submit-btn"><i data-lucide="plus"></i> Save Coupon</button>
                 </div>
