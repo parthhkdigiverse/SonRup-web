@@ -525,7 +525,6 @@
         </div>
         <div class="admin-header-actions">
             <a href="/" class="admin-header-btn"><i data-lucide="external-link" width="16"></i> View Live Site</a>
-            <a href="profile" class="admin-header-btn"><i data-lucide="user" width="16"></i> My Profile</a>
             <button id="admin-logout-btn" class="admin-header-btn" style="border-color: #ef4444; color: #f87171;"><i data-lucide="log-out" width="16"></i> Logout</button>
         </div>
     </header>
@@ -663,8 +662,30 @@
                     <button class="btn-action btn-gold" id="btn-open-add-product"><i data-lucide="plus-circle" width="16"></i> Add New Product</button>
                 </div>
 
-
-                
+                <div class="glass-panel" style="margin-bottom: 24px;">
+                    <h2 style="font-family: 'Outfit', sans-serif; font-size: 20px; margin-top: 0; margin-bottom: 16px; color: #ffffff;">Shop Page Header Text</h2>
+                    <form id="form-shop-settings" onsubmit="event.preventDefault(); window.saveShopSettingsToDB();">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Overline Heading</label>
+                                <input type="text" id="setting-shop-heading" class="form-input" placeholder="SONRUP WELLNESS SHELF">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Main Title</label>
+                                <input type="text" id="setting-shop-title" class="form-input" placeholder="PREMIUM GUMMIES & BUNDLES">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group full-width">
+                                <label class="form-label">Subtitle / Description</label>
+                                <textarea id="setting-shop-desc" class="form-input" rows="2" placeholder="Sugar-free, clinical-grade formulations crafted to elevate active health..."></textarea>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-action btn-gold" style="padding: 10px 20px; font-size: 13px; border-radius: 6px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                            <i data-lucide="save"></i> Save Shop Text
+                        </button>
+                    </form>
+                </div>
 
                 <div class="glass-panel">
                     <table class="admin-table">
@@ -723,70 +744,10 @@
                     </div>
                 </div>
 
-                <div class="glass-panel" style="margin-bottom: 24px;">
-                    <h2 style="font-family: 'Outfit', sans-serif; font-size: 20px; margin-top: 0; margin-bottom: 16px; color: #ffffff;">Shop Page Header Text</h2>
-                    <form id="form-shop-settings" onsubmit="event.preventDefault(); window.saveShopSettingsToDB();">
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label class="form-label">Overline Heading</label>
-                                <input type="text" id="setting-shop-heading" class="form-input" placeholder="SONRUP WELLNESS SHELF">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Main Title</label>
-                                <input type="text" id="setting-shop-title" class="form-input" placeholder="PREMIUM GUMMIES & BUNDLES">
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group full-width">
-                                <label class="form-label">Subtitle / Description</label>
-                                <textarea id="setting-shop-desc" class="form-input" rows="2" placeholder="Sugar-free, clinical-grade formulations crafted to elevate active health..."></textarea>
-                            </div>
-                        </div>
-                        <button type="submit" class="btn-action btn-gold" style="padding: 10px 20px; font-size: 13px; border-radius: 6px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
-                            <i data-lucide="save"></i> Save Shop Text
-                        </button>
-                    </form>
-                </div>
 
 
                 <form id="settings-form" class="glass-panel form-grid">
-                    <div class="form-group">
-                        <label class="form-label">Website Name / Brand Title</label>
-                        <input type="text" class="form-input" id="setting-site-name" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Customer Support Email</label>
-                        <input type="email" class="form-input" id="setting-support-email" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Support Phone Number</label>
-                        <input type="text" class="form-input" id="setting-support-phone" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">FSSAI Registration Number</label>
-                        <input type="text" class="form-input" id="setting-fssai" required>
-                    </div>
                     <div class="form-group full-width">
-                        <label class="form-label">Official Headquarters / Support Address</label>
-                        <input type="text" class="form-input" id="setting-address" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">License Number Badge</label>
-                        <input type="text" class="form-input" id="setting-license" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Announcement Top Banner Enabled</label>
-                        <select class="form-input" id="setting-banner-enabled">
-                            <option value="true">✅ Enabled (Show Top Bar)</option>
-                            <option value="false">❌ Disabled (Hide Bar)</option>
-                        </select>
-                    </div>
-                    <div class="form-group full-width">
-                        <label class="form-label">Announcement Banner Copy / Promo Text</label>
-                        <input type="text" class="form-input" id="setting-banner-text">
-                    </div>
-
-                    <div class="form-group full-width" style="margin-top: 24px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 20px;">
                         <h3 style="font-family: 'Outfit', sans-serif; font-size: 18px; color: #fff; margin: 0 0 4px 0; display: flex; align-items: center; gap: 8px;">
                             <span>💳 Razorpay Payment Gateway Settings</span>
                         </h3>
@@ -1408,6 +1369,45 @@
 
                             <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 25px; margin-bottom: 20px;">
                                 <h3 style="color: #E5C365; font-size: 16px; margin-top: 0; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+                                    <i data-lucide="megaphone" style="width: 18px;"></i> Announcement Banner & Offers
+                                </h3>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label class="form-label">Announcement Top Banner Enabled</label>
+                                        <select class="form-input" id="setting-banner-enabled">
+                                            <option value="true">✅ Enabled (Show Top Bar)</option>
+                                            <option value="false">❌ Disabled (Hide Bar)</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group full-width">
+                                        <label class="form-label">Announcement Banner Copy / Promo Text</label>
+                                        <input type="text" class="form-input" id="setting-banner-text">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 25px; margin-bottom: 20px;">
+                                <h3 style="color: #E5C365; font-size: 16px; margin-top: 0; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+                                    <i data-lucide="phone-call" style="width: 18px;"></i> Contact & Brand Information
+                                </h3>
+                                    <div class="form-group">
+                                        <label class="form-label">Customer Support Email</label>
+                                        <input type="email" class="form-input" id="setting-support-email" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Support Phone Number</label>
+                                        <input type="text" class="form-input" id="setting-support-phone" required>
+                                    </div>
+                                    <div class="form-group full-width">
+                                        <label class="form-label">Official Headquarters / Support Address</label>
+                                        <input type="text" class="form-input" id="setting-address" required>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 25px; margin-bottom: 20px;">
+                                <h3 style="color: #E5C365; font-size: 16px; margin-top: 0; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
                                     <i data-lucide="share-2" style="width: 18px;"></i> Social Media Links
                                 </h3>
                                 <div class="form-row">
@@ -1437,11 +1437,11 @@
                                 <div class="form-row">
                                     <div class="form-group">
                                         <label class="form-label">License Number</label>
-                                        <input type="text" id="setting-reg-lic" class="form-input" placeholder="GA/646-A">
+                                        <input type="text" id="setting-license" class="form-input" placeholder="GA/646-A">
                                     </div>
                                     <div class="form-group">
                                         <label class="form-label">FSSAI Number</label>
-                                        <input type="text" id="setting-reg-fssai" class="form-input" placeholder="10726997000544">
+                                        <input type="text" id="setting-fssai" class="form-input" placeholder="10726997000544">
                                     </div>
                                 </div>
                                 <div class="form-row">

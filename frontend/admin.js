@@ -3135,17 +3135,17 @@ window.saveSiteSettingsToDB = async function() {
         
         // Let's reuse the existing settings form handler's logic by triggering it, or we can just fetch all current inputs
         const payload = {
-            site_name: document.getElementById("setting-site-name").value?.trim() || "Sonrup",
-            support_email: document.getElementById("setting-support-email").value?.trim(),
-            support_phone: document.getElementById("setting-support-phone").value?.trim(),
-            support_address: document.getElementById("setting-address").value?.trim(),
-            fssai_number: document.getElementById("setting-fssai").value?.trim(),
-            license_number: document.getElementById("setting-license").value?.trim(),
-            announcement_banner_enabled: document.getElementById("setting-banner-enabled").value === "true",
-            announcement_banner_text: document.getElementById("setting-banner-text").value?.trim(),
-            razorpay_enabled: document.getElementById("setting-razorpay-enabled").value === "true",
-            razorpay_key_id: document.getElementById("setting-razorpay-key-id").value?.trim(),
-            razorpay_key_secret: document.getElementById("setting-razorpay-key-secret").value?.trim(),
+            site_name: document.getElementById("setting-site-name")?.value?.trim() || "Sonrup",
+            support_email: document.getElementById("setting-support-email")?.value?.trim() || "",
+            support_phone: document.getElementById("setting-support-phone")?.value?.trim() || "",
+            support_address: document.getElementById("setting-address")?.value?.trim() || "",
+            fssai_number: document.getElementById("setting-fssai")?.value?.trim() || "",
+            license_number: document.getElementById("setting-license")?.value?.trim() || "",
+            announcement_banner_enabled: document.getElementById("setting-banner-enabled")?.value === "true",
+            announcement_banner_text: document.getElementById("setting-banner-text")?.value?.trim() || "",
+            razorpay_enabled: document.getElementById("setting-razorpay-enabled")?.value === "true",
+            razorpay_key_id: document.getElementById("setting-razorpay-key-id")?.value?.trim(),
+            razorpay_key_secret: document.getElementById("setting-razorpay-key-secret")?.value?.trim(),
             delhivery_enabled: document.getElementById("setting-delhivery-enabled") ? document.getElementById("setting-delhivery-enabled").value === "true" : false,
             delhivery_environment: document.getElementById("setting-delhivery-environment")?.value?.trim(),
             delhivery_api_token: document.getElementById("setting-delhivery-api-token")?.value?.trim(),
@@ -3156,14 +3156,14 @@ window.saveSiteSettingsToDB = async function() {
             delhivery_warehouse_pincode: document.getElementById("setting-delhivery-warehouse-pincode")?.value?.trim(),
             delhivery_warehouse_phone: document.getElementById("setting-delhivery-warehouse-phone")?.value?.trim(),
             footer_settings: {
-                logo: document.getElementById("setting-footer-logo-input")?.value.trim(),
-                desc: document.getElementById("setting-footer-desc")?.value.trim(),
-                facebook: document.getElementById("setting-social-facebook")?.value.trim(),
-                instagram: document.getElementById("setting-social-instagram")?.value.trim(),
-                twitter: document.getElementById("setting-social-twitter")?.value.trim(),
-                license: document.getElementById("setting-reg-lic")?.value.trim(),
-                fssai: document.getElementById("setting-reg-fssai")?.value.trim(),
-                disclaimer: document.getElementById("setting-reg-disclaimer")?.value.trim()
+                logo: document.getElementById("setting-footer-logo-input")?.value?.trim() || "",
+                desc: document.getElementById("setting-footer-desc")?.value?.trim() || "",
+                facebook: document.getElementById("setting-social-facebook")?.value?.trim() || "",
+                instagram: document.getElementById("setting-social-instagram")?.value?.trim() || "",
+                twitter: document.getElementById("setting-social-twitter")?.value?.trim() || "",
+                license: document.getElementById("setting-license")?.value?.trim() || "",
+                fssai: document.getElementById("setting-fssai")?.value?.trim() || "",
+                disclaimer: document.getElementById("setting-reg-disclaimer")?.value?.trim() || ""
             }
         };
 

@@ -24,6 +24,7 @@ FRONTEND_IMAGES_DIR.mkdir(parents=True, exist_ok=True)
 
 # ─── Schemas for Admin Operations ───
 class WebsiteSettingsIn(BaseModel):
+    model_config = {"extra": "allow"}
     site_name: str
     support_email: str
     support_phone: str

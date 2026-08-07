@@ -627,16 +627,16 @@ function renderSiteFooterAndContactFromConfig() {
     
     // 1. Logo & Desc
     const footerLogo = document.querySelector(".footer-logo svg, .footer-logo img");
-    const navLogo = document.querySelector(".nav-logo svg, .nav-logo img"); // Also target header logo
+    const navLogo = document.querySelector(".brand-logo svg, .brand-logo img, .nav-logo svg, .nav-logo img"); // Target header logo
 
     if (fs.logo) {
         if (footerLogo) {
             const logoParent = footerLogo.parentElement;
-            logoParent.innerHTML = `<img src="${fs.logo}" alt="Footer Logo" style="height: 45px; object-fit: contain;"> <span class="brand-name">${APP_CONFIG.site_name ? APP_CONFIG.site_name.toUpperCase() : 'SONRUP'}</span>`;
+            logoParent.innerHTML = `<img src="${fs.logo}" alt="Footer Logo" style="height: 45px; object-fit: contain;">`;
         }
         if (navLogo) {
             const navParent = navLogo.parentElement;
-            navParent.innerHTML = `<img src="${fs.logo}" alt="Header Logo" style="height: 40px; object-fit: contain;"> <span class="brand-name">${APP_CONFIG.site_name ? APP_CONFIG.site_name.toUpperCase() : 'SONRUP'}</span>`;
+            navParent.innerHTML = `<img src="${fs.logo}" alt="Header Logo" style="height: 40px; object-fit: contain;">`;
         }
     }
     const footerDesc = document.querySelector(".footer-desc");
@@ -1628,7 +1628,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const cartQty = getCartTotals().totalQty;
         const headerCartHtml = `
             <button class="cart-trigger" id="cart-button" aria-label="View Cart" style="cursor: pointer;">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
+                <i data-lucide="shopping-cart"></i>
                 <span class="cart-badge" id="cart-count">${cartQty}</span>
             </button>
         `;
@@ -1638,7 +1638,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             authActionsContainer.innerHTML = `
                 ${headerCartHtml}
                 <a href="profile.html" class="nav-profile-btn" id="header-profile-icon" title="View Profile: ${userObj.name || ''}" style="display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid var(--color-gold); background: rgba(201, 162, 39, 0.1); color: var(--color-gold); cursor: pointer; text-decoration: none;">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    <i data-lucide="user"></i>
                 </a>
             `;
         } else {
@@ -1655,6 +1655,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                 openCartDrawer();
             });
         }
+        
+        if (window.lucide) window.lucide.createIcons();
     };
 
     // Run dynamic header update on page load
@@ -1762,57 +1764,17 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // Profile Page Loader — fetches data from API
     if (window.location.pathname.includes("profile")) {
-        if (!isLoggedIn()) {
-            window.location.href = "/login";
-        } else {
-            // Instantly populate from localStorage cache to prevent loading flashes
-            const cachedUserStr = localStorage.getItem("sonrup_user");
-            if (cachedUserStr) {
-                try {
-                    const cachedUser = JSON.parse(cachedUserStr);
-                    const welcomeEl = document.getElementById("profile-welcome-name");
-                    const detailNameEl = document.getElementById("profile-detail-name");
-                    const detailEmailEl = document.getElementById("profile-detail-email");
-                    const detailPhoneEl = document.getElementById("profile-detail-phone");
-                    const detailAddressEl = document.getElementById("profile-detail-address");
-
-                    if (welcomeEl) welcomeEl.textContent = cachedUser.name || "";
-                    if (detailNameEl) detailNameEl.textContent = cachedUser.name || "";
-                    if (detailEmailEl) detailEmailEl.textContent = cachedUser.email || "";
-                    if (detailPhoneEl) detailPhoneEl.textContent = cachedUser.phone || "Not provided";
-                    if (detailAddressEl) detailAddressEl.textContent = cachedUser.address ? (cachedUser.address + (cachedUser.pincode ? `, ${cachedUser.pincode}` : "")) : "Not provided";
-                } catch(e) {}
-            }
-
-            // Fetch user profile from API
-            try {
-                const profileRes = await fetch(`${getApiBase()}/api/auth/me`, {
-                    headers: getAuthHeaders(),
-                });
-
-                if (!profileRes.ok) {
-                    clearAuth();
-                    window.location.href = "login.html";
-                    return;
-                }
-
-                const userObj = await profileRes.json();
-                // Update localStorage cache
-                localStorage.setItem("sonrup_user", JSON.stringify(userObj));
-
-                const welcomeEl = document.getElementById("profile-welcome-name");
-                const detailNameEl = document.getElementById("profile-detail-name");
-                const detailEmailEl = document.getElementById("profile-detail-email");
-                const detailPhoneEl = document.getElementById("profile-detail-phone");
-                const detailAddressEl = document.getElementById("profile-detail-address");
-
-                if (welcomeEl) welcomeEl.textContent = userObj.name;
-                if (detailNameEl) detailNameEl.textContent = userObj.name;
-                if (detailEmailEl) detailEmailEl.textContent = userObj.email;
-                if (detailPhoneEl) detailPhoneEl.textContent = userObj.phone;
-                if (detailAddressEl) detailAddressEl.textContent = userObj.address + (userObj.pincode ? `, ${userObj.pincode}` : "");
-
-                // Fetch Orders from API
+        const welcomeEl = document.getElementById("profile-welcome-name");
+        const welcomeSubEl = document.getElementById("profile-welcome-sub");
+        const detailNameEl = document.getElementById("profile-detail-name");
+        const detailEmailEl = document.getElementById("profile-detail-email");
+        const detailPhoneEl = document.getElementById("profile-detail-phone");
+        const detailAddressEl = document.getElementById("profile-detail-address");
+        const logoutBtn = document.getElementById("logout-btn");
+        const loginLink = document.getElementById("login-link");
+        const signupLink = document.getElementById("signup-link");
+        
+        // Fetch Orders from API
                 const ordersListContainer = document.getElementById("profile-orders-list");
                 const noOrdersMsg = document.getElementById("no-orders-msg");
 
@@ -3071,7 +3033,7 @@ async function renderProductPage() {
     if (!slug) return;
 
     try {
-        const res = await fetch(`${API_BASE_URL}/products`);
+        const res = await fetch(`${getApiBase()}/api/products`);
         if (!res.ok) return;
         const products = await res.json();
         const product = products.find(p => p.slug === slug);
