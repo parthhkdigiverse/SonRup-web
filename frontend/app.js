@@ -11,29 +11,36 @@ try {
 async function loadAppConfig() {
     try {
         let res;
-        if (window.location.port === "3000" || window.location.protocol === "file:") {
+        
+        // 1. Try relative API path first (works in production if Nginx is configured)
+        try {
+            res = await fetch("/api/config?_t=" + Date.now());
+        } catch (e) {
+            // Ignore network errors silently
+        }
+
+        // 2. Local Development Fallback: If on localhost:3000, Nginx isn't running, so connect directly to backend port
+        if ((!res || !res.ok) && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")) {
+            try {
+                // Read static config to find the local backend port
+                const staticRes = await fetch("/config.json");
+                if (staticRes.ok) {
+                    const staticConfig = await staticRes.json();
+                    if (staticConfig.backend_port) {
+                        res = await fetch(`http://localhost:${staticConfig.backend_port}/api/config?_t=` + Date.now());
+                    }
+                }
+            } catch (e) {}
+        }
+
+        // 3. Last Resort: Use static config.json if the backend is completely unreachable
+        if (!res || !res.ok) {
             res = await fetch("/config.json");
             if (!res.ok) res = await fetch("config.json");
-        } else {
-            res = await fetch("/api/config");
-            if (!res.ok) {
-                res = await fetch("/config.json");
-                if (!res.ok) res = await fetch("config.json");
-            }
         }
+        
         const loadedConfig = await res.json();
         APP_CONFIG = { ...APP_CONFIG, ...loadedConfig };
-
-        // Fetch live MongoDB settings from backend server directly
-        if (APP_CONFIG.backend_port && window.location.port != APP_CONFIG.backend_port) {
-            try {
-                const liveRes = await fetch(`${window.location.protocol}//${window.location.hostname}:${APP_CONFIG.backend_port}/api/config`);
-                if (liveRes.ok) {
-                    const liveConfig = await liveRes.json();
-                    APP_CONFIG = { ...APP_CONFIG, ...liveConfig };
-                }
-            } catch (e) { /* use cached config */ }
-        }
 
         // Cache live config for instant zero-latency pre-rendering on hard refresh
         try {
@@ -815,13 +822,13 @@ function getApiBase() {
         return APP_CONFIG.backend_url;
     }
 
-    if (!APP_CONFIG || !APP_CONFIG.backend_port) return "";
-    // If browser port matches backend port, use clean relative URL
-    if (window.location.port == APP_CONFIG.backend_port || (!window.location.port && APP_CONFIG.backend_port == "80")) {
-        return "";
+    // 2. Local Development Fallback: connect directly to backend port
+    if ((window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") && APP_CONFIG && APP_CONFIG.backend_port) {
+        return `http://localhost:${APP_CONFIG.backend_port}`;
     }
-    // If served on FRONTEND_PORT, resolve dynamically without fixed domain names
-    return `${window.location.protocol}//${window.location.hostname}:${APP_CONFIG.backend_port}`;
+
+    // 3. Default to relative API path for production (relies on Nginx proxying /api/)
+    return "";
 }
 
 function getAuthHeaders() {
