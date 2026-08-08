@@ -645,8 +645,16 @@ function renderSiteFooterAndContactFromConfig() {
     // Header Logo
     const navLogo = document.querySelector(".brand-logo svg, .brand-logo img, .nav-logo svg, .nav-logo img");
     if (fs.logo && navLogo) {
-        const navParent = navLogo.parentElement;
-        navParent.innerHTML = `<img src="${fs.logo}" alt="Header Logo" style="height: 40px; object-fit: contain;">`;
+        const newImg = document.createElement("img");
+        newImg.src = fs.logo;
+        newImg.alt = "Header Logo";
+        newImg.style.height = "40px";
+        newImg.style.objectFit = "contain";
+        navLogo.replaceWith(newImg);
+        
+        // Hide hardcoded text brand name if a custom logo is uploaded
+        const brandTexts = document.querySelectorAll(".brand-name");
+        brandTexts.forEach(el => el.style.display = "none");
     }
 
     // Build Social Links HTML

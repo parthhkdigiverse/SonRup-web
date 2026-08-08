@@ -24,7 +24,35 @@ document.addEventListener("DOMContentLoaded", async () => {
     } catch (e) {
         console.warn("Using default API fallback URL:", API_BASE_URL);
     }
-    
+});
+
+// Instant pre-hydrate admin branding to prevent flicker
+try {
+    const cachedAdminBranding = localStorage.getItem("sonrup_admin_branding");
+    if (cachedAdminBranding) {
+        const fs = JSON.parse(cachedAdminBranding);
+        if (fs.favicon) {
+            let link = document.querySelector("link[rel*='icon']") || document.createElement('link');
+            link.type = 'image/x-icon';
+            link.rel = 'shortcut icon';
+            link.href = fs.favicon;
+            if (!link.parentNode) document.getElementsByTagName('head')[0].appendChild(link);
+        }
+        if (fs.logo) {
+            const adminBrandImg = document.querySelector(".admin-header-brand svg, .admin-header-brand img");
+            if (adminBrandImg) {
+                const newImg = document.createElement("img");
+                newImg.src = fs.logo;
+                newImg.style.height = "32px";
+                newImg.style.objectFit = "contain";
+                adminBrandImg.replaceWith(newImg);
+            }
+            // Hide text brand if logo is present
+            const brandText = document.querySelector(".admin-header-brand-text");
+            if (brandText) brandText.style.display = "none";
+        }
+    }
+} catch (e) {}    
     // Inject Dynamic Favicon
     try {
         const liveConfigRes = await fetch(`${API_BASE_URL}/config`);
@@ -503,6 +531,27 @@ async function loadSettings() {
         
         // Footer Settings
         const fs = data.footer_settings || {};
+
+        // Apply admin branding dynamically
+        if (fs.favicon) {
+            let link = document.querySelector("link[rel*='icon']") || document.createElement('link');
+            link.type = 'image/x-icon';
+            link.rel = 'shortcut icon';
+            link.href = fs.favicon;
+            if (!link.parentNode) document.getElementsByTagName('head')[0].appendChild(link);
+        }
+        if (fs.logo) {
+            const adminBrandImg = document.querySelector(".admin-header-brand svg, .admin-header-brand img");
+            if (adminBrandImg) {
+                const newImg = document.createElement("img");
+                newImg.src = fs.logo;
+                newImg.style.height = "32px";
+                newImg.style.objectFit = "contain";
+                adminBrandImg.replaceWith(newImg);
+            }
+        }
+        localStorage.setItem("sonrup_admin_branding", JSON.stringify(fs));
+
         if (document.getElementById("setting-footer-logo-input")) document.getElementById("setting-footer-logo-input").value = fs.logo || "";
         if (document.getElementById("setting-footer-logo-preview")) document.getElementById("setting-footer-logo-preview").src = fs.logo || "";
         if (document.getElementById("setting-favicon-input")) document.getElementById("setting-favicon-input").value = fs.favicon || "";
@@ -3200,6 +3249,27 @@ window.saveSiteSettingsToDB = async function() {
         if (!res.ok) throw new Error("Could not save settings");
         
         showToast("🌟 Footer Settings successfully published!");
+        
+        // Apply admin branding dynamically immediately after save
+        if (payload.footer_settings.favicon) {
+            let link = document.querySelector("link[rel*='icon']") || document.createElement('link');
+            link.type = 'image/x-icon';
+            link.rel = 'shortcut icon';
+            link.href = payload.footer_settings.favicon;
+            if (!link.parentNode) document.getElementsByTagName('head')[0].appendChild(link);
+        }
+        if (payload.footer_settings.logo) {
+            const adminBrandImg = document.querySelector(".admin-header-brand svg, .admin-header-brand img");
+            if (adminBrandImg) {
+                const newImg = document.createElement("img");
+                newImg.src = payload.footer_settings.logo;
+                newImg.style.height = "32px";
+                newImg.style.objectFit = "contain";
+                adminBrandImg.replaceWith(newImg);
+            }
+        }
+        localStorage.setItem("sonrup_admin_branding", JSON.stringify(payload.footer_settings));
+        
         localStorage.removeItem("sonrup_config");
         localStorage.removeItem("sonrup_config_time");
         if(btn) {
