@@ -490,6 +490,8 @@ async function loadSettings() {
         const fs = data.footer_settings || {};
         if (document.getElementById("setting-footer-logo-input")) document.getElementById("setting-footer-logo-input").value = fs.logo || "";
         if (document.getElementById("setting-footer-logo-preview")) document.getElementById("setting-footer-logo-preview").src = fs.logo || "";
+        if (document.getElementById("setting-favicon-input")) document.getElementById("setting-favicon-input").value = fs.favicon || "";
+        if (document.getElementById("setting-favicon-preview")) document.getElementById("setting-favicon-preview").src = fs.favicon || "";
         if (document.getElementById("setting-footer-desc")) document.getElementById("setting-footer-desc").value = fs.desc || "Premium natural wellness solutions. Empowering health, strength, and happiness across generations.";
         
         if (document.getElementById("setting-social-facebook")) document.getElementById("setting-social-facebook").value = fs.facebook || "";
@@ -2132,6 +2134,7 @@ function setupEventListeners() {
         ,
             footer_settings: {
                 logo: document.getElementById("setting-footer-logo-input")?.value.trim(),
+                favicon: document.getElementById("setting-favicon-input")?.value.trim(),
                 desc: document.getElementById("setting-footer-desc")?.value.trim(),
                 facebook: document.getElementById("setting-social-facebook")?.value.trim(),
                 instagram: document.getElementById("setting-social-instagram")?.value.trim(),
@@ -3088,10 +3091,10 @@ window.uploadBlogInnerImage = async function(fileInput, idx) {
     const input = fileInput.closest(".blog-article-card").querySelector(".blog-inner-img-input");
     try {
         preview.style.opacity = "0.5";
-        const res = await fetch(`${API_BASE_URL}/admin/upload-product-image`, { method: "POST", headers: getHeaders(false), body: formData });
+        const res = await fetch(`${API_BASE_URL}/admin/upload-image`, { method: "POST", headers: getHeaders(false), body: formData });
         const data = await res.json();
-        if (res.ok && data.filename) {
-            const imgUrl = `assets/images/${data.filename}`;
+        if (res.ok && data.image_path) {
+            const imgUrl = data.image_path;
             input.value = imgUrl;
             preview.src = imgUrl;
             showToast("Inner Image uploaded!");
@@ -3115,10 +3118,10 @@ window.uploadBlogArticleImage = async function(fileInput, idx) {
     const input = fileInput.closest(".blog-article-card").querySelector(".blog-img-input");
     try {
         preview.style.opacity = "0.5";
-        const res = await fetch(`${API_BASE_URL}/admin/upload-product-image`, { method: "POST", headers: getHeaders(false), body: formData });
+        const res = await fetch(`${API_BASE_URL}/admin/upload-image`, { method: "POST", headers: getHeaders(false), body: formData });
         const data = await res.json();
-        if (res.ok && data.filename) {
-            const imgUrl = `assets/images/${data.filename}`;
+        if (res.ok && data.image_path) {
+            const imgUrl = data.image_path;
             input.value = imgUrl;
             preview.src = imgUrl;
             showToast("Cover Image uploaded!");
@@ -3163,6 +3166,7 @@ window.saveSiteSettingsToDB = async function() {
             delhivery_warehouse_phone: document.getElementById("setting-delhivery-warehouse-phone")?.value?.trim(),
             footer_settings: {
                 logo: document.getElementById("setting-footer-logo-input")?.value?.trim() || "",
+                favicon: document.getElementById("setting-favicon-input")?.value?.trim() || "",
                 desc: document.getElementById("setting-footer-desc")?.value?.trim() || "",
                 facebook: document.getElementById("setting-social-facebook")?.value?.trim() || "",
                 instagram: document.getElementById("setting-social-instagram")?.value?.trim() || "",
@@ -3201,13 +3205,39 @@ window.uploadFooterLogo = async function(fileInput) {
     const input = document.getElementById("setting-footer-logo-input");
     try {
         if(preview) preview.style.opacity = "0.5";
-        const res = await fetch(`${API_BASE_URL}/admin/upload-product-image`, { method: "POST", headers: getHeaders(false), body: formData });
+        const res = await fetch(`${API_BASE_URL}/admin/upload-image`, { method: "POST", headers: getHeaders(false), body: formData });
         const data = await res.json();
-        if (res.ok && data.filename) {
-            const imgUrl = `assets/images/${data.filename}`;
+        if (res.ok && data.image_path) {
+            const imgUrl = data.image_path;
             if(input) input.value = imgUrl;
             if(preview) preview.src = imgUrl;
             showToast("Footer logo uploaded!");
+        } else {
+            throw new Error("Upload failed");
+        }
+    } catch (e) {
+        showToast("Upload failed", true);
+    } finally {
+        if(preview) preview.style.opacity = "1";
+    }
+};
+
+window.uploadFavicon = async function(fileInput) {
+    const file = fileInput.files[0];
+    if (!file) return;
+    const formData = new FormData();
+    formData.append("file", file);
+    const preview = document.getElementById("setting-favicon-preview");
+    const input = document.getElementById("setting-favicon-input");
+    try {
+        if(preview) preview.style.opacity = "0.5";
+        const res = await fetch(`${API_BASE_URL}/admin/upload-image`, { method: "POST", headers: getHeaders(false), body: formData });
+        const data = await res.json();
+        if (res.ok && data.image_path) {
+            const imgUrl = data.image_path;
+            if(input) input.value = imgUrl;
+            if(preview) preview.src = imgUrl;
+            showToast("Favicon uploaded!");
         } else {
             throw new Error("Upload failed");
         }

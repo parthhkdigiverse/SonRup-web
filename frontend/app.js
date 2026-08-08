@@ -36,6 +36,15 @@ async function loadAppConfig() {
             localStorage.setItem("sonrup_app_config", JSON.stringify(APP_CONFIG));
         } catch (e) {}
 
+        // Inject Dynamic Favicon if configured
+        if (APP_CONFIG.footer_settings && APP_CONFIG.footer_settings.favicon) {
+            let link = document.querySelector("link[rel*='icon']") || document.createElement('link');
+            link.type = 'image/x-icon';
+            link.rel = 'shortcut icon';
+            link.href = APP_CONFIG.footer_settings.favicon;
+            if (!link.parentNode) document.getElementsByTagName('head')[0].appendChild(link);
+        }
+
         // Inject Dynamic Announcement Top Bar if configured
         if (APP_CONFIG.announcement_banner_enabled && APP_CONFIG.announcement_banner_text) {
             let banner = document.getElementById("sonrup-announcement-bar");
@@ -3210,3 +3219,49 @@ function renderShopCards(products) {
         window.bindCartButtons();
     }
 }
+
+// =========================================
+// MOBILE HAMBURGER MENU INJECTION
+// =========================================
+document.addEventListener('DOMContentLoaded', () => {
+    const headerActions = document.getElementById('header-auth-actions');
+    const navLinks = document.getElementById('nav-navigation');
+    
+    if (headerActions && navLinks && !document.querySelector('.mobile-menu-btn')) {
+        const menuBtn = document.createElement('button');
+        menuBtn.className = 'mobile-menu-btn';
+        menuBtn.innerHTML = '<i data-lucide="menu"></i>';
+        menuBtn.setAttribute('aria-label', 'Toggle Navigation');
+        
+        // Insert before cart/login
+        headerActions.prepend(menuBtn);
+        
+        menuBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            navLinks.classList.toggle('active');
+            if (navLinks.classList.contains('active')) {
+                menuBtn.innerHTML = '<i data-lucide="x"></i>';
+            } else {
+                menuBtn.innerHTML = '<i data-lucide="menu"></i>';
+            }
+            if (window.lucide) {
+                window.lucide.createIcons();
+            }
+        });
+        
+        // Close menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (navLinks.classList.contains('active') && !navLinks.contains(e.target) && !menuBtn.contains(e.target)) {
+                navLinks.classList.remove('active');
+                menuBtn.innerHTML = '<i data-lucide="menu"></i>';
+                if (window.lucide) {
+                    window.lucide.createIcons();
+                }
+            }
+        });
+        
+        if (window.lucide) {
+            window.lucide.createIcons();
+        }
+    }
+});

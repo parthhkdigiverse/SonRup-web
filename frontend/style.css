@@ -2163,3 +2163,122 @@ body.fouc-cloak {
 body {
     transition: opacity 0.2s ease-in;
 }
+
+/* =========================================
+   GLOBAL MOBILE RESPONSIVE OVERRIDES
+   ========================================= */
+@media (max-width: 768px) {
+    /* Prevent horizontal scrolling */
+    html, body {
+        overflow-x: hidden;
+        width: 100%;
+    }
+
+    /* Make sure all major fixed-width containers scale */
+    .container, 
+    .auth-box, 
+    .modal-wrapper, 
+    .checkout-grid,
+    .product-detail-container {
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box;
+        padding-left: 15px !important;
+        padding-right: 15px !important;
+    }
+
+    /* Stack grid layouts that are commonly used (overriding inline HTML styles) */
+    .checkout-grid, 
+    .product-detail-split,
+    .products-grid,
+    .profile-layout,
+    .modal-wrapper,
+    .checkout-layout-grid {
+        display: flex !important;
+        flex-direction: column !important;
+    }
+
+    /* Make images responsive globally */
+    img {
+        max-width: 100%;
+        height: auto;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Full width cart drawer on mobile */
+    .cart-wrapper {
+        width: 100% !important;
+        max-width: 100vw !important;
+        border-left: none;
+    }
+    
+    /* Shrink decorative glowing backgrounds so they don't cause overflow */
+    .glowing-bg {
+        width: 250px !important;
+        height: 250px !important;
+    }
+    
+    /* Ensure forms stack correctly */
+    .form-group-row {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    /* Scale down large heading fonts globally */
+    h1, h2 {
+        font-size: 85% !important;
+    }
+    .hero-title {
+        font-size: 28px !important;
+        line-height: 1.2 !important;
+    }
+}
+
+/* =========================================
+   MOBILE HAMBURGER MENU
+   ========================================= */
+.mobile-menu-btn {
+    display: none;
+    background: transparent;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    padding: 8px;
+    margin-right: 12px;
+}
+
+@media (max-width: 768px) {
+    .mobile-menu-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .nav-links {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background: rgba(13, 15, 20, 0.98);
+        backdrop-filter: blur(16px);
+        flex-direction: column;
+        padding: 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+        z-index: 999;
+    }
+    
+    .nav-links.active {
+        display: flex !important;
+    }
+    
+    .nav-links .nav-link {
+        padding: 16px 24px;
+        font-size: 16px;
+        width: 100%;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+        text-align: left;
+    }
+}
