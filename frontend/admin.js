@@ -13,7 +13,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         const configRes = await fetch("/config.json");
         if (configRes.ok) {
             const config = await configRes.json();
-            if (config.backend_port) {
+            if (config.backend_url) {
+                // Use explicit backend URL from .env
+                API_BASE_URL = `${config.backend_url}/api`;
+            } else if (config.backend_port) {
+                // Fallback to local port mapping
                 API_BASE_URL = `http://localhost:${config.backend_port}/api`;
             }
         }

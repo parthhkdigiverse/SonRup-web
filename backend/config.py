@@ -18,7 +18,8 @@ def get_env_var(key: str, default: str = "") -> str:
     return os.path.expandvars(val)
 
 
-# ─── Dynamic Port Configuration ───
+# ─── Dynamic Port & API Configuration ───
+BACKEND_URL: str = get_env_var("BACKEND_URL", "")
 BACKEND_PORT: int = int(get_env_var("BACKEND_PORT", get_env_var("PORT", "8010")))
 PORT: int = BACKEND_PORT  # Backward compatibility alias
 FRONTEND_PORT: int = int(get_env_var("FRONTEND_PORT", "3000"))
@@ -41,6 +42,7 @@ ADMIN_PASSWORD: str = get_env_var("ADMIN_PASSWORD", "AdminSonRup2026!")
 
 # ─── Public frontend config (safe to expose via /api/config or config.json) ───
 FRONTEND_CONFIG: dict = {
+    "backend_url": BACKEND_URL,
     "backend_port": BACKEND_PORT,
     "frontend_port": FRONTEND_PORT,
     "site_name": get_env_var("SITE_NAME", "Sonrup"),

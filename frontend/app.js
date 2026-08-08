@@ -790,6 +790,11 @@ function renderShopPageFromConfig() {
 
 
 function getApiBase() {
+    // 1. Use explicit dynamic backend URL from .env if available
+    if (APP_CONFIG && APP_CONFIG.backend_url) {
+        return APP_CONFIG.backend_url;
+    }
+
     if (!APP_CONFIG || !APP_CONFIG.backend_port) return "";
     // If browser port matches backend port, use clean relative URL
     if (window.location.port == APP_CONFIG.backend_port || (!window.location.port && APP_CONFIG.backend_port == "80")) {
