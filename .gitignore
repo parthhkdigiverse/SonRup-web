@@ -28,3 +28,7 @@ package-lock.json
 
 # Generated static runtime config
 frontend/config.json
+
+# User uploaded dynamic images
+frontend/assets/images/prod_*
+frontend/favicon.ico

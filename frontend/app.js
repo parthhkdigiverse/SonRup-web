@@ -10,12 +10,16 @@ try {
 
 async function loadAppConfig() {
     try {
-        // Try fetching from API directly (when served on backend port)
-        let res = await fetch("/api/config");
-        if (!res.ok) {
-            // When running on dedicated FRONTEND_PORT, load exported local config.json
+        let res;
+        if (window.location.port === "3000" || window.location.protocol === "file:") {
             res = await fetch("/config.json");
             if (!res.ok) res = await fetch("config.json");
+        } else {
+            res = await fetch("/api/config");
+            if (!res.ok) {
+                res = await fetch("/config.json");
+                if (!res.ok) res = await fetch("config.json");
+            }
         }
         const loadedConfig = await res.json();
         APP_CONFIG = { ...APP_CONFIG, ...loadedConfig };
