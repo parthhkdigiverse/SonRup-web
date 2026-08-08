@@ -15,7 +15,7 @@ async function loadAppConfig() {
             res = await fetch("/config.json");
             if (!res.ok) res = await fetch("config.json");
         } else {
-            res = await fetch("/api/config");
+            res = await fetch("/api/config?_t=" + Date.now());
             if (!res.ok) {
                 res = await fetch("/config.json");
                 if (!res.ok) res = await fetch("config.json");
@@ -27,7 +27,7 @@ async function loadAppConfig() {
         // Fetch live MongoDB settings from backend server directly
         if (APP_CONFIG.backend_port && window.location.port != APP_CONFIG.backend_port) {
             try {
-                const liveRes = await fetch(`${window.location.protocol}//${window.location.hostname}:${APP_CONFIG.backend_port}/api/config`);
+                const liveRes = await fetch(`${window.location.protocol}//${window.location.hostname}:${APP_CONFIG.backend_port}/api/config?_t=${Date.now()}`);
                 if (liveRes.ok) {
                     const liveConfig = await liveRes.json();
                     APP_CONFIG = { ...APP_CONFIG, ...liveConfig };
