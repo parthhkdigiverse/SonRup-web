@@ -24,6 +24,21 @@ document.addEventListener("DOMContentLoaded", async () => {
     } catch (e) {
         console.warn("Using default API fallback URL:", API_BASE_URL);
     }
+    
+    // Inject Dynamic Favicon
+    try {
+        const liveConfigRes = await fetch(`${API_BASE_URL}/config`);
+        if (liveConfigRes.ok) {
+            const liveConfig = await liveConfigRes.json();
+            if (liveConfig.footer_settings && liveConfig.footer_settings.favicon) {
+                let link = document.querySelector("link[rel*='icon']") || document.createElement('link');
+                link.type = 'image/x-icon';
+                link.rel = 'shortcut icon';
+                link.href = liveConfig.footer_settings.favicon;
+                if (!link.parentNode) document.getElementsByTagName('head')[0].appendChild(link);
+            }
+        }
+    } catch(e) {}
 
     // 2. Initialize Icons
     if (window.lucide) {

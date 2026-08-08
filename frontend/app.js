@@ -3223,7 +3223,7 @@ function renderShopCards(products) {
 // =========================================
 // MOBILE HAMBURGER MENU INJECTION
 // =========================================
-document.addEventListener('DOMContentLoaded', () => {
+function injectMobileMenu() {
     const headerActions = document.getElementById('header-auth-actions');
     const navLinks = document.getElementById('nav-navigation');
     
@@ -3264,4 +3264,10 @@ document.addEventListener('DOMContentLoaded', () => {
             window.lucide.createIcons();
         }
     }
-});
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', injectMobileMenu);
+} else {
+    injectMobileMenu();
+}
