@@ -6,6 +6,41 @@
 let API_BASE_URL = "http://localhost:8030/api";
 let currentProducts = [];
 
+// Instant pre-hydrate admin branding to prevent flicker
+try {
+    const cachedAdminBranding = localStorage.getItem("sonrup_admin_branding");
+    if (cachedAdminBranding) {
+        const fs = JSON.parse(cachedAdminBranding);
+        if (fs.favicon) {
+            let link = document.querySelector("link[rel*='icon']") || document.createElement('link');
+            link.type = 'image/x-icon';
+            link.rel = 'shortcut icon';
+            link.href = fs.favicon;
+            if (!link.parentNode) document.getElementsByTagName('head')[0].appendChild(link);
+        }
+        if (fs.logo) {
+            // Header Brand
+            const adminBrandImg = document.querySelector(".admin-header-brand svg, .admin-header-brand img");
+            if (adminBrandImg) {
+                const newImg = document.createElement("img");
+                newImg.src = fs.logo;
+                newImg.style.height = "32px";
+                newImg.style.objectFit = "contain";
+                adminBrandImg.replaceWith(newImg);
+            }
+            // Auth Brand
+            const authBrandImg = document.getElementById("admin-auth-custom-logo");
+            if (authBrandImg) {
+                authBrandImg.src = fs.logo;
+                authBrandImg.style.display = "block";
+            }
+            // Hide text brands if logo is present
+            const brandTexts = document.querySelectorAll(".admin-header-brand-text, #admin-auth-brand-text");
+            brandTexts.forEach(el => el.style.display = "none");
+        }
+    }
+} catch (e) {}
+
 // Initialize Dashboard on load
 document.addEventListener("DOMContentLoaded", async () => {
     // 1. Resolve Dynamic API URL
@@ -24,46 +59,40 @@ document.addEventListener("DOMContentLoaded", async () => {
     } catch (e) {
         console.warn("Using default API fallback URL:", API_BASE_URL);
     }
-});
 
-// Instant pre-hydrate admin branding to prevent flicker
-try {
-    const cachedAdminBranding = localStorage.getItem("sonrup_admin_branding");
-    if (cachedAdminBranding) {
-        const fs = JSON.parse(cachedAdminBranding);
-        if (fs.favicon) {
-            let link = document.querySelector("link[rel*='icon']") || document.createElement('link');
-            link.type = 'image/x-icon';
-            link.rel = 'shortcut icon';
-            link.href = fs.favicon;
-            if (!link.parentNode) document.getElementsByTagName('head')[0].appendChild(link);
-        }
-        if (fs.logo) {
-            const adminBrandImg = document.querySelector(".admin-header-brand svg, .admin-header-brand img");
-            if (adminBrandImg) {
-                const newImg = document.createElement("img");
-                newImg.src = fs.logo;
-                newImg.style.height = "32px";
-                newImg.style.objectFit = "contain";
-                adminBrandImg.replaceWith(newImg);
-            }
-            // Hide text brand if logo is present
-            const brandText = document.querySelector(".admin-header-brand-text");
-            if (brandText) brandText.style.display = "none";
-        }
-    }
-} catch (e) {}    
-    // Inject Dynamic Favicon
+
+    // Inject Dynamic Favicon & Logo
     try {
         const liveConfigRes = await fetch(`${API_BASE_URL}/config`);
         if (liveConfigRes.ok) {
             const liveConfig = await liveConfigRes.json();
-            if (liveConfig.footer_settings && liveConfig.footer_settings.favicon) {
+            const fs = liveConfig.footer_settings || {};
+            if (fs.favicon) {
                 let link = document.querySelector("link[rel*='icon']") || document.createElement('link');
                 link.type = 'image/x-icon';
                 link.rel = 'shortcut icon';
-                link.href = liveConfig.footer_settings.favicon;
+                link.href = fs.favicon;
                 if (!link.parentNode) document.getElementsByTagName('head')[0].appendChild(link);
+            }
+            if (fs.logo) {
+                // Header Brand
+                const adminBrandImg = document.querySelector(".admin-header-brand svg, .admin-header-brand img");
+                if (adminBrandImg) {
+                    const newImg = document.createElement("img");
+                    newImg.src = fs.logo;
+                    newImg.style.height = "32px";
+                    newImg.style.objectFit = "contain";
+                    adminBrandImg.replaceWith(newImg);
+                }
+                // Auth Brand
+                const authBrandImg = document.getElementById("admin-auth-custom-logo");
+                if (authBrandImg) {
+                    authBrandImg.src = fs.logo;
+                    authBrandImg.style.display = "block";
+                }
+                // Hide text brands if logo is present
+                const brandTexts = document.querySelectorAll(".admin-header-brand-text, #admin-auth-brand-text");
+                brandTexts.forEach(el => el.style.display = "none");
             }
         }
     } catch(e) {}
@@ -71,6 +100,33 @@ try {
     // 2. Initialize Icons
     if (window.lucide) {
         window.lucide.createIcons();
+    }
+
+    // Mobile Menu Toggle
+    const adminMobileMenuBtn = document.getElementById("admin-mobile-menu-btn");
+    const adminSidebar = document.querySelector(".admin-sidebar");
+    if (adminMobileMenuBtn && adminSidebar) {
+        adminMobileMenuBtn.addEventListener("click", () => {
+            adminSidebar.classList.toggle("active");
+            if (adminSidebar.classList.contains("active")) {
+                adminMobileMenuBtn.innerHTML = '<i data-lucide="x" width="16"></i>';
+            } else {
+                adminMobileMenuBtn.innerHTML = '<i data-lucide="menu" width="16"></i>';
+            }
+            if (window.lucide) window.lucide.createIcons();
+        });
+        
+        // Auto-close sidebar on mobile when a tab is clicked
+        const sidebarTabs = document.querySelectorAll(".sidebar-tab, .sidebar-subtab-btn");
+        sidebarTabs.forEach(tab => {
+            tab.addEventListener("click", () => {
+                if (window.innerWidth <= 768) {
+                    adminSidebar.classList.remove("active");
+                    adminMobileMenuBtn.innerHTML = '<i data-lucide="menu" width="16"></i>';
+                    if (window.lucide) window.lucide.createIcons();
+                }
+            });
+        });
     }
 
     // 3. Setup Listeners & INSTANTLY Restore Active Page before network requests!
@@ -167,6 +223,9 @@ async function initDashboard() {
     showToast("Connecting to SonRup Enterprise Backend...");
     const statsSuccess = await loadStats();
     if (!statsSuccess) return;
+    
+    // Hide login screen and show dashboard now that we're verified
+    hideAdminLoginScreen();
 
     await Promise.all([
         loadProducts(),
@@ -541,6 +600,7 @@ async function loadSettings() {
             if (!link.parentNode) document.getElementsByTagName('head')[0].appendChild(link);
         }
         if (fs.logo) {
+            // Header Brand
             const adminBrandImg = document.querySelector(".admin-header-brand svg, .admin-header-brand img");
             if (adminBrandImg) {
                 const newImg = document.createElement("img");
@@ -549,6 +609,15 @@ async function loadSettings() {
                 newImg.style.objectFit = "contain";
                 adminBrandImg.replaceWith(newImg);
             }
+            // Auth Brand
+            const authBrandImg = document.getElementById("admin-auth-custom-logo");
+            if (authBrandImg) {
+                authBrandImg.src = fs.logo;
+                authBrandImg.style.display = "block";
+            }
+            // Hide text brands if logo is present
+            const brandTexts = document.querySelectorAll(".admin-header-brand-text, #admin-auth-brand-text");
+            brandTexts.forEach(el => el.style.display = "none");
         }
         localStorage.setItem("sonrup_admin_branding", JSON.stringify(fs));
 
@@ -2898,16 +2967,24 @@ function setupEventListeners() {
 
 function showAdminLoginScreen(msg = null) {
     const screen = document.getElementById("admin-login-screen");
+    const mainUi = document.getElementById("admin-main-ui");
     if (screen) {
         screen.style.display = "flex";
+    }
+    if (mainUi) {
+        mainUi.style.display = "none";
     }
     if (msg) showToast(msg, true);
 }
 
 function hideAdminLoginScreen() {
     const screen = document.getElementById("admin-login-screen");
+    const mainUi = document.getElementById("admin-main-ui");
     if (screen) {
         screen.style.display = "none";
+    }
+    if (mainUi) {
+        mainUi.style.display = "block";
     }
 }
 

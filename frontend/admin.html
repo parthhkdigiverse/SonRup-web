@@ -475,21 +475,43 @@
             transform: translateY(0);
         }
 
-        /* ─── Admin Mobile Responsive Overrides ─── */
+        /* 📱 Admin Mobile Responsive Overrides 📱 */
+        .admin-mobile-only {
+            display: none;
+        }
         @media (max-width: 768px) {
+            .admin-mobile-only {
+                display: flex;
+            }
+            .admin-desktop-only {
+                display: none !important;
+            }
             .admin-header {
                 padding: 10px 16px;
-                flex-direction: column;
+                flex-direction: row;
+                justify-content: space-between;
                 gap: 12px;
             }
             .admin-sidebar {
-                flex-direction: row;
-                flex-wrap: nowrap;
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch;
+                display: none;
+                flex-direction: column;
+                position: fixed;
+                top: 60px;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: #121212;
+                z-index: 1000;
+                padding: 20px;
+                overflow-y: auto;
+            }
+            .admin-sidebar.active {
+                display: flex;
             }
             .sidebar-tab {
                 flex-shrink: 0;
+                width: 100%;
+                justify-content: flex-start;
             }
             .admin-content {
                 padding: 16px;
@@ -520,14 +542,11 @@
 <body class="admin-body">
 
     <!-- Dedicated Admin Portal Login View -->
-    <div id="admin-login-screen" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #0b0c10; z-index: 99999; display: none; align-items: center; justify-content: center; padding: 20px;">
+    <div id="admin-login-screen" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #0b0c10; z-index: 99999; display: flex; align-items: center; justify-content: center; padding: 20px;">
         <div style="background: rgba(22, 25, 33, 0.95); backdrop-filter: blur(20px); border: 1px solid var(--admin-border-focus); border-radius: 24px; width: 100%; max-width: 440px; padding: 40px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.8), var(--gold-glow); text-align: center;">
             <div style="margin-bottom: 24px;">
-                <svg width="52" height="52" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="50" cy="50" r="45" stroke="#C9A227" stroke-width="3" />
-                    <path d="M35 38C35 32 45 28 50 35C55 28 65 32 65 38C65 52 50 68 50 68C50 68 35 52 35 38Z" fill="#C9A227" />
-                </svg>
-                <h1 style="font-family: 'Cinzel', serif; font-size: 26px; color: #fff; margin: 12px 0 4px 0; letter-spacing: 2px;">s<span style="color:#C9A227;">o</span>nrup</h1>
+                <img id="admin-auth-custom-logo" style="display: none; height: 52px; object-fit: contain; margin: 0 auto;">
+                <h1 id="admin-auth-brand-text" style="font-family: 'Cinzel', serif; font-size: 26px; color: #fff; margin: 12px 0 4px 0; letter-spacing: 2px;">s<span style="color:#C9A227;">o</span>nrup</h1>
                 <span class="admin-badge-pill" style="font-size: 10px;">⚡ Administrator Authentication</span>
             </div>
 
@@ -554,6 +573,9 @@
         </div>
     </div>
 
+    <!-- MAIN ADMIN UI CONTAINER (Hidden until authenticated) -->
+    <div id="admin-main-ui" style="display: none;">
+    
     <!-- Sticky Navbar -->
     <header class="admin-header">
         <div class="admin-header-brand">
@@ -564,7 +586,8 @@
             <span class="admin-badge-pill">⚡ Admin Portal</span>
         </div>
         <div class="admin-header-actions">
-            <a href="/" class="admin-header-btn"><i data-lucide="external-link" width="16"></i> View Live Site</a>
+            <button id="admin-mobile-menu-btn" class="admin-header-btn admin-mobile-only" style="border-color: #C9A227; color: #C9A227;"><i data-lucide="menu" width="16"></i></button>
+            <a href="/" class="admin-header-btn admin-desktop-only"><i data-lucide="external-link" width="16"></i> View Live Site</a>
             <button id="admin-logout-btn" class="admin-header-btn" style="border-color: #ef4444; color: #f87171;"><i data-lucide="log-out" width="16"></i> Logout</button>
         </div>
     </header>
@@ -1866,6 +1889,8 @@
         <i data-lucide="info" id="toast-icon" width="20"></i>
         <span id="toast-msg">Notification</span>
     </div>
+
+    </div> <!-- End admin-main-ui -->
 
     <!-- Scripts -->
     <script src="admin.js"></script>
