@@ -40,14 +40,13 @@ async function loadAppConfig() {
             localStorage.setItem("sonrup_app_config", JSON.stringify(APP_CONFIG));
         } catch (e) {}
 
-        // Inject Dynamic Favicon if configured
-        if (APP_CONFIG.footer_settings && APP_CONFIG.footer_settings.favicon) {
-            let link = document.querySelector("link[rel*='icon']") || document.createElement('link');
-            link.type = 'image/x-icon';
-            link.rel = 'shortcut icon';
-            link.href = APP_CONFIG.footer_settings.favicon;
-            if (!link.parentNode) document.getElementsByTagName('head')[0].appendChild(link);
-        }
+
+        // Inject Static Favicon
+        let link = document.querySelector("link[rel*='icon']") || document.createElement('link');
+        link.type = 'image/x-icon';
+        link.rel = 'shortcut icon';
+        link.href = '/favicon.ico?v=' + new Date().getTime();
+        if (!link.parentNode) document.getElementsByTagName('head')[0].appendChild(link);
 
         // Inject Dynamic Announcement Top Bar if configured
         if (APP_CONFIG.announcement_banner_enabled && APP_CONFIG.announcement_banner_text) {

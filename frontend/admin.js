@@ -9,15 +9,14 @@ let currentProducts = [];
 // Instant pre-hydrate admin branding to prevent flicker
 try {
     const cachedAdminBranding = localStorage.getItem("sonrup_admin_branding");
+    let link = document.querySelector("link[rel*='icon']") || document.createElement('link');
+    link.type = 'image/x-icon';
+    link.rel = 'shortcut icon';
+    link.href = '/favicon.ico?v=' + new Date().getTime();
+    if (!link.parentNode) document.getElementsByTagName('head')[0].appendChild(link);
+
     if (cachedAdminBranding) {
         const fs = JSON.parse(cachedAdminBranding);
-        if (fs.favicon) {
-            let link = document.querySelector("link[rel*='icon']") || document.createElement('link');
-            link.type = 'image/x-icon';
-            link.rel = 'shortcut icon';
-            link.href = fs.favicon;
-            if (!link.parentNode) document.getElementsByTagName('head')[0].appendChild(link);
-        }
         if (fs.logo) {
             // Header Brand
             const adminBrandImg = document.querySelector(".admin-header-brand svg, .admin-header-brand img");
@@ -67,13 +66,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (liveConfigRes.ok) {
             const liveConfig = await liveConfigRes.json();
             const fs = liveConfig.footer_settings || {};
-            if (fs.favicon) {
-                let link = document.querySelector("link[rel*='icon']") || document.createElement('link');
-                link.type = 'image/x-icon';
-                link.rel = 'shortcut icon';
-                link.href = fs.favicon;
-                if (!link.parentNode) document.getElementsByTagName('head')[0].appendChild(link);
-            }
             if (fs.logo) {
                 // Header Brand
                 const adminBrandImg = document.querySelector(".admin-header-brand svg, .admin-header-brand img");
@@ -623,8 +615,6 @@ async function loadSettings() {
 
         if (document.getElementById("setting-footer-logo-input")) document.getElementById("setting-footer-logo-input").value = fs.logo || "";
         if (document.getElementById("setting-footer-logo-preview")) document.getElementById("setting-footer-logo-preview").src = fs.logo || "";
-        if (document.getElementById("setting-favicon-input")) document.getElementById("setting-favicon-input").value = fs.favicon || "";
-        if (document.getElementById("setting-favicon-preview")) document.getElementById("setting-favicon-preview").src = fs.favicon || "";
         if (document.getElementById("setting-footer-desc")) document.getElementById("setting-footer-desc").value = fs.desc || "Premium natural wellness solutions. Empowering health, strength, and happiness across generations.";
         
         if (document.getElementById("setting-social-facebook")) document.getElementById("setting-social-facebook").value = fs.facebook || "";
@@ -2267,7 +2257,6 @@ function setupEventListeners() {
         ,
             footer_settings: {
                 logo: document.getElementById("setting-footer-logo-input")?.value.trim(),
-                favicon: document.getElementById("setting-favicon-input")?.value.trim(),
                 desc: document.getElementById("setting-footer-desc")?.value.trim(),
                 facebook: document.getElementById("setting-social-facebook")?.value.trim(),
                 instagram: document.getElementById("setting-social-instagram")?.value.trim(),
@@ -3307,7 +3296,6 @@ window.saveSiteSettingsToDB = async function() {
             delhivery_warehouse_phone: document.getElementById("setting-delhivery-warehouse-phone")?.value?.trim(),
             footer_settings: {
                 logo: document.getElementById("setting-footer-logo-input")?.value?.trim() || "",
-                favicon: document.getElementById("setting-favicon-input")?.value?.trim() || "",
                 desc: document.getElementById("setting-footer-desc")?.value?.trim() || "",
                 facebook: document.getElementById("setting-social-facebook")?.value?.trim() || "",
                 instagram: document.getElementById("setting-social-instagram")?.value?.trim() || "",
@@ -3328,13 +3316,6 @@ window.saveSiteSettingsToDB = async function() {
         showToast("🌟 Footer Settings successfully published!");
         
         // Apply admin branding dynamically immediately after save
-        if (payload.footer_settings.favicon) {
-            let link = document.querySelector("link[rel*='icon']") || document.createElement('link');
-            link.type = 'image/x-icon';
-            link.rel = 'shortcut icon';
-            link.href = payload.footer_settings.favicon;
-            if (!link.parentNode) document.getElementsByTagName('head')[0].appendChild(link);
-        }
         if (payload.footer_settings.logo) {
             const adminBrandImg = document.querySelector(".admin-header-brand svg, .admin-header-brand img");
             if (adminBrandImg) {
@@ -3374,32 +3355,6 @@ window.uploadFooterLogo = async function(fileInput) {
             if(input) input.value = imgUrl;
             if(preview) preview.src = imgUrl;
             showToast("Footer logo uploaded!");
-        } else {
-            throw new Error("Upload failed");
-        }
-    } catch (e) {
-        showToast("Upload failed", true);
-    } finally {
-        if(preview) preview.style.opacity = "1";
-    }
-};
-
-window.uploadFavicon = async function(fileInput) {
-    const file = fileInput.files[0];
-    if (!file) return;
-    const formData = new FormData();
-    formData.append("file", file);
-    const preview = document.getElementById("setting-favicon-preview");
-    const input = document.getElementById("setting-favicon-input");
-    try {
-        if(preview) preview.style.opacity = "0.5";
-        const res = await fetch(`${API_BASE_URL}/admin/upload-image`, { method: "POST", headers: getHeaders(false), body: formData });
-        const data = await res.json();
-        if (res.ok && data.image_path) {
-            const imgUrl = data.image_path;
-            if(input) input.value = imgUrl;
-            if(preview) preview.src = imgUrl;
-            showToast("Favicon uploaded!");
         } else {
             throw new Error("Upload failed");
         }
